@@ -2,9 +2,6 @@ apply plugin: "java"
 
 version '1.0'
 
-targetCompatibility = 8
-sourceCompatibility = JavaVersion.VERSION_16
-
 sourceSets.main.java.srcDirs = ["src"]
 
 repositories{
@@ -22,7 +19,7 @@ ext{
 //java 8 backwards compatibility flag
 allprojects{
     tasks.withType(JavaCompile){
-        options.compilerArgs.addAll(['--release', '8'])
+        //options.compilerArgs.addAll(['--release', '8'])
     }
 }
 
@@ -47,6 +44,20 @@ task jarAndroid{
         //dex and desugar files - this requires d8 in your PATH
         "d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
             .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+    }
+}
+
+task buildRun(dependsOn: jar){
+    doLast {
+        copy {
+            from "build/libs/Welcome-to-the-FrostscapeDesktopDesktop.jar"
+            into System.getenv("destination")
+        }
+        exec {
+            executable = "java"
+            args = ["-jar", System.getenv("game")];
+            workingDir = System.getenv("gameDir");
+        }
     }
 }
 
