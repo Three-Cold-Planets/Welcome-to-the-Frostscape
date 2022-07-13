@@ -28,7 +28,7 @@ allprojects{
 
 dependencies{
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
-    compileOnly "com.github.Anuken.Mindustry:core:a734f8423c7503a80c7b01d0b5fea117b991697b"
+    compileOnly "com.github.Anuken.MindustryJitpack:core:75f5e7271e"
 }
 
 task jarAndroid{
