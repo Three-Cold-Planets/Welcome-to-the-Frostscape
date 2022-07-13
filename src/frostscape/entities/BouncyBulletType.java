@@ -4,8 +4,7 @@ import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
-import arc.util.Time;
-import arc.util.Tmp;
+import arc.util.*;
 import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
@@ -43,6 +42,8 @@ public class BouncyBulletType extends BasicBulletType {
     public TextureRegion shadowRegion;
 
     public float minLife;
+
+    private float visualHeightRange;
 
     public BouncyBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
@@ -86,6 +87,7 @@ public class BouncyBulletType extends BasicBulletType {
         }
 
         shadowRegion = new TextureRegion(new Texture(stencil));
+        visualHeightRange = startingHeight + ((startingLift * startingLift)/2)/gravity;
     }
 
     @Override
@@ -121,16 +123,26 @@ public class BouncyBulletType extends BasicBulletType {
         Draw.z(Layer.darkness);
         Draw.rect(shadowRegion, b.x + shadowTX * h, b.y + shadowTY * h,  width, height,b.rotation() - 90);
 
-        Draw.z(Layer.bullet);
-        if(backRegion.found()){
-            Draw.color(backColor);
-            Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
+        float[] layers = new float[]{Layer.flyingUnit - 1, Layer.bullet};
+
+        //What this oes is make the bullet glow the closer it is to the ground.
+        for (int i = 0; i < 2; i++) {
+            Draw.z(layers[i]);
+            float visibility = h/visualHeightRange;
+            if(i == 1) visibility = 1 - visibility;
+
+            if(backRegion.found()){
+                Draw.color(backColor);
+                Draw.alpha(visibility);
+                Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
+            }
+
+            Draw.color(frontColor);
+            Draw.alpha(visibility);
+            Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() + offset);
         }
-
-        Draw.color(frontColor);
-        Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() + offset);
-
         Draw.reset();
+
     }
 
     @Override
