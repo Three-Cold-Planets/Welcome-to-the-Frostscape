@@ -1,5 +1,5 @@
 #the mod name as displayed in-game
-displayName: "Java Mod Template"
+displayName: "Welcome to the Frostscape"
 
 #the internal name of your mod
 name: "hollow-frostscape"
@@ -11,7 +11,7 @@ author: "Sh1penfire"
 main: "frostscape.Main"
 
 #the mod description as seen in the mod dialog
-description: "A Mindustry Java mod template."
+description: "An experimental modification created to test v7's new API. Will *not* be worked on consistently due to life."
 
 #the mod version
 version: 1.0
