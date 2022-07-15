@@ -5,6 +5,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Angles;
 import arc.math.Mathf;
+import arc.struct.Seq;
 import arc.util.*;
 import frostscape.time.Stopwatch;
 import frostscape.util.StatUtils;
@@ -17,10 +18,16 @@ import mindustry.type.UnitType.UnitEngine;
 import mindustry.world.meta.Stat;
 
 public class HollusUnitType extends UnitType{
-    public Family family;
+    public Seq<Family> families;
 
     public HollusUnitType(String name) {
         super(name);
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        families.each(family -> family.members.add(this));
     }
 
     @Override
@@ -28,8 +35,8 @@ public class HollusUnitType extends UnitType{
         super.setStats();
         stats.useCategories = true;
 
-        if(family != null){
-            StatUtils.addFamilyStats(stats, family);
+        if(families != null && families.size > 0){
+            StatUtils.addFamilyStats(stats, families);
         }
     }
 

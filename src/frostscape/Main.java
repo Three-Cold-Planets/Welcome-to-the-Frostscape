@@ -12,7 +12,8 @@ import mindustry.type.UnitType;
 
 public class Main extends Mod{
 
-    public static String NAME = "hollow-frostscape";
+    public static final String NAME = "hollow-frostscape";
+    public static final float VERSION = 136;
     public Main(){
 
         Events.on(EventType.ClientLoadEvent.class,

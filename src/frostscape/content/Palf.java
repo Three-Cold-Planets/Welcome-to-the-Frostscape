@@ -4,5 +4,5 @@ import arc.graphics.Color;
 public class Palf {
     public static Color
 
-    hunterColor = Color.valueOf("#dde6f0");
+    hunter = Color.valueOf("#dde6f0");
 }

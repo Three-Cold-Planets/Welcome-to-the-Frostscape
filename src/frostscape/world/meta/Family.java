@@ -4,15 +4,19 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.Pixmap;
 import arc.graphics.g2d.TextureRegion;
-import arc.struct.IntSeq;
-import arc.struct.Seq;
+import arc.struct.*;
 import mindustry.Vars;
-import mindustry.ctype.UnlockableContent;
+import mindustry.core.ContentLoader;
+import mindustry.ctype.*;
+import mindustry.ui.dialogs.ContentInfoDialog;
+import mindustry.ui.dialogs.DatabaseDialog;
 
 /** Describes a group of UnlockableContent and related metadata**/
 public class Family {
 
     public static Seq<Family> all = new Seq<Family>();
+
+    public Seq<UnlockableContent> members = new Seq<>();
     private static int nextFree = 0;
 
     public int id;

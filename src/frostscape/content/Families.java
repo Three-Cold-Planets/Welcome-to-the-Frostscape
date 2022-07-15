@@ -1,13 +1,16 @@
 package frostscape.content;
 
+import arc.graphics.Color;
 import frostscape.world.meta.Family;
 
-import static frostscape.content.Palf.hunterColor;
+import frostscape.content.Palf;
+import mindustry.content.Fx;
 
 public class Families {
-    public static Family hunter;
+    public static Family assault, hunter;
 
     public static void load(){
-        hunter = new Family("hunter", hunterColor);
+        assault = new Family("assault", Color.valueOf("ffa465"));
+        hunter = new Family("hunter", Palf.hunter);
     }
 }

@@ -16,8 +16,6 @@ public class ContentInfoAdditions {
             StringBuilder text = ((Label) ((Table) (info.getChildren().get(0))).getChildren().get(1)).getText();
             String name = text.substring(text.length()/2+8, text.length());
             if(!name.contains(NAME)) return;
-            Log.info(Vars.content.getByName(ContentType.unit, name).name);
-            Log.info("hi! I showed the content " + name);
         });
     }
 }
