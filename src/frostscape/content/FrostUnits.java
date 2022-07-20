@@ -30,7 +30,7 @@ import static arc.graphics.g2d.Lines.stroke;
 import static frostscape.Main.NAME;
 
 public class FrostUnits {
-    public static UnitType
+    public static HollusUnitType
     sunspot, javelin;
 
     public static void load(){
@@ -96,87 +96,103 @@ public class FrostUnits {
             );
 
             weapons.add(
-                new Weapon(NAME + "-javelin-mounts-under"){{
-                    reload = 115;
-                    top = false;
-                    layerOffset = -1;
-                    x = 0;
-                    y = 0;
-                    recoil = 4.25f;
-                    shootX = 32/4;
-                    shootY = 56/4;
-                    bullet = new MissileBulletType(2, 15, "missile") {
-                        @Override
-                        public void draw(Bullet b) {
-                            super.draw(b);
-
-                            Lines.stroke((0.7f + Mathf.absin(10, 0.7f)) * b.fin() * 1.6f, Palf.hunter);
-
-                            for (int i = 0; i < 6; i++) {
-                                float rot = i * 360f / 6 - Time.time * 0.8f * b.fout(Interp.smooth);
-                                Lines.arc(b.x, b.y, 125 * b.fin(Interp.smooth) + 3f, 0.08f + b.fin() * 0.06f, rot);
-                            }
-                        }
-                        {
-                        lifetime = 110;
-                        width = 5;
-                        height = 8;
-                        collides = false;
-                        keepVelocity = false;
-                        homingPower = 0;
-                        lightningColor = Color.white;
-                        frontColor = Color.white;
-                        backColor = Pal.lancerLaser;
-                        trailColor = Pal.lancerLaser;
-                        fragBullets = 1;
-                        fragBullet = new EmpBulletType() {{
-                            float rad = 125;
-                            damage = 35;
+                new Weapon(NAME + "-javelin-mounts-under"){
+                    {
+                        reload = 135;
+                        top = false;
+                        layerOffset = -1;
+                        x = 0;
+                        y = 0;
+                        recoil = 4.25f;
+                        shootX = 32 / 4;
+                        shootY = 56 / 4;
+                        range = 50;
+                        shootCone = 15;
+                        bullet = new FrostBulletType(){{
+                            speed = 6;
+                            range = 120;
+                            overrideRange = true;
                             instantDisappear = true;
-                            despawnHit = true;
-                            hitEffect = new Effect(50f, 100f, e -> {
-                                e.scaled(7f, b -> {
-                                    color(Palf.hunter, b.fout());
-                                    Fill.circle(e.x, e.y, rad);
-                                });
 
-                                color(Palf.hunter);
-                                stroke(e.fout() * 3f);
-                                Lines.circle(e.x, e.y, rad);
+                            spawnBullets.add(new MissileBulletType(6, 15, "missile") {
+                            @Override
+                            public void draw(Bullet b) {
+                                super.draw(b);
 
-                                Fill.circle(e.x, e.y, 12f * e.fout());
-                                color();
-                                Fill.circle(e.x, e.y, 6f * e.fout());
-                                Drawf.light(e.x, e.y, rad * 1.6f, Palf.hunter, e.fout());
-                            });
-                            hitPowerEffect = Fx.none;
-                            applyEffect = Fx.none;
-                            healPercent = 0;
-                            radius = rad;
-                        }};
+                                Lines.stroke((0.7f + Mathf.absin(10, 0.7f)) * b.fin() * 1.6f, Palf.hunter);
 
-                        for (int i = 0; i < 5; i++) {
-                            final int j = i;
-                            spawnBullets.add(
-                                    new MissileBulletType(2 + i * 0.2f, 10 + 5 * i, "missile"){
-                                    {
-                                        hitSound = Sounds.spark;
-                                        lifetime = 55 + 10 * j;
-                                        width = 8 + j * 1.75f;
-                                        height = 10 + j * 1.75f;
-                                        keepVelocity = false;
-                                        homingPower = 0;
-                                        lightningDamage = 10;
-                                        lightning = 1;
-                                        lightningLength = 6;
-                                        lightningColor = Color.white;
-                                        frontColor = Color.white;
-                                        backColor = Pal.lancerLaser;
-                                        trailColor = Pal.lancerLaser;
-                                    }}
-                            );
-                        }};
-                    };
+                                for (int i = 0; i < 6; i++) {
+                                    float rot = i * 360f / 6 - 360 * b.fout(Interp.smooth);
+                                    Lines.arc(b.x, b.y, 125 * b.fin(Interp.smooth) + 3f, 0.08f + b.fin() * 0.06f, rot);
+                                }
+                            }
+
+                            {
+                                lifetime = 110;
+                                width = 5;
+                                height = 8;
+                                collides = false;
+                                keepVelocity = false;
+                                homingPower = 0;
+                                drag = 0.045f;
+                                lightningColor = Color.white;
+                                frontColor = Color.white;
+                                backColor = Pal.lancerLaser;
+                                trailColor = Pal.lancerLaser;
+                                fragBullets = 1;
+                                fragBullet = new EmpBulletType() {{
+                                    float rad = 125;
+                                    damage = 35;
+                                    instantDisappear = true;
+                                    despawnHit = true;
+                                    hitEffect = new Effect(50f, 100f, e -> {
+                                        e.scaled(7f, b -> {
+                                            color(Palf.hunter, b.fout());
+                                            Fill.circle(e.x, e.y, rad);
+                                        });
+
+                                        color(Palf.hunter);
+                                        stroke(e.fout() * 3f);
+                                        Lines.circle(e.x, e.y, rad);
+
+                                        Fill.circle(e.x, e.y, 12f * e.fout());
+                                        color();
+                                        Fill.circle(e.x, e.y, 6f * e.fout());
+                                        Drawf.light(e.x, e.y, rad * 1.6f, Palf.hunter, e.fout());
+                                    });
+                                    hitPowerEffect = Fx.none;
+                                    applyEffect = Fx.none;
+                                    healPercent = 0;
+                                    radius = rad;
+                                }};
+
+                                for (int i = 0; i < 5; i++) {
+                                    final int j = i;
+                                    spawnBullets.add(
+                                            new MissileBulletType(6 + i * 0.6f, 10 + 5 * i, "missile") {
+                                                {
+                                                    hitSound = Sounds.spark;
+                                                    lifetime = 55 + 10 * j;
+                                                    width = 8 + j * 1.75f;
+                                                    height = 10 + j * 1.75f;
+                                                    keepVelocity = false;
+                                                    homingPower = 0;
+                                                    drag = 0.045f;
+                                                    lightningDamage = 10 + 10 * j;
+                                                    lightning = 1 + Mathf.floor(j / 2 * j / 2);
+                                                    lightningLength = 6 + j;
+                                                    lightningColor = Color.white;
+                                                    hitShake = j;
+                                                    frontColor = Color.white;
+                                                    backColor = Pal.lancerLaser;
+                                                    trailColor = Pal.lancerLaser;
+                                                }
+                                            }
+                                    );
+                                }
+                            }}
+                        );
+                    }};
                     parentizeEffects = false;
                 }}
             );
