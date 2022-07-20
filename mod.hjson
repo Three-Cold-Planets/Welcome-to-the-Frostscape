@@ -21,3 +21,6 @@ minGameVersion: 136
 
 #this is a java mod
 java: true
+
+#hidden from the browser
+hideFromBrowser: true
