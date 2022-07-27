@@ -1,13 +1,14 @@
 package frostscape.content;
 
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.Time;
+import arc.util.Tmp;
 import frostscape.math.Interps;
 import mindustry.Vars;
 import mindustry.entities.Effect;
 
+import static frostscape.util.WeatherUtils.windDirection;
 import static mindustry.content.Fx.rand;
 
 public class Fxf {
@@ -26,4 +27,19 @@ public class Fxf {
         }
         if(Vars.state.isPlaying() && Mathf.chance(e.fin() * 0.65f * Time.delta)) Effect.shake(e.fin() * 4.85f, 15, e.x, e.y);
     });
+
+    public static Effect steamEffect(float lifetime, float radius, Interp interp){
+        return new Effect(lifetime, e -> {
+            float a = interp.apply(e.fin());
+            Fill.circle(e.x + Tmp.v1.set(windDirection()).x * a, e.y + Tmp.v1.y * a, radius * 1 - a);
+        });
+    };
+
+
+    public static Effect steamEffect(float lifetime, float radius){
+        return new Effect(lifetime, e -> {
+            float a = e.fin();
+            Fill.circle(e.x + Tmp.v1.set(windDirection()).x * a, e.y + Tmp.v1.y * a, radius * 1 - a);
+        });
+    };
 }

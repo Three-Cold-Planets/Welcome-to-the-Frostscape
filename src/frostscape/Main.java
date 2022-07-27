@@ -5,10 +5,13 @@ import arc.util.*;
 import frostscape.ui.FrostUI;
 import frostscape.util.UIUtils;
 import frostscape.world.meta.Family;
+import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.game.EventType.*;
 import mindustry.mod.*;
 import mindustry.type.UnitType;
+import rhino.ImporterTopLevel;
+import rhino.NativeJavaPackage;
 
 public class Main extends Mod{
 
@@ -21,6 +24,10 @@ public class Main extends Mod{
                     Family.all.each(f -> f.load());
                 }
         );
+
+        Events.on(EventType.ContentInitEvent.class, e -> {
+
+        });
     }
 
 

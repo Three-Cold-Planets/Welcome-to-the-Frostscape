@@ -1,12 +1,16 @@
 package frostscape.ui.dialog;
 
 import arc.Core;
+import arc.graphics.Color;
 import arc.math.Mathf;
+import arc.scene.event.ClickListener;
+import arc.scene.event.HandCursorListener;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Log;
+import arc.util.Time;
 import frostscape.content.Families;
 import frostscape.ui.Texf;
 import frostscape.world.meta.Family;
@@ -21,6 +25,8 @@ import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.DatabaseDialog;
 
 import java.util.Locale;
+
+import static mindustry.Vars.mobile;
 
 public class FamilyDescriptionDialog extends BaseDialog {
 
@@ -108,7 +114,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
 
             endingMessage = "END OF DOCUMENT";
 
-            int columns = Mathf.floor(maxWidth/40);
+            int columns = Mathf.floor(maxWidth/60);
 
             map.each((type, members) -> {
                 members.each(member -> {
@@ -116,8 +122,17 @@ public class FamilyDescriptionDialog extends BaseDialog {
 
                         if((buttons++ % columns) == 0) table.row();
                         Image image = new Image(member.uiIcon);
-                        image.clicked(() -> Vars.ui.content.show(member));
-                        table.add(image).size(40);
+                        ClickListener listener = new ClickListener();
+                        image.addListener(listener);
+                        if(!mobile){
+                            image.addListener(new HandCursorListener());
+                            image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, Mathf.clamp(0.4f * Time.delta)));
+                        }
+                        image.clicked(() -> {
+                            hide();
+                            Vars.ui.content.show(member);
+                        });
+                        table.add(image).size(60);
                 });
             });
 

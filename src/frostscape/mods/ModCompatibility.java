@@ -26,7 +26,7 @@ public class ModCompatibility {
             if(!(meta == null) && Float.valueOf(meta.minGameVersion) >= VERSION) return;
 
             ConfigMeta config = findConfig(zip);
-            if(config != null) Log.info("MY TIME MANE WORKSS YESSSSSSSSSSSSSSSSSSS");
+            if(config != null) Log.info("MY TIME MACHINE WORKSS YESSSSSSSSSSSSSSSSSSS");
         }
     }
 
