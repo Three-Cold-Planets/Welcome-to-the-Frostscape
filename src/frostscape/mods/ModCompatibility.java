@@ -6,7 +6,7 @@ import arc.util.Log;
 import mindustry.Vars;
 import mindustry.mod.Mods.ModMeta;
 
-import static frostscape.Main.VERSION;
+import static frostscape.Frostscape.VERSION;
 
 public class ModCompatibility {
     public void start(){

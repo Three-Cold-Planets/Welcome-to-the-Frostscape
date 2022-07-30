@@ -3,11 +3,12 @@ package frostscape.ui;
 import arc.scene.ui.Label;
 import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Table;
-import arc.util.Log;
 import mindustry.Vars;
-import mindustry.ctype.ContentType;
+import mindustry.core.UI;
+import mindustry.editor.MapInfoDialog;
+import mindustry.editor.MapObjectivesDialog;
 
-import static frostscape.Main.NAME;
+import static frostscape.Frostscape.NAME;
 
 public class ContentInfoAdditions {
     public static void load(){

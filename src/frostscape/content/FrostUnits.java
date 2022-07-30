@@ -4,30 +4,21 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.Seq;
-import arc.util.Time;
-import arc.util.serialization.Json;
 import frostscape.entities.ability.MoveDamageLineAbility;
 import frostscape.entities.bullet.FrostBulletType;
 import frostscape.type.HollusUnitType;
-import frostscape.type.HollusUnitType.ActivationEngine;
 import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.Lightning;
-import mindustry.entities.abilities.Ability;
 import mindustry.entities.abilities.MoveLightningAbility;
 import mindustry.entities.bullet.*;
-import mindustry.entities.part.DrawPart;
-import mindustry.entities.pattern.ShootHelix;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
-import mindustry.io.JsonIO;
-import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.graphics.g2d.Lines.stroke;
-import static frostscape.Main.NAME;
+import static frostscape.Frostscape.NAME;
 
 public class FrostUnits {
     public static HollusUnitType

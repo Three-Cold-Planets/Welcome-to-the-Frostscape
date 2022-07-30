@@ -1,10 +1,9 @@
 package frostscape.ui;
 
 import arc.Core;
-import arc.graphics.g2d.NinePatch;
 import arc.scene.style.Drawable;
 
-import static frostscape.Main.NAME;
+import static frostscape.Frostscape.NAME;
 
 public class Texf {
     public static Drawable

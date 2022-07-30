@@ -6,6 +6,7 @@ import frostscape.world.blocks.environment.SteamVentProp;
 import mindustry.content.*;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
+import mindustry.io.SaveIO;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
@@ -38,7 +39,7 @@ public class FrostBlocks {
         }};
 
         frostWall = new StaticWall("frost-wall"){{
-            variants = 2;
+            variants = 3;
         }};
 
         volcanicAndesiteWall = new StaticWall("volcanic-andesite-wall"){{
@@ -47,6 +48,7 @@ public class FrostBlocks {
 
         magnetiteAndesite = new StaticWall("magnetite-andesite"){{
             variants = 3;
+            itemDrop = FrostItems.magnetite;
         }};
 
         pyroclast = new MinRangeTurret("pyroclast"){{
@@ -72,7 +74,7 @@ public class FrostBlocks {
         }};
 
         frostVent = new SteamVentProp("frost-vent"){{
-            parent = blendGroup = frostSnow;
+            parent = blendGroup = frostStone;
             hasShadow = false;
             offsets = new Point2[25];
             int size = 5;
