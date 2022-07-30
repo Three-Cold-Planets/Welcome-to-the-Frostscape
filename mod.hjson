@@ -8,7 +8,7 @@ name: "hollow-frostscape"
 author: "Sh1penfire"
 
 #the fully qualified main class of the mod
-main: "frostscape.Main"
+main: "frostscape.Frostscape"
 
 #the mod description as seen in the mod dialog
 description: "An experimental modification created to test v7's new API. Will *not* be worked on consistently due to life."
