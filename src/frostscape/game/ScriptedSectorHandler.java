@@ -87,7 +87,7 @@ public class ScriptedSectorHandler implements Loadable, CustomChunk {
         if(last != controller) {
             last.read(reads);
             last.reset();
-            Log.err("Sector controllers " + controller.localizedName + " in map " + state.map.file.name() + " conflicts with previously saved controller of " + last.localizedName);
+            Log.err("Sector controllers " + controller + " in map " + state.map.file.name() + " conflicts with previously saved controller of " + last);
             controller = last;
             return;
         }
