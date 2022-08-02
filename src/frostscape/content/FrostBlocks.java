@@ -2,6 +2,7 @@ package frostscape.content;
 
 import arc.math.geom.Point2;
 import frostscape.world.blocks.defense.MinRangeTurret;
+import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.SteamVentProp;
 import mindustry.content.*;
 import mindustry.entities.pattern.ShootSpread;
@@ -10,11 +11,17 @@ import mindustry.io.SaveIO;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.liquid.LiquidRouter;
+import mindustry.world.blocks.production.GenericCrafter;
+import mindustry.world.blocks.production.Pump;
+import mindustry.world.draw.DrawBlock;
 
 public class FrostBlocks {
     public static Floor frostStone, frostSnow, andesiteFloor, volcanicAndesiteFloor, paileanFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite;
     public static SteamVentProp frostVent;
+
+    public static CoreSiphon coreSiphon;
     public static ItemTurret pyroclast;
 
     public static void load(){
@@ -49,6 +56,18 @@ public class FrostBlocks {
         magnetiteAndesite = new StaticWall("magnetite-andesite"){{
             variants = 3;
             itemDrop = FrostItems.magnetite;
+        }};
+
+        coreSiphon = new CoreSiphon("core-siphon"){{
+            requirements(Category.production, ItemStack.with());
+            liquidPadding = 6;
+            this.tier = 2;
+            this.drillTime = 600.0F;
+            this.size = 7;
+            envEnabled ^= 2;
+            liquidCapacity = 1000;
+            boost = consumeLiquid(Liquids.water, 0.05F);
+            boost.boost();
         }};
 
         pyroclast = new MinRangeTurret("pyroclast"){{

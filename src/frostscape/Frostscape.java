@@ -42,6 +42,7 @@ public class Frostscape extends Mod{
 
         Seq<String> packages = Seq.with(
                 "frostscape",
+                "frostscape.content",
                 "frostscape.ui",
                 "frostscape.game"
         );
