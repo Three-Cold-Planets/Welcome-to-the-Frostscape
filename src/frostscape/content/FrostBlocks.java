@@ -1,6 +1,7 @@
 package frostscape.content;
 
 import arc.math.geom.Point2;
+import arc.math.geom.Vec2;
 import frostscape.world.blocks.defense.MinRangeTurret;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.SteamVentProp;
@@ -68,6 +69,14 @@ public class FrostBlocks {
             liquidCapacity = 1000;
             boost = consumeLiquid(Liquids.water, 0.05F);
             boost.boost();
+
+            drills = 4;
+            positions = new Vec2[]{
+                    new Vec2(44/4, 44/4),
+                    new Vec2(44/4, -44/4),
+                    new Vec2(-44/4, 44/4),
+                    new Vec2(-44/4, -44/4)
+            };
         }};
 
         pyroclast = new MinRangeTurret("pyroclast"){{

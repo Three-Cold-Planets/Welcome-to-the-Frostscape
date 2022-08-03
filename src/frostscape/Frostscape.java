@@ -5,6 +5,7 @@ import arc.struct.Seq;
 import arc.util.*;
 import frostscape.game.ScriptedSector;
 import frostscape.game.ScriptedSectorHandler;
+import frostscape.graphics.Draww;
 import frostscape.ui.FrostUI;
 import frostscape.util.UIUtils;
 import frostscape.world.meta.Family;
@@ -43,6 +44,7 @@ public class Frostscape extends Mod{
         Seq<String> packages = Seq.with(
                 "frostscape",
                 "frostscape.content",
+                "frostscape.math",
                 "frostscape.ui",
                 "frostscape.game"
         );
