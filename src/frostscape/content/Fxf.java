@@ -1,12 +1,16 @@
 package frostscape.content;
 
+import arc.graphics.Blending;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.Time;
 import arc.util.Tmp;
+import frostscape.entities.effect.LifetimeEffect;
 import frostscape.math.Interps;
 import mindustry.Vars;
 import mindustry.entities.Effect;
+import mindustry.gen.Building;
+import mindustry.gen.Tex;
 
 import static frostscape.util.WeatherUtils.windDirection;
 import static mindustry.content.Fx.rand;
@@ -26,6 +30,19 @@ public class Fxf {
             Lines.lineAngle(e.x + Angles.trnsx(angle, len), e.y + Angles.trnsy(angle, len), angle, 12 * fin);
         }
         if(Vars.state.isPlaying() && Mathf.chance(e.fin() * 0.65f * Time.delta)) Effect.shake(e.fin() * 4.85f, 15, e.x, e.y);
+    });
+
+    public static Effect
+
+    glowEffect = new Effect(0, e -> {
+        Building b = Vars.world.buildWorld(e.x, e.y);
+        if(b != null) return;
+        TextureRegion region = (TextureRegion) e.data;
+        Draw.alpha(e.fslope() * e.fslope());
+        Draw.rect(region, e.x, e.y, e.rotation);
+        Draw.blend(Blending.additive);
+        Draw.rect(region, e.x, e.y, e.rotation);
+        Draw.blend();
     });
 
     public static Effect steamEffect(float lifetime, float radius, Interp interp){

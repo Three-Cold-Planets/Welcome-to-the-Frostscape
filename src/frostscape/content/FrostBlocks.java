@@ -1,24 +1,25 @@
 package frostscape.content;
 
+import arc.graphics.Color;
 import arc.math.geom.Point2;
 import arc.math.geom.Vec2;
 import frostscape.world.blocks.defense.MinRangeTurret;
 import frostscape.world.blocks.drill.CoreSiphon;
+import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
 import mindustry.content.*;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
-import mindustry.io.SaveIO;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.liquid.LiquidRouter;
-import mindustry.world.blocks.production.GenericCrafter;
-import mindustry.world.blocks.production.Pump;
-import mindustry.world.draw.DrawBlock;
+import mindustry.world.blocks.production.*;
+import mindustry.world.draw.DrawHeatInput;
+import mindustry.world.draw.DrawHeatOutput;
 
 public class FrostBlocks {
     public static Floor frostStone, frostSnow, andesiteFloor, volcanicAndesiteFloor, paileanFloor;
+    public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite;
     public static SteamVentProp frostVent;
 
@@ -42,6 +43,20 @@ public class FrostBlocks {
             variants = 3;
         }};
 
+        crackedAndesiteFloor = new CrackedBlock("cracked-andesite-floor"){{
+            variants = 5;
+            blendGroup = volcanicAndesiteFloor;
+            minBlinkTime = 60 * 5;
+            maxBlinkTime = 60 * 9;
+        }};
+
+        fracturedAndesiteFloor = new CrackedBlock("fractured-andesite-floor"){{
+            variants = 3;
+            blendGroup = volcanicAndesiteFloor;
+            minBlinkTime = 60 * 3;
+            maxBlinkTime = 60 * 6;
+        }};
+
         paileanFloor = new Floor("pailean-floor"){{
             variants = 2;
         }};
@@ -62,14 +77,15 @@ public class FrostBlocks {
         coreSiphon = new CoreSiphon("core-siphon"){{
             requirements(Category.production, ItemStack.with());
             liquidPadding = 6;
-            this.tier = 2;
-            this.drillTime = 600.0F;
             this.size = 7;
             envEnabled ^= 2;
             liquidCapacity = 1000;
             boost = consumeLiquid(Liquids.water, 0.05F);
+            heatColor = new Color(Palf.heat).a(0.35f);
             boost.boost();
-
+            drillEffectRnd = 0.1f;
+            updateEffectChance = 0.15f;
+            rotateSpeed = 5;
             drills = 4;
             positions = new Vec2[]{
                     new Vec2(44/4, 44/4),

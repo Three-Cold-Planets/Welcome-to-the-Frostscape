@@ -8,6 +8,7 @@ import frostscape.game.ScriptedSectorHandler;
 import frostscape.graphics.Draww;
 import frostscape.ui.FrostUI;
 import frostscape.util.UIUtils;
+import frostscape.world.environment.FloorDataHandler;
 import frostscape.world.meta.Family;
 import mindustry.Vars;
 import mindustry.game.EventType;
@@ -23,6 +24,7 @@ public class Frostscape extends Mod{
     public static final String NAME = "hollow-frostscape";
     public static final float VERSION = 136.1f;
     public static ScriptedSectorHandler sectors = new ScriptedSectorHandler();
+    public static FloorDataHandler floors = new FloorDataHandler();
 
     public Frostscape(){
 

@@ -3,6 +3,7 @@ package frostscape.ui.dialog.settings;
 import arc.func.Prov;
 import arc.scene.ui.Dialog;
 import arc.scene.ui.layout.Table;
+import frostscape.Frostscape;
 import frostscape.game.SectorController;
 import frostscape.ui.FrostUI;
 import mindustry.Vars;
@@ -60,6 +61,8 @@ public class ControllerSettingDialog extends BaseDialog {
                     select.show();
                 }
         ).left().width(300f).row();
+        Frostscape.sectors.reRead();
+        controller = Frostscape.sectors.controller;
     }
 
     void rebuildSelect(){
