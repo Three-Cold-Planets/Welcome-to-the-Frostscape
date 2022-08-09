@@ -1,10 +1,8 @@
 package frostscape.world;
 
 import arc.struct.Seq;
-import frostscape.world.upgrades.Upgrade;
-import mindustry.gen.Sounds;
+import frostscape.type.upgrade.Upgrade;
 import mindustry.world.Block;
-import mindustry.world.meta.BlockGroup;
 
 public class FrostscapeBlock extends Block {
     public FrostscapeBlock(String name) {

@@ -104,14 +104,14 @@ public class FrostBlocks {
             range = 242;
             velocityRnd = 0.05f;
             ammo(
-                    Items.pyratite, FrostBullets.pyraGel
+                    Items.pyratite, FrostBullets.pyraNapalm
             );
             consumeLiquids(new LiquidStack(Liquids.oil, 1.35f));
 
             shoot = new ShootSpread(){{
-                shotDelay = 25;
+                shotDelay = 5;
                 shots = 3;
-                inaccuracy = 5;
+                inaccuracy = 15;
                 spread = 1;
             }};
             shootSound = Sounds.bang;

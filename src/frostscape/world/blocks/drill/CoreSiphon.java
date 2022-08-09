@@ -257,7 +257,6 @@ public class CoreSiphon extends FrostscapeBlock {
                                 drill.progress = 0;
                                 drill.curFloor = getCracked(nextTarget);
                                 drill.drilling = true;
-                                Log.info(drilling.contains(nextTarget.pos()));
                                 drilling.add(nextTarget.pos());
                                 state = 0;
                             } else {

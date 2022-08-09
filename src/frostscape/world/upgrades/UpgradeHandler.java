@@ -4,10 +4,10 @@ import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import frostscape.type.upgrade.Upgrade;
 import mindustry.game.Team;
 import mindustry.io.SaveFileReader.CustomChunk;
 import mindustry.io.SaveVersion;
-import mindustry.world.Block;
 
 import java.io.*;
 
@@ -49,5 +49,10 @@ public class UpgradeHandler implements CustomChunk {
             }
             teamMap.put(Team.get(team), upgradeSeq);
         }
+    }
+
+    @Override
+    public boolean shouldWrite() {
+        return !teamMap.isEmpty();
     }
 }
