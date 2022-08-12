@@ -32,7 +32,7 @@ public class FrostBlocks {
         }};
 
         frostSnow = new Floor("frost-snow"){{
-            variants = 2;
+            variants = 3;
         }};
 
         andesiteFloor = new Floor("andesite-floor"){{

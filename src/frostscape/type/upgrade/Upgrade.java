@@ -13,21 +13,19 @@ public class Upgrade<T> {
     public int stacks;
 
     public Upgrade(String name, ItemStack[] cost){
-        super();
+        UpgradeHandler.upgrades.add(this);
+        this.name = Vars.content.transformName(name);
         stackCosts = new ItemStack[][]{cost};
         stacks = 1;
     }
 
     public Upgrade(String name, ItemStack[][] costs){
-        super();
+        UpgradeHandler.upgrades.add(this);
+        this.name = Vars.content.transformName(name);
         stackCosts = costs;
         stacks = costs.length;
     }
 
-    public Upgrade(String name){
-        UpgradeHandler.upgrades.add(this);
-        this.name = Vars.content.transformName(name);
-    }
 
     public void unlock(Team team){
         Frostscape.upgrades.unlock(team, this);

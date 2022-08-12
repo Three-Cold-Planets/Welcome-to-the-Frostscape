@@ -4,6 +4,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.struct.Seq;
+import frostscape.entities.ability.MoveArmorAbility;
 import frostscape.entities.ability.MoveDamageLineAbility;
 import frostscape.entities.bullet.FrostBulletType;
 import frostscape.type.HollusUnitType;
@@ -12,8 +13,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.abilities.MoveLightningAbility;
 import mindustry.entities.bullet.*;
 import mindustry.gen.*;
-import mindustry.graphics.Drawf;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 import mindustry.type.Weapon;
 
 import static arc.graphics.g2d.Draw.color;
@@ -24,22 +24,31 @@ public class FrostUnits {
     public static HollusUnitType
     sunspot, javelin;
 
+    public static HollusUnitType
+    upgradeDrone;
+
     public static void load(){
         sunspot = new HollusUnitType("sunspot"){{
+            maxRange = 150;
+            range = 10;
             families = Seq.with(Families.hunter);
             hitSize = 70/8;
             constructor = UnitEntity::create;
             flying = true;
-            speed = 5;
-            accel = 0.023f;
-            drag = 0.015f;
+            speed = 3;
+            rotateSpeed = 3;
+            accel = 0.038f;
+            drag = 0.028f;
             faceTarget = true;
+            circleTarget = true;
+            omniMovement = false;
             setEnginesMirror(
                         new ActivationEngine(24/4, -32/4, 3.5f, 15 - 90, 0.45f, 1, 1, 3.5f)
             );
             abilities.add(
                     new MoveLightningAbility(0, 0, 0, 0, 2, 4.5f, Color.white, name + "-glow"),
-                    new MoveDamageLineAbility(9, 40/4, 0.85f, 6/4, 1, 4.5f, 0, Fx.sparkShoot)
+                    new MoveDamageLineAbility(9, 40/4, 0.85f, 6/4, 1, 4.5f, 0, Fx.sparkShoot),
+                    new MoveArmorAbility(1.2f, 5, 0.6f, Layer.flyingUnit + 0.1f)
             );
 
             weapons.add(
@@ -50,12 +59,13 @@ public class FrostUnits {
                     //Note: The range of this is effectively the targeting range of the unit
                     bullet = new FrostBulletType(){{
                         instantDisappear = true;
+                        overrideRange = true;
                         speed = 1;
-                        range = 550;
+                        range = 150;
                         recoil = 0.5f;
                         shootEffect = new Effect(12, e -> {
                             Draw.color(Color.white);
-                            Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id) * 3 + 2), e.fin(Interp.pow4) * 145, e.rotation, 15, (x1, y1) -> {
+                            Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id) * 8 + 2), e.fin(Interp.pow4) * 145, e.rotation, 15, (x1, y1) -> {
                                 Lines.lineAngle(e.x, e.y, Mathf.angle(x1, y1), e.fout(Interp.pow4) * 8);
                             });
                         });
@@ -67,7 +77,7 @@ public class FrostUnits {
                     alternate = false;
                     shootCone = 180;
                     shootStatus = FrostStatusEffects.engineBoost;
-                    shootStatusDuration = 65;
+                    shootStatusDuration = 35;
                 }}
             );
         }};

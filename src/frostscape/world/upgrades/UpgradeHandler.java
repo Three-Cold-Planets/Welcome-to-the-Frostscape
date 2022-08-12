@@ -14,29 +14,40 @@ import java.util.Iterator;
 
 public class UpgradeHandler implements CustomChunk {
 
-    private static Seq<Upgrade> s1 = new Seq<Upgrade>();
+    private static Seq<UpgradeData> s1 = new Seq<UpgradeData>();
     public static Seq<Upgrade> upgrades = new Seq<Upgrade>();
-    public static IntMap<Seq<UpgradeDataHolder>> teamMap = new IntMap<Seq<UpgradeDataHolder>>();
+    public static IntMap<Seq<UpgradeData>> teamMap = new IntMap<Seq<UpgradeData>>();
 
     public UpgradeHandler(){
         SaveVersion.addCustomChunk("frostscape-UH", this);
     }
 
     public void unlock(Team team, Upgrade upgrade){
+        getData(team, upgrade).state = 1;
+    }
+
+    public UpgradeData getData(Team team, Upgrade upgrade){
         s1 = teamMap.get(team.id);
         if(s1 == null) {
             s1 = new Seq<>();
-            teamMap.put(team.id, new Seq<>());
-            s1.add(upgrade);
+            teamMap.put(team.id, s1);
+            UpgradeData data = new UpgradeData(upgrade, 0);
+            s1.add(data);
+            return data;
         }
-        s1.find()
+        UpgradeData data = s1.find(udata -> udata.upgrade == upgrade);
+        if(data == null){
+            data = new UpgradeData(upgrade, 0);
+            s1.add(data);
+        }
+        return data;
     }
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
         Writes write = new Writes(dataOutput);
         write.i(teamMap.size);
-        for (Entry<Seq<UpgradeDataHolder>> next: teamMap.entries()){
+        for (Entry<Seq<UpgradeData>> next: teamMap.entries()){
 
             write.i(next.key);
             write.i(next.value.size);
@@ -56,12 +67,12 @@ public class UpgradeHandler implements CustomChunk {
         for (int i = 0; i < size; i++) {
             int team = read.i();
             int listSize = read.i();
-            Seq<UpgradeDataHolder> upgradeSeq = new Seq<>();
+            Seq<UpgradeData> upgradeSeq = new Seq<>();
 
             for (int j = 0; j < listSize; j++) {
                 String name = read.str();
                 int state = read.i();
-                UpgradeDataHolder data = new UpgradeDataHolder(upgrades.find(u -> u.name.equals(name)), state);
+                UpgradeData data = new UpgradeData(upgrades.find(u -> u.name.equals(name)), state);
                 if(data.upgrade != null) upgradeSeq.add(data);
             }
             teamMap.put(team, upgradeSeq);
@@ -73,11 +84,11 @@ public class UpgradeHandler implements CustomChunk {
         return !teamMap.isEmpty();
     }
 
-    public class UpgradeDataHolder{
+    public class UpgradeData{
         public Upgrade upgrade;
         public int state;
 
-        public UpgradeDataHolder(Upgrade upgrade, int state){
+        public UpgradeData(Upgrade upgrade, int state){
             this.upgrade = upgrade;
             this.state = state;
         }

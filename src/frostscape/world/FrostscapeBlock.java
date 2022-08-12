@@ -15,4 +15,9 @@ public class FrostscapeBlock extends Block {
     }
 
     public Seq<Upgrade> upgrades = new Seq<>();
+
+    @Override
+    public boolean isVisible() {
+        return super.isVisible();
+    }
 }
