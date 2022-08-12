@@ -154,7 +154,7 @@ public class CoreSiphon extends FrostscapeBlock {
 
             while(ittr.hasNext()) {
                 Tile other = (Tile)ittr.next();
-                if (other.floor().liquidDrop != null) {
+                if (other.floor().liquidDrop == slagLiquid) {
                     last = other.floor().liquidDrop;
                 }
             }

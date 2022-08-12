@@ -1,14 +1,17 @@
 package frostscape.content;
 
 import arc.graphics.Color;
-import arc.math.geom.Point2;
-import arc.math.geom.Vec2;
+import arc.math.geom.*;
+import arc.struct.Seq;
+import frostscape.world.blocks.core.BuildBeamCore;
+import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
 import mindustry.content.*;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.game.Team;
 import mindustry.gen.Sounds;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
@@ -25,6 +28,8 @@ public class FrostBlocks {
 
     public static CoreSiphon coreSiphon;
     public static ItemTurret pyroclast;
+
+    public static FrostscapeCore coreBunker;
 
     public static void load(){
         frostStone = new Floor("frost-stone"){{
@@ -139,6 +144,15 @@ public class FrostBlocks {
             };
             clipSize = 170;
             variants = 1;
+        }};
+
+        coreBunker = new BuildBeamCore("core-bunker"){{
+            requirements(Category.effect, ItemStack.empty);
+            size = 5;
+            mountPoses = new Seq<>();
+            for (int i = 1; i < Geometry.d8.length; i += 2) {
+                mountPoses.add(new Vec2(Geometry.d8[i].x * 29/2, Geometry.d8[i].y * 29/2));
+            }
         }};
     }
 }
