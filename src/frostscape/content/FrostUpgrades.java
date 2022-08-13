@@ -6,9 +6,9 @@ import mindustry.type.Item;
 import mindustry.type.ItemStack;
 
 public class FrostUpgrades {
-    public static Upgrade test1;
+    public static Upgrade improvedWelding;
 
     public static void load(){
-        test1 = new Upgrade("test1", ItemStack.with(Items.copper, 15));
+        improvedWelding = new Upgrade("welding1", ItemStack.with(FrostItems.magnetite, 15));
     }
 }

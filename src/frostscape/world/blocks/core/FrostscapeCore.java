@@ -8,11 +8,15 @@ import arc.scene.ui.layout.Scl;
 import arc.struct.IntSeq;
 import arc.struct.Seq;
 import arc.util.Time;
+import frostscape.Frostscape;
+import frostscape.type.upgrade.Upgrade;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
+import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.type.UnitType;
+import mindustry.world.Tile;
 import mindustry.world.blocks.storage.CoreBlock;
 
 public class FrostscapeCore extends CoreBlock {
@@ -24,53 +28,56 @@ public class FrostscapeCore extends CoreBlock {
     public float cameraMoveSpeed = 0.01f;
     public TextureRegion mountRegion;
 
-    public Seq<UnitType> unitTypes = Seq.with();
-
-    public Seq<UnitType> playerUnitTypes(){
-        return unitTypes;
-    };
+    public Seq<UnitEntry> entries = Seq.with();
+    public UnitEntry defaultEntry;
 
     public FrostscapeCore(String name) {
         super(name);
         config(Byte[].class, (build, b) -> {
             FrostscapeCoreBuild core = ((FrostscapeCoreBuild) build);
-            for(byte id : b){
-                Player spawn = Groups.player.getByID(id);
-                if(spawn != null) {
-                    if(!core.que.contains(spawn)) core.que.add(spawn);
-                    else {
-                        switch (b[1]) {
-                            case 1:
-                                core.que.remove(spawn);
-                            case 2:
-                                core.togglePause(spawn);
-                        }
+            byte id = b[0];
+            Player spawn = Groups.player.getByID(id);
+            if(spawn != null) {
+                if(!core.que.contains(spawn)) core.que.add(spawn);
+                else {
+                    switch (b[1]) {
+                        case 1:
+                            core.que.remove(spawn);
+                        case 2:
+                            core.togglePause(spawn);
                     }
-                };
-            }
-        });
-        config(Integer.class, (build, b) -> {
-            FrostscapeCoreBuild core = ((FrostscapeCoreBuild) build);
-            core.setType(Vars.content.units().get(b));
+                }
+            };
         });
     }
 
 
     public class FrostscapeCoreBuild extends CoreBuild{
+
         public float warmup = 0;
         public Seq<Player> que = Seq.with();
         public Vec2 constructPos = new Vec2(0, 16);
         public float progress = 0;
         //used for saving
-        public int typeId;
+        public int current = -1;
 
         public IntSeq paused = IntSeq.with();
 
-        public UnitType type = UnitTypes.gamma;
+        public UnitEntry entry = null;
 
-        public void setType(UnitType type){
-            this.type = type;
-            typeId = type.id;
+        @Override
+        public Building init(Tile tile, Team team, boolean shouldAdd, int rotation) {
+            setEntry(defaultEntry);
+            return super.init(tile, team, shouldAdd, rotation);
+        }
+
+        public void setEntry(UnitEntry entry){
+            this.entry = entry;
+            if(entry == null) {
+                current = -1;
+                return;
+            }
+            current = entries.indexOf(entry);
         }
 
         public void respawn(byte playerId, byte interrupt){
@@ -96,7 +103,7 @@ public class FrostscapeCore extends CoreBlock {
         public void updateTile(){
             super.updateTile();
             building = false;
-            if(que.size > 0 && type != null) {
+            if(que.size > 0 && entry != null) {
                 building = true;
                 progress += Time.delta;
                 constructPos.set(x, y).add(0, size * 16 + 8);
@@ -115,7 +122,8 @@ public class FrostscapeCore extends CoreBlock {
                 }
                 if(progress >= constructTime && canSpawn) {
                     progress = 0;
-                    Unit coreUnit = type.spawn(team, constructPos.x, constructPos.y);
+                    Unit coreUnit = entry.type.spawn(team, constructPos.x, constructPos.y);
+                    coreUnit.rotation += 90;
                     coreUnit.spawnedByCore = true;
                     que.remove(0);
                     Call.unitControl(p, coreUnit);
@@ -135,6 +143,24 @@ public class FrostscapeCore extends CoreBlock {
 
         public void requestSpawn(Player player){
             configure(new Byte[]{(byte) player.id, 0});
+        }
+    }
+
+    public class UnitEntry{
+        public Upgrade locked;
+        public Upgrade unlocked;
+        public float constructionTime;
+        public UnitType type;
+
+        public UnitEntry(Upgrade unlockedBy, Upgrade lockedBy, float constructionTime, UnitType type){
+            this.unlocked = unlockedBy;
+            this.locked = lockedBy;
+            this.constructionTime = constructionTime;
+            this.type = type;
+        }
+
+        public boolean isValid(){
+            return (locked == null || !locked.unlocked(Vars.player.team())) && (unlocked == null || unlocked.unlocked(Vars.player.team()));
         }
     }
 }

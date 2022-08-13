@@ -15,9 +15,9 @@ public class FrostContentLoader {
         FrostItems.load();
         FrostBullets.load();
         FrostUpgrades.load();
-        FrostBlocks.load();
         FrostStatusEffects.load();
         FrostUnits.load();
+        FrostBlocks.load();
         SectorControllers.load();
         Events.run(ClientLoadEvent.class, () -> {
             controllers.each(SectorController::load);

@@ -153,6 +153,8 @@ public class FrostBlocks {
             for (int i = 1; i < Geometry.d8.length; i += 2) {
                 mountPoses.add(new Vec2(Geometry.d8[i].x * 29/2, Geometry.d8[i].y * 29/2));
             }
+            entries.add(new UnitEntry(null, FrostUpgrades.improvedWelding, 180, UnitTypes.pulsar));
+            defaultEntry = entries.get(0);
         }};
     }
 }

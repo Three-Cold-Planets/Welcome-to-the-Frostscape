@@ -16,7 +16,7 @@ import mindustry.world.Tile;
 
 public class BuildBeamCore extends FrostscapeCore{
     private static TextureRegion unitRegion;
-    public float srotSpeed = 6.2f, mountRotSpeed = 1;
+    public float srotSpeed = 1.2f, mountRotSpeed = 2.2f;
     public Interp srotScaling = Interp.smooth;
 
     public Seq<Vec2> mountPoses = Seq.with();
@@ -49,7 +49,7 @@ public class BuildBeamCore extends FrostscapeCore{
         public void updateTile() {
             super.updateTile();
             srotVel = Mathf.lerpDelta(srotVel, building ? srotSpeed : 0, warmup);
-            srot += srotVel;
+            srot += srotScaling.apply(srotVel);
             
             if(building) for (int i = 0; i < mountRotations.length; i++) {
                 mountRotations[i] = Angles.moveToward(mountRotations[i], Tmp.v1.set(mountPoses.get(i)).add(x, y).angleTo(constructPos), mountRotSpeed * Time.delta);
@@ -62,24 +62,25 @@ public class BuildBeamCore extends FrostscapeCore{
         @Override
         public void draw() {
             super.draw();
-            unitRegion = type.fullIcon;
             float cx = constructPos.x, cy = constructPos.y;
             float invalidWarmup = 1 - warmup;
-            Lines.line(x, y, cx, cy);
 
             for (int i = 0; i < mountPoses.size; i++) {
                 Draw.rect(mountRegion, mountPoses.get(i).x + x, mountPoses.get(i).y + y, mountRotations[i] - 90);
             }
 
+            if(entry == null) return;
+            unitRegion = entry.type.fullIcon;
+
             Draw.draw(Layer.blockBuilding, () -> {
                 Draw.color(Pal.accent, warmup);
 
                 drawTeam();
-                Shaders.blockbuild.region = type.fullIcon;
+                Shaders.blockbuild.region = entry.type.fullIcon;
                 Shaders.blockbuild.time = Time.time;
-                Shaders.blockbuild.progress = Mathf.clamp(progress/constructTime + 0.05f);
+                Shaders.blockbuild.progress = Mathf.clamp(progressf() + 0.05f);
 
-                Draw.rect(type.fullIcon, cx, cy);
+                Draw.rect(entry.type.fullIcon, cx, cy);
 
                 Draw.flush();
                 Draw.color();
@@ -90,14 +91,14 @@ public class BuildBeamCore extends FrostscapeCore{
             Draw.alpha(warmup);
 
             Draw.z(Layer.effect);
-            Lines.square(cx, cy, type.hitSize + 3.8f, srot);
-            Lines.square(cx, cy, type.hitSize + 3.8f, -srot);
+            Lines.square(cx, cy, entry.type.hitSize + 3.8f, srot);
+            Lines.square(cx, cy, entry.type.hitSize + 3.8f, -srot);
 
             Draw.z(Layer.buildBeam);
 
             for (int i = 0; i < mountRotations.length; i++) {
                 Tmp.v1.trns(mountRotations[i], mountRegion.height/8).add(mountPoses.get(i)).add(x, y);
-                Drawf.buildBeam(Tmp.v1.x, Tmp.v1.y, cx, cy, type.hitSize);
+                Drawf.buildBeam(Tmp.v1.x, Tmp.v1.y, cx, cy, entry.type.hitSize);
             }
         }
     }
