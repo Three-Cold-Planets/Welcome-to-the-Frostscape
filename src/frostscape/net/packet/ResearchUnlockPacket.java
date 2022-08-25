@@ -3,27 +3,24 @@ package frostscape.net.packet;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.Frostscape;
-import frostscape.type.upgrade.Upgrade;
-import frostscape.world.upgrades.UpgradeHandler;
+import frostscape.world.research.ResearchHandler;
 import mindustry.game.Team;
-import mindustry.gen.Itemsc;
-import mindustry.io.TypeIO;
 import mindustry.net.NetConnection;
 import mindustry.net.Packet;
 
-public class UpgradeUnlockPacket extends Packet {
-    int upgradeId, teamId;
+public class ResearchUnlockPacket extends Packet {
+    int researchId, teamId;
 
-    public UpgradeUnlockPacket() {
+    public ResearchUnlockPacket() {
     }
 
     public void read(Reads read) {
-        this.upgradeId = read.i();
+        this.researchId = read.i();
         this.teamId = read.i();
     }
 
     public void write(Writes write) {
-        write.i(upgradeId);
+        write.i(researchId);
         write.i(teamId);
     }
 
@@ -32,7 +29,7 @@ public class UpgradeUnlockPacket extends Packet {
     }
 
     public void handled() {
-        this.upgradeId = READ.i();
+        this.researchId = READ.i();
         this.teamId = READ.i();
     }
 
@@ -41,7 +38,7 @@ public class UpgradeUnlockPacket extends Packet {
     }
 
     public void handleClient() {
-        Frostscape.upgrades.unlock(Team.get(teamId), UpgradeHandler.upgrades.get(upgradeId));
+        Frostscape.research.unlock(Team.get(teamId), ResearchHandler.types.get(researchId));
     }
 
     public void handleServer(NetConnection con) {

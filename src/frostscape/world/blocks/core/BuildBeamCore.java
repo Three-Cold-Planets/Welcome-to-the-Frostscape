@@ -100,6 +100,7 @@ public class BuildBeamCore extends FrostscapeCore{
                 Tmp.v1.trns(mountRotations[i], mountRegion.height/8).add(mountPoses.get(i)).add(x, y);
                 Drawf.buildBeam(Tmp.v1.x, Tmp.v1.y, cx, cy, entry.type.hitSize);
             }
+            Fill.square(cx, cy, entry.type.hitSize);
         }
     }
 }

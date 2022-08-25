@@ -1,7 +1,9 @@
 package frostscape.world;
 
+import arc.func.Prov;
 import arc.struct.Seq;
 import frostscape.type.upgrade.Upgrade;
+import mindustry.gen.Building;
 import mindustry.world.Block;
 
 public class FrostscapeBlock extends Block {
@@ -14,6 +16,7 @@ public class FrostscapeBlock extends Block {
         this.hasItems = true;
     }
 
+    //Aplicable upgrades
     public Seq<Upgrade> upgrades = new Seq<>();
 
     @Override

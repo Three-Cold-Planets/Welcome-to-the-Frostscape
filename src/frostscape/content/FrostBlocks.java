@@ -3,12 +3,14 @@ package frostscape.content;
 import arc.graphics.Color;
 import arc.math.geom.*;
 import arc.struct.Seq;
+import frostscape.Frostscape;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
+import frostscape.world.research.ResearchHandler;
 import mindustry.content.*;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.game.Team;
@@ -28,7 +30,6 @@ public class FrostBlocks {
 
     public static CoreSiphon coreSiphon;
     public static ItemTurret pyroclast;
-
     public static FrostscapeCore coreBunker;
 
     public static void load(){
@@ -153,7 +154,7 @@ public class FrostBlocks {
             for (int i = 1; i < Geometry.d8.length; i += 2) {
                 mountPoses.add(new Vec2(Geometry.d8[i].x * 29/2, Geometry.d8[i].y * 29/2));
             }
-            entries.add(new UnitEntry(null, FrostUpgrades.improvedWelding, 180, UnitTypes.pulsar));
+            entries.add(new UnitEntry(null, new ResearchedLockedCond(FrostResearch.improvedWelding), 180, UnitTypes.pulsar));
             defaultEntry = entries.get(0);
         }};
     }

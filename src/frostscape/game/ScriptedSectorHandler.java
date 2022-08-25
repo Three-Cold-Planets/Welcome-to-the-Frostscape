@@ -60,7 +60,7 @@ public class ScriptedSectorHandler implements Loadable, CustomChunk {
 
     @Override
     public void write(DataOutput stream) throws IOException {
-        Log.info("Writing sector controller");
+        //Log.info("Writing sector controller");
         Writes write = new Writes(stream);
         write.str(controller.name);
         controller.write(new Writes(stream));
@@ -69,40 +69,40 @@ public class ScriptedSectorHandler implements Loadable, CustomChunk {
 
     @Override
     public void read(DataInput stream) throws IOException {
-        Log.info("Reading sector controller");
+        //Log.info("Reading sector controller");
         Reads reads = new Reads(stream);
         String lastName = reads.str();
-        Log.info(lastName);
+        //Log.info(lastName);
         SectorController last = controllers.find(c -> c.name.equals(lastName));
 
         String current = state.rules.tags.get(saveKey, "");
         controller = controllers.find(c -> c.name.equals(current));
 
-        Log.info(current);
+        //Log.info(current);
 
-        Log.info(last);
-        Log.info(controller);
+        //Log.info(last);
+        //Log.info(controller);
 
         //If the controllers don't match. Get the last controller to read the data and then reset it.
         if(last != controller) {
             last.read(reads);
             last.reset();
-            Log.err("Sector controllers " + controller + " in map " + state.map.file.name() + " conflicts with previously saved controller of " + last);
+            //Log.err("Sector controllers " + controller + " in map " + state.map.file.name() + " conflicts with previously saved controller of " + last);
             return;
         }
         if(controller == null) return;
         controller.read(reads);
-        Log.info("Read controller successfully");
+        //Log.info("Read controller successfully");
         hasRead = true;
     }
 
     public void reRead(){
-        Log.info("Reading tags again");
+        //Log.info("Reading tags again");
         String current = state.rules.tags.get(saveKey, "");
-        Log.info(current);
+        //Log.info(current);
         if(current == "") return;
         controller = controllers.find(c -> c.name.equals(current));
-        Log.info(controller);
+        //Log.info(controller);
     }
     
 

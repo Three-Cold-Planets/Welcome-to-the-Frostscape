@@ -1,15 +1,21 @@
 package frostscape.world.blocks.core;
 
 import arc.Core;
+import arc.func.Boolf;
+import arc.func.Boolp;
+import arc.func.Prov;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.scene.ui.layout.Scl;
 import arc.struct.IntSeq;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Time;
 import frostscape.Frostscape;
+import frostscape.content.FrostResearch;
 import frostscape.type.upgrade.Upgrade;
+import frostscape.world.research.ResearchHandler.ResearchType;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
 import mindustry.game.Team;
@@ -19,9 +25,14 @@ import mindustry.type.UnitType;
 import mindustry.world.Tile;
 import mindustry.world.blocks.storage.CoreBlock;
 
-public class FrostscapeCore extends CoreBlock {
-    protected static boolean canSpawn = false, building = false;
+import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
+public class FrostscapeCore extends BaseCore {
+    //Bytebuffer used in sending player data as an array of bytes
+    static final ByteBuffer b = ByteBuffer.wrap(new byte[4]);
+    protected static boolean canSpawn = false, building = false;
     public float warmupSpeed = 0.12f, warmDownSpeed = 0.08f;
     public float constructTime = 150;
     public float targetScale = Scl.scl(1);
@@ -33,14 +44,15 @@ public class FrostscapeCore extends CoreBlock {
 
     public FrostscapeCore(String name) {
         super(name);
-        config(Byte[].class, (build, b) -> {
+        config(Byte[].class, (build, bytes) -> {
             FrostscapeCoreBuild core = ((FrostscapeCoreBuild) build);
-            byte id = b[0];
+            int id = ByteBuffer.wrap(new byte[]{bytes[0], bytes[1], bytes[2], bytes[3]}, 0, 4).getInt();
             Player spawn = Groups.player.getByID(id);
+            Log.info("I've been configured by " + id);
             if(spawn != null) {
                 if(!core.que.contains(spawn)) core.que.add(spawn);
                 else {
-                    switch (b[1]) {
+                    switch (bytes[4]) {
                         case 1:
                             core.que.remove(spawn);
                         case 2:
@@ -52,7 +64,7 @@ public class FrostscapeCore extends CoreBlock {
     }
 
 
-    public class FrostscapeCoreBuild extends CoreBuild{
+    public class FrostscapeCoreBuild extends BaseCoreBuild {
 
         public float warmup = 0;
         public Seq<Player> que = Seq.with();
@@ -71,6 +83,58 @@ public class FrostscapeCore extends CoreBlock {
             return super.init(tile, team, shouldAdd, rotation);
         }
 
+
+        @Override
+        public void updateTile(){
+            super.updateTile();
+            warmup = Mathf.lerpDelta(warmup, building ? 1 : 0, building ? warmupSpeed : warmDownSpeed);
+            updateSpawning();
+        }
+
+        public void updateSpawning(){
+            building = false;
+            if(que.size > 0 && entry != null && entry.isValid(team)) {
+                building = true;
+                progress += Time.delta * warmup;
+                constructPos.set(x, y).add(0, size * 16 + 8);
+                Player p = que.get(0);
+                canSpawn = true;
+                if (!(p.unit() == null || p.unit().isNull())){
+                    que.remove(p);
+                    return;
+                }
+                if(paused.contains(p.id)){
+                    if(que.size > 1) {
+                        que.remove(p);
+                        que.add(p);
+                    }
+                    return;
+                }
+                //No.
+                if(false && p == Vars.player){
+                    Vars.renderer.setScale(targetScale);
+                    Core.camera.position.lerp(x, y, Time.delta * cameraMoveSpeed);
+                }
+                if(progress >= constructTime && canSpawn) {
+                    progress = 0;
+                    Unit coreUnit = entry.type.spawn(team, constructPos.x, constructPos.y);
+                    coreUnit.rotation += 90;
+                    coreUnit.spawnedByCore = true;
+                    que.remove(0);
+                    Call.unitControl(p, coreUnit);
+                }
+            }
+        }
+
+        @Override
+        public float warmup() {
+            return warmup;
+        }
+
+        public float progressf(){
+            return progress/constructTime;
+        }
+
         public void setEntry(UnitEntry entry){
             this.entry = entry;
             if(entry == null) {
@@ -85,7 +149,13 @@ public class FrostscapeCore extends CoreBlock {
         }
 
         public void pause(byte playerId){
-            configure(new Byte[]{playerId, 2});
+
+            b.clear();
+            b.put(playerId);
+            b.hasArray();
+            byte[] out = b.array();
+
+            configure(new Byte[]{out[0], out[1], out[2], out[3], 2});
         }
 
         public void togglePause(Player player){
@@ -98,69 +168,43 @@ public class FrostscapeCore extends CoreBlock {
             paused.add(player.id);
             if(que.contains(player)) que.remove(player);
         }
-        
-        @Override
-        public void updateTile(){
-            super.updateTile();
-            building = false;
-            if(que.size > 0 && entry != null) {
-                building = true;
-                progress += Time.delta;
-                constructPos.set(x, y).add(0, size * 16 + 8);
-                Player p = que.get(0);
-                canSpawn = true;
-                if(paused.contains(p.id)){
-                    canSpawn = false;
-                    if(que.size > 1) {
-                        que.remove(p);
-                        que.add(p);
-                    }
-                }
-                if(false && p == Vars.player){
-                    Vars.renderer.setScale(targetScale);
-                    Core.camera.position.lerp(x, y, Time.delta * cameraMoveSpeed);
-                }
-                if(progress >= constructTime && canSpawn) {
-                    progress = 0;
-                    Unit coreUnit = entry.type.spawn(team, constructPos.x, constructPos.y);
-                    coreUnit.rotation += 90;
-                    coreUnit.spawnedByCore = true;
-                    que.remove(0);
-                    Call.unitControl(p, coreUnit);
-                }
-            }
-            warmup = Mathf.lerpDelta(warmup, building ? 1 : 0, building ? warmupSpeed : warmDownSpeed);
-        }
-
-        @Override
-        public float warmup() {
-            return warmup;
-        }
-
-        public float progressf(){
-            return progress/constructTime;
-        }
 
         public void requestSpawn(Player player){
-            configure(new Byte[]{(byte) player.id, 0});
+
+            b.clear();
+            b.putInt(player.id);
+            b.hasArray();
+            byte[] out = b.array();
+
+            configure(new Byte[]{out[0], out[1], out[2], out[3], 3});
         }
     }
 
     public class UnitEntry{
-        public Upgrade locked;
-        public Upgrade unlocked;
+        public Boolf<Team> locked;
+        public Boolf<Team> unlocked;
         public float constructionTime;
         public UnitType type;
 
-        public UnitEntry(Upgrade unlockedBy, Upgrade lockedBy, float constructionTime, UnitType type){
+        public UnitEntry(Boolf<Team> unlockedBy, Boolf<Team> lockedBy, float constructionTime, UnitType type){
             this.unlocked = unlockedBy;
             this.locked = lockedBy;
             this.constructionTime = constructionTime;
             this.type = type;
         }
 
-        public boolean isValid(){
-            return (locked == null || !locked.unlocked(Vars.player.team())) && (unlocked == null || unlocked.unlocked(Vars.player.team()));
+        public boolean isValid(Team team){
+            return (locked == null || !locked.get(team)) && (unlocked == null || unlocked.get(team));
+        }
+    }
+    public class ResearchedLockedCond implements Boolf<Team>{
+        public ResearchType research;
+        public ResearchedLockedCond(ResearchType research){
+            this.research = research;
+        }
+        @Override
+        public boolean get(Team team) {
+            return Frostscape.research.getData(team, research).unlocked;
         }
     }
 }

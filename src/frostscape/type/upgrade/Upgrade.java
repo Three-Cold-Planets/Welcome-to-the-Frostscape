@@ -1,7 +1,10 @@
 package frostscape.type.upgrade;
 
 import arc.struct.Seq;
+import arc.util.Strings;
 import frostscape.Frostscape;
+import frostscape.content.FrostResearch;
+import frostscape.world.research.ResearchHandler;
 import frostscape.world.upgrades.UpgradeHandler;
 import mindustry.Vars;
 import mindustry.game.Team;
@@ -13,6 +16,10 @@ public class Upgrade<T> {
     public Seq<UpgradeCondition> conditions = new Seq<UpgradeCondition>();
     public ItemStack[][] stackCosts;
     public int stacks;
+    //loaded from settings, used by the player to categorize upgrades.
+    public String[] tags;
+    //
+    public ResearchHandler.ResearchType unlockedBy;
 
     public Upgrade(String name, ItemStack[] cost){
         UpgradeHandler.upgrades.add(this);
@@ -29,14 +36,10 @@ public class Upgrade<T> {
     }
 
     public boolean unlocked(Team team){
-        return Frostscape.upgrades.getData(team, this).state > 0;
+        return Frostscape.research.getData(team, unlockedBy).unlocked;
     }
 
-    public void unlock(Team team){
-        Frostscape.upgrades.unlock(team, this);
-    }
-
-    public void update(T build){
+    public void update(T entity){
 
     }
 

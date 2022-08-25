@@ -1,14 +1,25 @@
 package frostscape.world.upgrades;
 
+import arc.util.io.Reads;
+import arc.util.io.Writes;
+import frostscape.io.ItemIO;
 import frostscape.type.upgrade.Upgrade;
+import mindustry.gen.Building;
 import mindustry.type.ItemStack;
+
+import static frostscape.world.upgrades.UpgradeHandler.upgrades;
 
 public class UpgradeState {
     public ItemStack[] cost, items;
     public Upgrade upgrade;
+    public int level = 0;
     public float progress;
     public boolean installed = false, installing = false;
-    
+
+    //NOTE: Only to be used for reading data!
+    public UpgradeState(){
+
+    }
     public UpgradeState(Upgrade upgrade, ItemStack[] cost){
         this.upgrade = upgrade;
         this.cost = cost;
@@ -39,6 +50,24 @@ public class UpgradeState {
     public enum ProgressType{
         TOTAL,
         PER_ITEM
+    }
+
+    public void write(Writes write){
+        write.str(upgrade.name);
+        write.i(level);
+        write.f(progress);
+        ItemIO.writeStacks(write, cost);
+        ItemIO.writeStacks(write, items);
+    }
+
+    public UpgradeState read(Reads read){
+        String name = read.str();
+        upgrade = upgrades.find(up -> up.name.equals(name));
+        level = read.i();
+        progress = read.f();
+        cost = ItemIO.readStacks(read);
+        items = ItemIO.readStacks(read);
+        return this;
     }
 }
 

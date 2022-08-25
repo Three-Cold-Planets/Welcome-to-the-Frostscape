@@ -373,6 +373,7 @@ public class CoreSiphon extends FrostscapeBlock {
             Draw.rect(topRegion, x, y, 0);
         }
 
+
         public void onProximityUpdate() {
             super.onProximityUpdate();
             amount = 0.0F;
