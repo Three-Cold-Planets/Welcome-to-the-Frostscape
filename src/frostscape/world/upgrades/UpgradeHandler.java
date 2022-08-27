@@ -5,7 +5,10 @@ import arc.struct.IntMap.Entry;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.type.upgrade.Upgrade;
+import frostscape.type.upgrade.Upgradeable;
+import frostscape.type.upgrade.UpgradeableBuilding;
 import mindustry.game.Team;
+import mindustry.gen.Building;
 import mindustry.io.SaveFileReader.CustomChunk;
 import mindustry.io.SaveVersion;
 

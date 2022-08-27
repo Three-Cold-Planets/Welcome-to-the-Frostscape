@@ -3,24 +3,18 @@ package frostscape.content;
 import arc.graphics.Color;
 import arc.math.geom.*;
 import arc.struct.Seq;
-import frostscape.Frostscape;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
-import frostscape.world.research.ResearchHandler;
 import mindustry.content.*;
 import mindustry.entities.pattern.ShootSpread;
-import mindustry.game.Team;
 import mindustry.gen.Sounds;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.production.*;
-import mindustry.world.draw.DrawHeatInput;
-import mindustry.world.draw.DrawHeatOutput;
 
 public class FrostBlocks {
     public static Floor frostStone, frostSnow, andesiteFloor, volcanicAndesiteFloor, paileanFloor;
@@ -52,14 +46,14 @@ public class FrostBlocks {
         crackedAndesiteFloor = new CrackedBlock("cracked-andesite-floor"){{
             variants = 5;
             blendGroup = volcanicAndesiteFloor;
-            minBlinkTime = 60 * 5;
+            blinkTimeRange = 60 * 5;
             maxBlinkTime = 60 * 9;
         }};
 
         fracturedAndesiteFloor = new CrackedBlock("fractured-andesite-floor"){{
             variants = 3;
             blendGroup = volcanicAndesiteFloor;
-            minBlinkTime = 60 * 3;
+            blinkTimeRange = 60 * 3;
             maxBlinkTime = 60 * 6;
         }};
 

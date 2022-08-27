@@ -3,8 +3,10 @@ package frostscape.world.blocks.core;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.type.upgrade.Upgradeable;
+import frostscape.type.upgrade.UpgradeableBuilding;
 import frostscape.world.module.UpgradeModule;
 import frostscape.world.upgrades.UpgradeState;
+import mindustry.gen.Building;
 import mindustry.world.blocks.storage.CoreBlock;
 
 public class BaseCore extends CoreBlock {
@@ -12,7 +14,7 @@ public class BaseCore extends CoreBlock {
         super(name);
     }
 
-    public class BaseCoreBuild extends CoreBuild implements Upgradeable {
+    public class BaseCoreBuild extends CoreBuild implements UpgradeableBuilding {
         public float
                 damageMultiplier,
                 healthMultiplier,
@@ -58,6 +60,11 @@ public class BaseCore extends CoreBlock {
         @Override
         public void resetDeltas() {
             damageMultiplier = healthMultiplier = speedMultiplier = reloadMultiplier = buildSpeedMultiplier = 1;
+        }
+
+        @Override
+        public Building self() {
+            return this;
         }
     }
 }

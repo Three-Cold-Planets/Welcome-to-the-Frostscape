@@ -1,25 +1,23 @@
 package frostscape;
 
 import arc.*;
+import arc.graphics.g2d.Draw;
 import arc.struct.Seq;
 import arc.util.*;
-import frostscape.game.ScriptedSector;
 import frostscape.game.ScriptedSectorHandler;
-import frostscape.graphics.Draww;
 import frostscape.ui.FrostUI;
+import frostscape.ui.overlay.SelectOverlay;
 import frostscape.util.UIUtils;
 import frostscape.world.environment.FloorDataHandler;
 import frostscape.world.meta.Family;
 import frostscape.world.research.ResearchHandler;
-import frostscape.world.upgrades.UpgradeHandler;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.game.EventType.*;
+import mindustry.graphics.Layer;
 import mindustry.mod.*;
 import rhino.ImporterTopLevel;
 import rhino.NativeJavaPackage;
-
-import java.nio.ByteBuffer;
 
 public class Frostscape extends Mod{
 
@@ -31,6 +29,9 @@ public class Frostscape extends Mod{
     public static FloorDataHandler floors = new FloorDataHandler();
     public static ResearchHandler research = new ResearchHandler();
 
+    //Initialized during adding processes to the async core
+    public static SelectOverlay selection = new SelectOverlay();
+
     public Frostscape(){
 
         Events.on(EventType.ClientLoadEvent.class,
@@ -41,6 +42,15 @@ public class Frostscape extends Mod{
 
         Events.on(EventType.ContentInitEvent.class, e -> {
 
+        });
+
+        Events.run(Trigger.update, () -> {
+            if(!Vars.state.isPlaying()) return;
+            selection.update();
+        });
+
+        Events.run(Trigger.draw, () -> {
+            Draw.draw(Layer.overlayUI, selection::drawSelect);
         });
     }
 

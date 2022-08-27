@@ -1,18 +1,13 @@
 package frostscape.world;
 
-import arc.struct.Seq;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import frostscape.type.upgrade.Upgrade;
-import frostscape.type.upgrade.Upgradeable;
+import frostscape.type.upgrade.UpgradeableBuilding;
 import frostscape.world.module.UpgradeModule;
 import frostscape.world.upgrades.UpgradeState;
-import frostscape.world.upgrades.UpgradeState.ProgressType;
-import mindustry.game.Team;
 import mindustry.gen.Building;
-import mindustry.world.Block;
 
-public class FrostscapeBuilding extends Building implements Upgradeable {
+public class FrostscapeBuilding extends Building implements UpgradeableBuilding {
     public float
             damageMultiplier,
             healthMultiplier,
@@ -58,5 +53,10 @@ public class FrostscapeBuilding extends Building implements Upgradeable {
     @Override
     public void resetDeltas() {
         damageMultiplier = healthMultiplier = speedMultiplier = reloadMultiplier = buildSpeedMultiplier = 1;
+    }
+
+    @Override
+    public Building self() {
+        return this;
     }
 }
