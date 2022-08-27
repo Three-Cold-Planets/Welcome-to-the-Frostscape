@@ -48,7 +48,6 @@ public class FrostscapeCore extends BaseCore {
             FrostscapeCoreBuild core = ((FrostscapeCoreBuild) build);
             int id = ByteBuffer.wrap(new byte[]{bytes[0], bytes[1], bytes[2], bytes[3]}, 0, 4).getInt();
             Player spawn = Groups.player.getByID(id);
-            Log.info("I've been configured by " + id);
             if(spawn != null) {
                 if(!core.que.contains(spawn)) core.que.add(spawn);
                 else {
@@ -93,7 +92,8 @@ public class FrostscapeCore extends BaseCore {
 
         public void updateSpawning(){
             building = false;
-            if(que.size > 0 && entry != null && entry.isValid(team)) {
+            if(!entry.isValid(team)) entry = entries.find(e -> e.isValid(team));
+            if(que.size > 0 && entry != null) {
                 building = true;
                 progress += Time.delta * warmup;
                 constructPos.set(x, y).add(0, size * 16 + 8);
@@ -133,6 +133,10 @@ public class FrostscapeCore extends BaseCore {
 
         public float progressf(){
             return progress/constructTime;
+        }
+
+        public void setEntry(int entry){
+            setEntry(entries.get(entry));
         }
 
         public void setEntry(UnitEntry entry){

@@ -13,6 +13,20 @@ import mindustry.gen.Building;
 import mindustry.world.Block;
 
 public class FrostscapeBuilding extends Building implements Upgradeable {
+    public float
+            damageMultiplier,
+            healthMultiplier,
+            speedMultiplier,
+            reloadMultiplier,
+            buildSpeedMultiplier;
+
+    @Override
+    public void update() {
+        resetDeltas();
+        upgrades.update(this);
+        super.update();
+    }
+
     public UpgradeModule upgrades = new UpgradeModule();
 
     @Override
@@ -30,5 +44,19 @@ public class FrostscapeBuilding extends Building implements Upgradeable {
     @Override
     public UpgradeModule upgrades() {
         return upgrades;
+    }
+
+    @Override
+    public void applyDeltas(UpgradeState state) {
+        damageMultiplier += state.upgrade.damageMultiplier[state.level];
+        healthMultiplier += state.upgrade.healthMultiplier[state.level];
+        speedMultiplier += state.upgrade.speedMultiplier[state.level];
+        reloadMultiplier += state.upgrade.reloadMultiplier[state.level];
+        buildSpeedMultiplier += state.upgrade.buildSpeedMultiplier[state.level];
+    }
+
+    @Override
+    public void resetDeltas() {
+        damageMultiplier = healthMultiplier = speedMultiplier = reloadMultiplier = buildSpeedMultiplier = 1;
     }
 }

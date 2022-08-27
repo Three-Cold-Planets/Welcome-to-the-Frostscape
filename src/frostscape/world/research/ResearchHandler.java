@@ -2,6 +2,7 @@ package frostscape.world.research;
 
 import arc.struct.IntMap;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.Vars;
@@ -89,7 +90,7 @@ public class ResearchHandler implements CustomChunk {
     public class ResearchData{
         public ResearchType type;
         public float progress;
-        public boolean unlocked = false;
+        public boolean unlocked;
 
         public ResearchData(ResearchType type, boolean unlocked){
             this.type = type;
@@ -104,6 +105,12 @@ public class ResearchHandler implements CustomChunk {
         public ResearchType(String name, float researchTime){
             this.name = Vars.content.transformName(name);
             this.researchTime = researchTime;
+            types.add(this);
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }

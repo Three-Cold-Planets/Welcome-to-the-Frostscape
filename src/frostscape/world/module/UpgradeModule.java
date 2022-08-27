@@ -4,10 +4,19 @@ import arc.struct.Seq;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.type.upgrade.Upgrade;
+import frostscape.type.upgrade.Upgradeable;
 import frostscape.world.upgrades.UpgradeState;
 import mindustry.world.modules.BlockModule;
 
 public class UpgradeModule extends BlockModule {
+
+    public Seq<UpgradeState> states = new Seq<>();
+
+    public void update(Upgradeable u){
+        states.each(s -> {
+            u.applyDeltas(s);
+        });
+    }
 
     @Override
     public void write(Writes write){
@@ -22,8 +31,6 @@ public class UpgradeModule extends BlockModule {
             states.add(new UpgradeState().read(read));
         }
     }
-
-    public Seq<UpgradeState> states = new Seq<>();
 
     public float getProgress(UpgradeState.ProgressType type){
         float total = 0;

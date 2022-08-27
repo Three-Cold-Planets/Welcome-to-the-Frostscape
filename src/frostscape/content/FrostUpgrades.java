@@ -9,6 +9,10 @@ public class FrostUpgrades {
 
     public static Upgrade improvedWelding;
     public static void load(){
-        improvedWelding = new Upgrade("improved-welding", ItemStack.with());
+        improvedWelding = new Upgrade("improved-welding", ItemStack.with()){{
+            healthMultiplier = new float[]{
+                    1.15f
+            };
+        }};
     }
 }
