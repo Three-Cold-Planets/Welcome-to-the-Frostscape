@@ -11,12 +11,14 @@ import static frostscape.game.ScriptedSectorHandler.controllers;
 
 public class FrostContentLoader {
     public static void load(){
+        FrostResearch.load();
         Families.load();
         FrostItems.load();
         FrostBullets.load();
-        FrostBlocks.load();
+        FrostUpgrades.load();
         FrostStatusEffects.load();
         FrostUnits.load();
+        FrostBlocks.load();
         SectorControllers.load();
         Events.run(ClientLoadEvent.class, () -> {
             controllers.each(SectorController::load);

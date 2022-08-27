@@ -31,7 +31,7 @@ import static mindustry.Vars.mobile;
 public class FamilyDescriptionDialog extends BaseDialog {
 
     private String endingMessage = "END OF DOCUMENT";
-    private int buttons = 0;
+    private int entries = 0;
 
     public float maxWidth = 0;
     public Family current;
@@ -89,7 +89,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
                     search.addInputDialog();
                 }).left().padLeft(10);
             }).padLeft(maxWidth/2);
-
+            rebuildList();
         }).fill();
 
         show();
@@ -110,7 +110,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
                 map.get(content.getContentType()).add(content);
             });
 
-            buttons = 0;
+            entries = 0;
 
             endingMessage = "END OF DOCUMENT";
 
@@ -120,7 +120,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
                 members.each(member -> {
                         if (!member.localizedName.contains(search.getText()) && !(search.getText() == "")) return;
 
-                        if((buttons++ % columns) == 0) table.row();
+                        if((entries++ % columns) == 0) table.row();
                         Image image = new Image(member.uiIcon);
                         ClickListener listener = new ClickListener();
                         image.addListener(listener);
@@ -136,7 +136,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
                 });
             });
 
-            if(buttons == 0) endingMessage = "NO RESULTS FOUND";
+            if(entries == 0) endingMessage = "NO RESULTS FOUND";
         });
 
         unitList.row();

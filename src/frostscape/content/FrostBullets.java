@@ -23,8 +23,8 @@ public class FrostBullets {
             trailEffect = Fx.none;
         }};
 
-        pyraGel = new BouncyBulletType(2.5f, 10, "shell"){{
-            lifetime = 120;
+        pyraGel = new BouncyBulletType(2f, 10, "shell"){{
+            lifetime = 150;
             minLife = 48f;
             hitEffect = Fx.blastExplosion;
             despawnEffect = Fx.blastExplosion;
@@ -117,7 +117,7 @@ public class FrostBullets {
                         Fx.fireHit,
                         new Effect(15, e -> {
                             Draw.color(Pal.lightPyraFlame);
-                            Lines.stroke(e.fout() * 1.85f);
+                            Draw.alpha(e.fout() * e.fout());
                             Lines.circle(e.x, e.y, e.finpow() * 16);
                         })
                 };

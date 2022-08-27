@@ -11,6 +11,7 @@ import mindustry.Vars;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.gen.Tex;
+import mindustry.graphics.Layer;
 
 import static frostscape.util.WeatherUtils.windDirection;
 import static mindustry.content.Fx.rand;
@@ -35,6 +36,7 @@ public class Fxf {
     public static Effect
 
     glowEffect = new Effect(0, e -> {
+        Draw.z(Layer.floor);
         Building b = Vars.world.buildWorld(e.x, e.y);
         if(b != null) return;
         TextureRegion region = (TextureRegion) e.data;

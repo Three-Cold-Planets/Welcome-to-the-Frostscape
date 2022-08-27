@@ -1,10 +1,10 @@
 package frostscape.world;
 
+import arc.func.Prov;
 import arc.struct.Seq;
-import frostscape.world.upgrades.Upgrade;
-import mindustry.gen.Sounds;
+import frostscape.type.upgrade.Upgrade;
+import mindustry.gen.Building;
 import mindustry.world.Block;
-import mindustry.world.meta.BlockGroup;
 
 public class FrostscapeBlock extends Block {
     public FrostscapeBlock(String name) {
@@ -16,5 +16,11 @@ public class FrostscapeBlock extends Block {
         this.hasItems = true;
     }
 
+    //Aplicable upgrades
     public Seq<Upgrade> upgrades = new Seq<>();
+
+    @Override
+    public boolean isVisible() {
+        return super.isVisible();
+    }
 }

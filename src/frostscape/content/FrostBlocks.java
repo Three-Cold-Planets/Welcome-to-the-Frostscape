@@ -1,8 +1,10 @@
 package frostscape.content;
 
 import arc.graphics.Color;
-import arc.math.geom.Point2;
-import arc.math.geom.Vec2;
+import arc.math.geom.*;
+import arc.struct.Seq;
+import frostscape.world.blocks.core.BuildBeamCore;
+import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
@@ -13,9 +15,6 @@ import mindustry.gen.Sounds;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.production.*;
-import mindustry.world.draw.DrawHeatInput;
-import mindustry.world.draw.DrawHeatOutput;
 
 public class FrostBlocks {
     public static Floor frostStone, frostSnow, andesiteFloor, volcanicAndesiteFloor, paileanFloor;
@@ -25,6 +24,7 @@ public class FrostBlocks {
 
     public static CoreSiphon coreSiphon;
     public static ItemTurret pyroclast;
+    public static FrostscapeCore coreBunker;
 
     public static void load(){
         frostStone = new Floor("frost-stone"){{
@@ -32,7 +32,7 @@ public class FrostBlocks {
         }};
 
         frostSnow = new Floor("frost-snow"){{
-            variants = 2;
+            variants = 3;
         }};
 
         andesiteFloor = new Floor("andesite-floor"){{
@@ -46,14 +46,14 @@ public class FrostBlocks {
         crackedAndesiteFloor = new CrackedBlock("cracked-andesite-floor"){{
             variants = 5;
             blendGroup = volcanicAndesiteFloor;
-            minBlinkTime = 60 * 5;
+            blinkTimeRange = 60 * 5;
             maxBlinkTime = 60 * 9;
         }};
 
         fracturedAndesiteFloor = new CrackedBlock("fractured-andesite-floor"){{
             variants = 3;
             blendGroup = volcanicAndesiteFloor;
-            minBlinkTime = 60 * 3;
+            blinkTimeRange = 60 * 3;
             maxBlinkTime = 60 * 6;
         }};
 
@@ -104,14 +104,14 @@ public class FrostBlocks {
             range = 242;
             velocityRnd = 0.05f;
             ammo(
-                    Items.pyratite, FrostBullets.pyraGel
+                    Items.pyratite, FrostBullets.pyraNapalm
             );
             consumeLiquids(new LiquidStack(Liquids.oil, 1.35f));
 
             shoot = new ShootSpread(){{
-                shotDelay = 25;
+                shotDelay = 5;
                 shots = 3;
-                inaccuracy = 5;
+                inaccuracy = 15;
                 spread = 1;
             }};
             shootSound = Sounds.bang;
@@ -139,6 +139,20 @@ public class FrostBlocks {
             };
             clipSize = 170;
             variants = 1;
+        }};
+
+        coreBunker = new BuildBeamCore("core-bunker"){{
+            requirements(Category.effect, ItemStack.empty);
+            size = 5;
+            mountPoses = new Seq<>();
+            for (int i = 1; i < Geometry.d8.length; i += 2) {
+                mountPoses.add(new Vec2(Geometry.d8[i].x * 29/2, Geometry.d8[i].y * 29/2));
+            }
+            entries.addAll(
+                    new UnitEntry(null, new ResearchedLockedCond(FrostResearch.improvedWelding), 180, UnitTypes.pulsar),
+                    new UnitEntry(new ResearchedLockedCond(FrostResearch.improvedWelding), null, 300, UnitTypes.quasar)
+            );
+            defaultEntry = entries.get(0);
         }};
     }
 }

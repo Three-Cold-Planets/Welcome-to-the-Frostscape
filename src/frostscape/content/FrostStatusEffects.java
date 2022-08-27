@@ -16,7 +16,8 @@ public class FrostStatusEffects {
         }};
 
         engineBoost = new StatusEffect("engine-boost"){{
-            speedMultiplier = 1.45f;
+            speedMultiplier = 2.45f;
+            dragMultiplier = 0.5f;
         }};
     }
 }

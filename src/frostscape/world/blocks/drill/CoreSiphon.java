@@ -123,7 +123,19 @@ public class CoreSiphon extends FrostscapeBlock {
         Tile tile = Vars.world.tile(x, y);
         if (tile != null) {
             countOre(tile);
-            if(returnCount == 0) drawPlaceText(Core.bundle.get("bar.nocrackedfloors"), x, y, valid);
+            if(returnCount == 0) {
+                Iterator ittr = tile.getLinkedTilesAs(this, tempTiles).iterator();
+
+                boolean slag = false;
+                while(ittr.hasNext()) {
+                    Tile other = (Tile)ittr.next();
+                    if (canPump(other)) {
+                        slag = true;
+                    }
+                }
+                if(slag) drawPlaceText(Core.bundle.get("bar.pumpabletiles"), x, y, valid);
+                else drawPlaceText(Core.bundle.get("bar.nocrackedfloors"), x, y, valid);
+            }
             else drawPlaceText(Core.bundle.format("bar.crackedfloors", returnCount), x, y, valid);
         }
     }
@@ -149,19 +161,21 @@ public class CoreSiphon extends FrostscapeBlock {
     public boolean canPlaceOn(Tile tile, Team team, int rotation) {
         boolean cracked = super.canPlaceOn(tile, team, rotation);
         if (isMultiblock()) {
-            Liquid last = null;
+            countOre(tile);
+            if(returnCount > 1) return true;
             Iterator ittr = tile.getLinkedTilesAs(this, tempTiles).iterator();
 
             while(ittr.hasNext()) {
                 Tile other = (Tile)ittr.next();
-                if (other.floor().liquidDrop != null) {
-                    last = other.floor().liquidDrop;
+                if (other.floor().liquidDrop == slagLiquid) {
+                    return true;
                 }
             }
 
-            return last != null || cracked;
+            //No Tiles of interest found, return here
+            return false;
         } else {
-            return canPump(tile) || cracked;
+            return canPump(tile) || canMine(tile);
         }
     }
 
@@ -257,7 +271,6 @@ public class CoreSiphon extends FrostscapeBlock {
                                 drill.progress = 0;
                                 drill.curFloor = getCracked(nextTarget);
                                 drill.drilling = true;
-                                Log.info(drilling.contains(nextTarget.pos()));
                                 drilling.add(nextTarget.pos());
                                 state = 0;
                             } else {
@@ -373,6 +386,7 @@ public class CoreSiphon extends FrostscapeBlock {
             }
             Draw.rect(topRegion, x, y, 0);
         }
+
 
         public void onProximityUpdate() {
             super.onProximityUpdate();
