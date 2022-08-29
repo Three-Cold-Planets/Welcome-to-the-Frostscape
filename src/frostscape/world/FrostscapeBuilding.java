@@ -1,11 +1,14 @@
 package frostscape.world;
 
+import arc.util.Log;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.type.upgrade.UpgradeableBuilding;
 import frostscape.world.module.UpgradeModule;
 import frostscape.world.upgrades.UpgradeState;
+import mindustry.Vars;
 import mindustry.gen.Building;
+import mindustry.gen.Statusc;
 
 public class FrostscapeBuilding extends Building implements UpgradeableBuilding {
     public float
@@ -20,6 +23,16 @@ public class FrostscapeBuilding extends Building implements UpgradeableBuilding 
         resetDeltas();
         upgrades.update(this);
         super.update();
+    }
+
+    @Override
+    public void damage(float damage) {
+        super.damage(damage/healthMultiplier);
+    }
+
+    @Override
+    public void heal(float amount) {
+        super.heal(amount/healthMultiplier);
     }
 
     public UpgradeModule upgrades = new UpgradeModule();
@@ -43,6 +56,7 @@ public class FrostscapeBuilding extends Building implements UpgradeableBuilding 
 
     @Override
     public void applyDeltas(UpgradeState state) {
+        
         damageMultiplier += state.upgrade.damageMultiplier[state.level];
         healthMultiplier += state.upgrade.healthMultiplier[state.level];
         speedMultiplier += state.upgrade.speedMultiplier[state.level];

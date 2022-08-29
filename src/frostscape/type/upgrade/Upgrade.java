@@ -3,11 +3,13 @@ package frostscape.type.upgrade;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.struct.StringMap;
+import arc.util.Log;
 import arc.util.Strings;
 import frostscape.Frostscape;
 import frostscape.content.FrostResearch;
 import frostscape.world.research.ResearchHandler;
 import frostscape.world.upgrades.UpgradeHandler;
+import frostscape.world.upgrades.UpgradeState;
 import mindustry.Vars;
 import mindustry.game.Team;
 import mindustry.type.ItemStack;
@@ -51,12 +53,32 @@ public class Upgrade<T> {
     public void initialiseDeltas(){
         float[][] empty = new float[6][];
         if(healthMultiplier == null) healthMultiplier = new float[stacks];
+        if(damageMultiplier == null) damageMultiplier = new float[stacks];
+        if(reloadMultiplier == null) reloadMultiplier = new float[stacks];
+        if(speedMultiplier == null) speedMultiplier = new float[stacks];
+        if(buildSpeedMultiplier == null) buildSpeedMultiplier = new float[stacks];
     };
 
     public boolean unlocked(Team team){
         return Frostscape.research.getData(team, unlockedBy).unlocked;
     }
 
+    //Generates an array of floats used in upgrade stats. PUT THE INDEXES IN ORDER
+    public static float[] genStats(int size, float base, int[] indexes, float[] values){
+        float[] returnArr = new float[size];
+        float current = base;
+        int index = 0;
+        for (int i = 0; i < size; i++) {
+            Log.info(index);
+            Log.info(index < indexes.length);
+            if(index < indexes.length && indexes[index] == i) {
+                current = values[index];
+                index++;
+            }
+            returnArr[i] = current;
+        }
+        return returnArr;
+    }
     public interface UpgradeCondition{
         boolean valid();
     }

@@ -15,11 +15,26 @@ import mindustry.io.SaveVersion;
 import java.io.*;
 import java.util.Iterator;
 
-public class UpgradeHandler {
+public class UpgradeHandler implements CustomChunk{
 
     public static Seq<Upgrade> upgrades = new Seq<Upgrade>();
 
     public UpgradeHandler(){
 
+    }
+
+    //Makes upgrades instant
+    public boolean instantUpgrades = true;
+
+    @Override
+    public void write(DataOutput stream) throws IOException {
+        Writes write = new Writes(stream);
+        write.bool(instantUpgrades);
+    }
+
+    @Override
+    public void read(DataInput stream) throws IOException {
+        Reads reads = new Reads(stream);
+        instantUpgrades = reads.bool();
     }
 }
