@@ -18,19 +18,25 @@ import mindustry.world.blocks.defense.ShockMine;
 import mindustry.world.blocks.production.GenericCrafter;
 
 public class DrawUpgradePart extends UpgradeDrawer{
-    public TextureRegion[] regions;
-    public TextureRegion base;
+    public String[] regions;
 
-    public DrawUpgradePart(TextureRegion base, TextureRegion[] regions, Upgrade upgrade){
+    public TextureRegion[] loaded;
+    public String base;
+    public TextureRegion loadedBase;
+
+    public DrawUpgradePart(String base, String[] regions, Upgrade upgrade){
         this.regions = regions;
         this.base = base;
+        this.upgrade = upgrade;
+        loaded = new TextureRegion[regions.length];
     }
 
     @Override
     public void draw(Building build) {
         super.draw(build);
         TextureRegion region = getRegion(build);
-        if(region == null) region = base;
+        if(region == null) region = loadedBase;
+        Draw.rect(region, build.x, build.y);
     }
 
     public TextureRegion getRegion(Building build){
@@ -38,7 +44,7 @@ public class DrawUpgradePart extends UpgradeDrawer{
         UpgradeableBuilding building = (UpgradeableBuilding) build;
         UpgradeState state = building.upgrades().states.find(s -> s.upgrade == upgrade);
         if(state == null) return null;
-        return regions[state.level];
+        return loaded[state.level];
     }
 
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
@@ -46,7 +52,10 @@ public class DrawUpgradePart extends UpgradeDrawer{
     }
 
     public void load(Block block){
-
+        for (int i = 0; i < regions.length; i++) {
+            loaded[i] = Core.atlas.find(regions[i]);
+        }
+        loadedBase = Core.atlas.find(base);
     }
 
     public TextureRegion[] icons(Block block){

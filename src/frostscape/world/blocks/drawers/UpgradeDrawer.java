@@ -11,7 +11,7 @@ public class UpgradeDrawer extends DrawBlock {
     public Upgrade upgrade;
 
     public UpgradesBlock expectUpgradeable(Block block){
-        if(!(block instanceof UpgradesBlock crafter)) throw new ClassCastException("This drawer requires the block to be a GenericCrafter. Use a different drawer.");
-        return (UpgradesBlock) crafter;
+        if(!(block instanceof UpgradesBlock upgradeable)) throw new ClassCastException("This drawer requires the block to implement UpgradeableBlock. Use a different drawer.");
+        return upgradeable;
     }
 }

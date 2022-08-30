@@ -6,6 +6,7 @@ import frostscape.type.upgrade.Upgrade;
 import frostscape.world.blocks.drawers.UpgradeDrawer;
 import mindustry.gen.Building;
 import mindustry.world.Block;
+import mindustry.world.draw.DrawBlock;
 
 public class FrostscapeBlock extends Block implements UpgradesBlock{
     public FrostscapeBlock(String name) {

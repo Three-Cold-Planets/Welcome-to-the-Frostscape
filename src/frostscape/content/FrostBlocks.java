@@ -1,11 +1,16 @@
 package frostscape.content;
 
+import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.geom.*;
 import arc.struct.Seq;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
+import frostscape.world.blocks.defense.ThermalMine;
+import frostscape.world.blocks.defense.UpgradeableMine;
+import frostscape.world.blocks.drawers.DrawUpgradePart;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
@@ -15,6 +20,9 @@ import mindustry.gen.Sounds;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.draw.DrawMulti;
+
+import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
     public static Floor frostStone, frostSnow, andesiteFloor, volcanicAndesiteFloor, paileanFloor;
@@ -25,6 +33,8 @@ public class FrostBlocks {
     public static CoreSiphon coreSiphon;
     public static ItemTurret pyroclast;
     public static FrostscapeCore coreBunker;
+
+    public static ThermalMine thermalLandmine;
 
     public static void load(){
         frostStone = new Floor("frost-stone"){{
@@ -153,6 +163,34 @@ public class FrostBlocks {
                     new UnitEntry(new ResearchedLockedCond(FrostResearch.improvedWelding), null, 300, UnitTypes.quasar)
             );
             defaultEntry = entries.get(0);
+        }};
+
+        thermalLandmine = new ThermalMine("thermal-landmine"){{
+            requirements(Category.effect, ItemStack.with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
+            health = 55;
+            tileDamage = 0.75f;
+
+            upgrades.addAll(FrostUpgrades.improvedBase, FrostUpgrades.improvedPayload);
+            drawer = new DrawMulti(
+                    new DrawUpgradePart(
+                            NAME + "-thermal-landmine-base0",
+                            new String[]{
+                                    NAME + "-thermal-landmine-base0",
+                                    NAME + "-thermal-landmine-base1",
+                                    NAME + "-thermal-landmine-base2"
+                            },
+                            FrostUpgrades.improvedBase
+                    ),
+                    new DrawUpgradePart(
+                            NAME + "-thermal-landmine-payload0",
+                            new String[]{
+                                    NAME + "-thermal-landmine-payload0",
+                                    NAME + "-thermal-landmine-payload1",
+                                    NAME + "-thermal-landmine-payload2"
+                            },
+                            FrostUpgrades.improvedPayload
+                    )
+            );
         }};
     }
 }

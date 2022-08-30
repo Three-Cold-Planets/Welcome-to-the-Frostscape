@@ -12,17 +12,25 @@ import mindustry.gen.Statusc;
 
 public class FrostscapeBuilding extends Building implements UpgradeableBuilding {
     public float
-            damageMultiplier,
-            healthMultiplier,
-            speedMultiplier,
-            reloadMultiplier,
-            buildSpeedMultiplier;
+            damageMultiplier = 1,
+            healthMultiplier = 1,
+            speedMultiplier = 1,
+            reloadMultiplier = 1,
+            rangeMultiplier = 1,
+            buildSpeedMultiplier = 1;
+
 
     @Override
-    public void update() {
+    public void updateTile() {
+        super.updateTile();
+
         resetDeltas();
         upgrades.update(this);
-        super.update();
+    }
+
+    @Override
+    public void draw() {
+        super.draw();
     }
 
     @Override
@@ -56,17 +64,17 @@ public class FrostscapeBuilding extends Building implements UpgradeableBuilding 
 
     @Override
     public void applyDeltas(UpgradeState state) {
-        
-        damageMultiplier += state.upgrade.damageMultiplier[state.level];
-        healthMultiplier += state.upgrade.healthMultiplier[state.level];
-        speedMultiplier += state.upgrade.speedMultiplier[state.level];
-        reloadMultiplier += state.upgrade.reloadMultiplier[state.level];
-        buildSpeedMultiplier += state.upgrade.buildSpeedMultiplier[state.level];
+        damageMultiplier *= state.upgrade.damageMultiplier[state.level];
+        healthMultiplier *= state.upgrade.healthMultiplier[state.level];
+        speedMultiplier *= state.upgrade.speedMultiplier[state.level];
+        reloadMultiplier *= state.upgrade.reloadMultiplier[state.level];
+        rangeMultiplier *= state.upgrade.rangeMultiplier[state.level];
+        buildSpeedMultiplier *= state.upgrade.buildSpeedMultiplier[state.level];
     }
 
     @Override
     public void resetDeltas() {
-        damageMultiplier = healthMultiplier = speedMultiplier = reloadMultiplier = buildSpeedMultiplier = 1;
+        damageMultiplier = healthMultiplier = speedMultiplier = reloadMultiplier = rangeMultiplier = buildSpeedMultiplier = 1;
     }
 
     @Override

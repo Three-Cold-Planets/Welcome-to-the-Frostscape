@@ -34,6 +34,7 @@ public class Upgrade<T> {
             healthMultiplier,
             speedMultiplier,
             reloadMultiplier,
+            rangeMultiplier,
             buildSpeedMultiplier;
 
     public Upgrade(String name, ItemStack[] cost){
@@ -51,12 +52,20 @@ public class Upgrade<T> {
     }
 
     public void initialiseDeltas(){
+        //Quick way to fill all empty arrays
         float[][] empty = new float[6][];
-        if(healthMultiplier == null) healthMultiplier = new float[stacks];
-        if(damageMultiplier == null) damageMultiplier = new float[stacks];
-        if(reloadMultiplier == null) reloadMultiplier = new float[stacks];
-        if(speedMultiplier == null) speedMultiplier = new float[stacks];
-        if(buildSpeedMultiplier == null) buildSpeedMultiplier = new float[stacks];
+        if(healthMultiplier == null) empty[0] = healthMultiplier = new float[stacks + 1];
+        if(damageMultiplier == null) empty[1] = damageMultiplier = new float[stacks + 1];
+        if(reloadMultiplier == null) empty[2] = reloadMultiplier = new float[stacks + 1];
+        if(rangeMultiplier == null) empty[3] = rangeMultiplier = new float[stacks + 1];
+        if(speedMultiplier == null) empty[4] = speedMultiplier = new float[stacks + 1];
+        if(buildSpeedMultiplier == null) empty[5] = buildSpeedMultiplier = new float[stacks + 1];
+
+        for (int i = 0; i < empty.length; i++) {
+            if(empty[i] != null) for (int j = 0; j < empty[i].length; j++) {
+                empty[i][j] = 1;
+            }
+        }
     };
 
     public boolean unlocked(Team team){
