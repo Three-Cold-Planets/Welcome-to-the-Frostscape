@@ -14,6 +14,7 @@ import frostscape.world.blocks.drawers.DrawUpgradePart;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
+import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
@@ -169,8 +170,50 @@ public class FrostBlocks {
             requirements(Category.effect, ItemStack.with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
             health = 55;
             tileDamage = 0.75f;
+            warmupSpeed = 0.002f;
+            warmDownSpeed = 0.06f;
 
-            upgrades.addAll(FrostUpgrades.improvedBase, FrostUpgrades.improvedPayload);
+            entries.addAll(
+                    new UpgradeEntry(FrostUpgrades.improvedBase){{
+                        healthMultiplier = new float[]{
+                                1.1f,
+                                1.5f,
+                                3.5f
+                        };
+                        speedMultiplier = new float[]{
+                                1,
+                                0.85f,
+                                0.65f
+                        };
+                        costs = new ItemStack[][]{
+                                ItemStack.with(Items.graphite, 5, Items.lead, 10),
+                                ItemStack.with(Items.metaglass, 7),
+                                ItemStack.with(Items.titanium, 10, Items.graphite, 15)
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.improvedPayload){{
+                        damageMultiplier = new float[]{
+                                1.2f,
+                                1.5f,
+                                1.8f
+                        };
+                        reloadMultiplier = new float[]{
+                                1,
+                                1.3f,
+                                2
+                        };
+                        rangeMultiplier = new float[]{
+                                1.5f,
+                                2.1f,
+                                2.8f
+                        };
+                        costs = new ItemStack[][]{
+                                ItemStack.with(Items.coal, 5),
+                                ItemStack.with(Items.pyratite, 10),
+                                ItemStack.with(Items.coal, 10, Items.pyratite, 25)
+                        };
+                    }}
+            );
             drawer = new DrawMulti(
                     new DrawUpgradePart(
                             NAME + "-thermal-landmine-base0",

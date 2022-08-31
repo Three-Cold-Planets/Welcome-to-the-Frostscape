@@ -62,7 +62,7 @@ public class UpgradeState {
 
     public UpgradeState read(Reads read){
         String name = read.str();
-        upgrade = upgrades.find(up -> up.name.equals(name));
+        upgrade = upgrades.find(u -> u.name.equals(name));
         level = read.i();
         progress = read.f();
         cost = ItemIO.readStacks(read);

@@ -10,6 +10,7 @@ import arc.util.Nullable;
 import frostscape.Frostscape;
 import frostscape.world.FrostscapeBlock;
 import frostscape.world.FrostscapeBuilding;
+import frostscape.world.UpgradesType;
 import mindustry.entities.Lightning;
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Sounds;
@@ -74,5 +75,10 @@ public class UpgradeableMine extends FrostscapeBlock {
         public void triggered(){
 
         };
+
+        @Override
+        public UpgradesType type() {
+            return (UpgradesType) block;
+        }
     }
 }

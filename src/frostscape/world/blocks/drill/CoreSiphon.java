@@ -17,6 +17,7 @@ import frostscape.math.Mathh;
 import frostscape.math.MultiInterp;
 import frostscape.world.FrostscapeBlock;
 import frostscape.world.FrostscapeBuilding;
+import frostscape.world.UpgradesType;
 import frostscape.world.blocks.environment.CrackedBlock;
 import mindustry.Vars;
 import mindustry.content.*;
@@ -195,6 +196,11 @@ public class CoreSiphon extends FrostscapeBlock {
     }
 
     public class CoreSiphonBuild extends FrostscapeBuilding {
+
+        @Override
+        public UpgradesType type() {
+            return (UpgradesType) block;
+        }
 
         public boolean doneDrilling = false;
         public IntMap<Integer> drillPositions = new IntMap<Integer>();

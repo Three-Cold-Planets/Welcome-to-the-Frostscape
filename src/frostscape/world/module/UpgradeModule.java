@@ -8,12 +8,19 @@ import frostscape.Frostscape;
 import frostscape.type.upgrade.Upgrade;
 import frostscape.type.upgrade.Upgradeable;
 import frostscape.world.FrostscapeBuilding;
+import frostscape.world.UpgradesType;
+import frostscape.world.upgrades.UpgradeEntry;
 import frostscape.world.upgrades.UpgradeState;
+import mindustry.type.ItemStack;
 import mindustry.world.modules.BlockModule;
 
 public class UpgradeModule extends BlockModule {
 
     public Seq<UpgradeState> states = new Seq<>();
+
+    public UpgradeModule(){
+
+    }
 
     public void update(Upgradeable u){
         states.each(s -> {
@@ -59,18 +66,18 @@ public class UpgradeModule extends BlockModule {
         return total;
     }
 
-    public void startUpgrade(Upgrade upgrade) {
-        UpgradeState current = states.find(state -> state.upgrade == upgrade);
+    public void startUpgrade(UpgradeEntry entry) {
+        UpgradeState current = states.find(state -> state.upgrade == entry.upgrade);
         //if no state is found create a new one
         if(current == null){
-            states.add(new UpgradeState(upgrade, upgrade.stackCosts[0]));
+            states.add(new UpgradeState(entry.upgrade, entry.costs[0]));
             return;
         }
         //Don't create a new state if it's maxed
-        if(current.level == upgrade.stacks) return;
+        if(current.level == entry.stacks()) return;
         //start on the next stack
         current.progress = 0;
         current.level++;
-        current.cost = upgrade.stackCosts[current.level];
+        current.cost = entry.costs[current.level];
     }
 }

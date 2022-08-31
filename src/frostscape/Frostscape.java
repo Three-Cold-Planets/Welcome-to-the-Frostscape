@@ -39,7 +39,6 @@ public class Frostscape extends Mod{
         Events.on(EventType.ClientLoadEvent.class,
                 e -> {
                     Family.all.each(Family::load);
-                    UpgradeHandler.upgrades.each(Upgrade::initialiseDeltas);
                 }
         );
 

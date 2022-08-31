@@ -87,7 +87,7 @@ public class ThermalMine extends UpgradeableMine{
             super.updateTile();
             boolean activated = active > 0;
 
-            warmup = Mathf.approach(warmup, activated ? 1 : 0, activated ? warmupSpeed : warmDownSpeed);
+            warmup = Mathf.approach(warmup, activated ? 1 : 0, activated ? warmupSpeed * speedMultiplier : warmDownSpeed * speedMultiplier);
             heatRadius = Mathf.approach(heatRadius, activated ? getRadius() : 0, warmup);
             if(warmup < 0.001F) heatRadius = 0;
 
@@ -117,11 +117,11 @@ public class ThermalMine extends UpgradeableMine{
         public void display(Table table) {
             table.table((t) -> {
                 t.left();
-                t.add(active > 0.001F ? new Image(this.block.getDisplayIcon(this.tile)) : new Image(this.tile.floor().uiIcon)).size(32.0F);
-                t.labelWrap(() -> active > 0.001F ? this.getDisplayName() : this.tile.floor().localizedName + "..?").left().width(190.0F).padLeft(5.0F);
+                t.add(warmup > 0.001F ? new Image(this.block.getDisplayIcon(this.tile)) : new Image(this.tile.floor().uiIcon)).size(32.0F);
+                t.labelWrap(() -> warmup > 0.001F ? this.getDisplayName() : this.tile.floor().localizedName + "..?").left().width(190.0F).padLeft(5.0F);
             }).growX().left();
             table.row();
-            if (this.team == Vars.player.team() && active > 0.001F) {
+            if (this.team == Vars.player.team() && warmup > 0.001F) {
                 table.table((bars) -> {
                     bars.defaults().growX().height(18.0F).pad(4.0F);
                     this.displayBars(bars);
