@@ -8,7 +8,7 @@ Currently the next milestone in development that im aiming to hit is finishing t
 
 Required in MVP
 
-Upgrades system []
+Upgrades system []/n
 Block selection/actions ui []
 Environmental heat systems []
 Light systems []
