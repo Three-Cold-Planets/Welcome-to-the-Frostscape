@@ -9,16 +9,24 @@ Currently the next milestone in development that im aiming to hit is finishing t
 ### Required in MVP
 
 [] Upgrades system
+
 [] Block selection/actions ui
+
 [] Environmental heat systems
+
 [] Light systems
+
 [] Stealth systems
 
 ### Alpha release
 [] Tutorial
+
 [] Barebones content
+
 [] Sector Controllers system(for the editor)
+
 [] Further development of heat systems
+
 
 ### Future goals..?
 Main Planet implementation
