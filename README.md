@@ -6,22 +6,22 @@ Currently the next milestone in development that im aiming to hit is finishing t
 
 ## Todo
 
-Required in MVP
+### Required in MVP
 
-Upgrades system []\n
-Block selection/actions ui []
-Environmental heat systems []
-Light systems []
-Stealth systems []
+[] Upgrades system
+[] Block selection/actions ui
+[] Environmental heat systems
+[] Light systems
+[] Stealth systems
 
-Alpha release
-Tutorial []
-Barebones content []
-Sector Controllers system(for the editor) []
-Further development of heat systems []
+### Alpha release
+[] Tutorial
+[] Barebones content
+[] Sector Controllers system(for the editor)
+[] Further development of heat systems
 
-Future goals..?
-Main Planet implementation []
-Roguelike planetgen []
-Unique research system []
-Sh1p gets a life [](Never being completed)
+### Future goals..?
+Main Planet implementation
+Roguelike planetgen
+Unique research system
+Sh1p gets a life (Never being completed)
