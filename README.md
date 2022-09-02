@@ -7,6 +7,7 @@ Currently the next milestone in development that im aiming to hit is finishing t
 ## Todo
 
 ### Required in MVP
+Theese goals will be required before the Minimum Viable Product is released.
 
 [] Upgrades system
 
@@ -19,6 +20,7 @@ Currently the next milestone in development that im aiming to hit is finishing t
 [] Stealth systems
 
 ### Alpha release
+Theese goals will be required before the Alpha release launches
 [] Tutorial
 
 [] Barebones content
@@ -29,6 +31,7 @@ Currently the next milestone in development that im aiming to hit is finishing t
 
 
 ### Future goals..?
+Theese goals are VAPID, but expandable goals for future progression and development of the mod
 Main Planet implementation
 Roguelike planetgen
 Unique research system
