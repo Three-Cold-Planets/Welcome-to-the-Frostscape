@@ -33,6 +33,9 @@ Theese goals will be required before the Alpha release launches
 ### Future goals..?
 Theese goals are VAPID, but expandable goals for future progression and development of the mod
 Main Planet implementation
+
 Roguelike planetgen
+
 Unique research system
+
 Sh1p gets a life (Never being completed)
