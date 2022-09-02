@@ -21,6 +21,7 @@ Theese goals will be required before the Minimum Viable Product is released.
 
 ### Alpha release
 Theese goals will be required before the Alpha release launches
+
 [] Tutorial
 
 [] Barebones content
