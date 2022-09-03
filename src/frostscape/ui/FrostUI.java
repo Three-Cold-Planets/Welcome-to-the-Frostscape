@@ -4,8 +4,10 @@ import arc.scene.ui.Dialog;
 import arc.util.Reflect;
 import frostscape.ui.dialog.FamilyDescriptionDialog;
 import frostscape.ui.dialog.settings.ControllerSettingDialog;
+import frostscape.ui.frag.BlockSelectFrag;
 import mindustry.Vars;
 import mindustry.game.Rules;
+import mindustry.gen.Groups;
 import mindustry.gen.Icon;
 
 import static mindustry.Vars.experimental;
@@ -15,10 +17,13 @@ import static mindustry.Vars.steam;
 public class FrostUI {
     public static FamilyDescriptionDialog family;
     public static ControllerSettingDialog SCHSettings;
+    public static BlockSelectFrag select;
 
     public static void load(){
         family = new FamilyDescriptionDialog("@category.family");
         SCHSettings = new ControllerSettingDialog("@dialog.SCHsettings");
+        select = new BlockSelectFrag();
+        select.build(Vars.ui.hudGroup);
 
         modifyUI();
     }

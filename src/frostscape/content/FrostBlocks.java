@@ -21,7 +21,11 @@ import mindustry.gen.Sounds;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.legacy.LegacyCommandCenter;
+import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.draw.DrawMulti;
+
+import java.nio.ByteBuffer;
 
 import static frostscape.Frostscape.NAME;
 
@@ -165,14 +169,12 @@ public class FrostBlocks {
             );
             defaultEntry = entries.get(0);
         }};
-
         thermalLandmine = new ThermalMine("thermal-landmine"){{
             requirements(Category.effect, ItemStack.with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
             health = 55;
             tileDamage = 0.75f;
             warmupSpeed = 0.002f;
             warmDownSpeed = 0.06f;
-
             entries.addAll(
                     new UpgradeEntry(FrostUpgrades.improvedBase){{
                         healthMultiplier = new float[]{

@@ -12,9 +12,15 @@ import static frostscape.world.upgrades.UpgradeHandler.upgrades;
 public class UpgradeState {
     public ItemStack[] cost, items;
     public Upgrade upgrade;
-    public int level = 0;
+    //Level of the state. If it's -1 it has not been installed yet.
+    public int level = -1;
+    //The progress on installing an upgrade's next level
     public float progress;
-    public boolean installed = false, installing = false;
+    public boolean
+        //If the upgrade has been installed on the entity
+        installed = false,
+        //If the upgrade has finished installing it's next level
+        installing = true;
 
     //NOTE: Only to be used for reading data!
     public UpgradeState(){

@@ -10,6 +10,7 @@ import frostscape.type.upgrade.Upgradeable;
 import frostscape.world.FrostscapeBuilding;
 import frostscape.world.UpgradesType;
 import frostscape.world.upgrades.UpgradeEntry;
+import frostscape.world.upgrades.UpgradeHandler;
 import frostscape.world.upgrades.UpgradeState;
 import mindustry.type.ItemStack;
 import mindustry.world.modules.BlockModule;
@@ -24,7 +25,7 @@ public class UpgradeModule extends BlockModule {
 
     public void update(Upgradeable u){
         states.each(s -> {
-            u.applyDeltas(s);
+            if(s.installing == false) u.applyDeltas(s);
         });
     }
 
@@ -70,14 +71,24 @@ public class UpgradeModule extends BlockModule {
         UpgradeState current = states.find(state -> state.upgrade == entry.upgrade);
         //if no state is found create a new one
         if(current == null){
-            states.add(new UpgradeState(entry.upgrade, entry.costs[0]));
+            states.add(current = new UpgradeState(entry.upgrade, entry.costs[0]));
+            if(Frostscape.upgrades.instantUpgrades){
+                current.level = 0;
+                current.installed = true;
+                current.installing = false;
+            }
             return;
         }
         //Don't create a new state if it's maxed
-        if(current.level == entry.stacks()) return;
+        if(current.level == (entry.stacks() - 1)) return;
         //start on the next stack
-        current.progress = 0;
-        current.level++;
-        current.cost = entry.costs[current.level];
+        if(Frostscape.upgrades.instantUpgrades){
+            current.level++;
+            current.installing = false;
+        }else {
+            current.installing = true;
+            current.progress = 0;
+            current.cost = entry.costs[current.level];
+        };
     }
 }

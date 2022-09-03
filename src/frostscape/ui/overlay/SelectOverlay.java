@@ -10,6 +10,7 @@ import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.Log;
 import frostscape.content.Palf;
+import frostscape.ui.FrostUI;
 import frostscape.world.FrostscapeBlock;
 import mindustry.Vars;
 import mindustry.content.Blocks;
@@ -40,7 +41,8 @@ public class SelectOverlay {
     public void update(){
         changed = false;
 
-        if(Core.input.keyTap(KeyCode.controlLeft)) {
+        if(Core.input.keyTap(KeyCode.controlLeft) && !Core.scene.hasField() && !Core.scene.hasDialog()) {
+            FrostUI.select.forceHide();
             if(!awaitingSelect && !selecting) {
                 awaitingSelect = true;
                 Vars.ui.showInfoToast("Block select active! Press Ctrl again to cancel", 1);
@@ -65,6 +67,7 @@ public class SelectOverlay {
         }
         //After started, run logic
         if(selecting){
+            Vars.player.shooting = false;
             if(Core.input.keyDown(KeyCode.mouseLeft)) {
                 selectArea.width = Core.input.mouseWorldX() - selectArea.x;
                 selectArea.height = Core.input.mouseWorldY() - selectArea.y;
@@ -74,10 +77,11 @@ public class SelectOverlay {
                 selecting = false;
                 if(override) buildings.clear();
                 intersectRect();
-                Vars.indexer.eachBlock(Vars.player.team(), select, b -> b.block instanceof FrostscapeBlock, b -> {
+                Vars.indexer.eachBlock(Vars.player.team(), select, b -> true, b -> {
                     buildings.add(b);
                 });
                 changed = true;
+                FrostUI.select.showConfig(buildings);
             }
         }
 
@@ -113,7 +117,7 @@ public class SelectOverlay {
             Draw.alpha(0.45f);
             intersectRect();
             Fill.rect(select.x + select.width/2, select.y + select.height/2, select.width, select.height);
-            Vars.indexer.eachBlock(Vars.player.team(), select, b -> b.block instanceof FrostscapeBlock, b -> {
+            Vars.indexer.eachBlock(Vars.player.team(), select, b -> true, b -> {
                 if(!buildings.contains(b)) Drawf.square(b.x, b.y, b.block.size * tilesize / 2f, Palf.select);
             });
         }

@@ -31,6 +31,8 @@ public class Frostscape extends Mod{
     public static FloorDataHandler floors = new FloorDataHandler();
     public static ResearchHandler research = new ResearchHandler();
 
+    public static UpgradeHandler upgrades = new UpgradeHandler();
+
     //Initialized during adding processes to the async core
     public static SelectOverlay selection = new SelectOverlay();
 

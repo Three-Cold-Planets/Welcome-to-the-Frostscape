@@ -20,7 +20,7 @@ public class UpgradeHandler implements CustomChunk{
     public static Seq<Upgrade> upgrades = new Seq<Upgrade>();
 
     public UpgradeHandler(){
-
+        SaveVersion.addCustomChunk("frostscape-UH", this);
     }
 
     //Makes upgrades instant
