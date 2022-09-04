@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.func.Boolf;
 import arc.func.Cons;
+import arc.func.Cons2;
 import arc.graphics.Color;
 import arc.math.Interp;
 import arc.math.Mathf;
@@ -44,7 +45,7 @@ import static mindustry.Vars.player;
 public class BlockSelectFrag {
     public Table table = new Table(), content = new Table();
     public Seq<SelectButton> buttons = new Seq<>(), current = new Seq<>();
-    private SelectButton selected = null;
+    public SelectButton selected = null;
 
     public void setButton(SelectButton b){
         selected = b;
@@ -57,12 +58,22 @@ public class BlockSelectFrag {
         Events.on(EventType.ResetEvent.class, e -> forceHide());
 
         //Add exit button
-        buttons.add(new SelectButton("Exit", Icon.left, false, (b) -> true, (t) -> forceHide()));
+        buttons.add(new SelectButton("Exit", Icon.left, false, (b) -> true, (t, builds) -> hideConfig()));
+        //Enable/Disable
+        buttons.add(new SelectButton("Disable", Icon.cancel, false, (b) -> true, (t, builds) -> builds.each(b -> b.enabled = false)));
+        buttons.add(new SelectButton("Enable", Icon.play, false, (b) -> true, (t, builds) -> builds.each(b -> b.enabled = true)));
         //Upgrades
-        SelectButton upgrades = new SelectButton("Upgrades", Icon.hammer, true, (b) -> b.find(build -> build instanceof UpgradeableBuilding) != null, (table) -> {
-            table.pane(Styles.horizontalPane, e -> {
-
-            }).width(160);
+        SelectButton upgrades = new SelectButton("Upgrades", Icon.hammer, true, (b) -> b.find(build -> build instanceof UpgradeableBuilding) != null, (table, builds) -> {
+            table.clear();
+            table.background(Styles.black6);
+            table.setOrigin(Align.top);
+            table.setSize(160, 800);
+            table.pane(Styles.horizontalPane, pane -> {
+                for (int i = 0; i < 50; i++) {
+                    pane.add("RELEASE THE LIIIIONS!");
+                    pane.row();
+                }
+            }).width(160).height(300);
         });
         buttons.add(upgrades);
     }
@@ -73,9 +84,8 @@ public class BlockSelectFrag {
     }
     public void forceHide(){
         table.visible = false;
-        if(selected == null || selected.table == null) return;
-        selected.table.clear();
-        selected.table.visible = false;
+        content.visible = false;
+        selected = null;
     }
 
     public void setButtons(Seq<Building> buildings){
@@ -103,46 +113,46 @@ public class BlockSelectFrag {
         table.setTransform(true);
         table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
         Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
-        table.setOrigin(Align.center);
+        table.setOrigin(Align.top);
         updateTableAlign(table);
+
+        content.setOrigin(Align.center);
 
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
-        table.defaults().size(40);
-
-        i = 0;
-        current.each(c -> {
-
-            ImageButton button = table.button(Tex.whiteui, Styles.clearTogglei, 24, () -> {
-                if(c == selected) return;
-                setButton(c);
-                //set up the table
-                if(c.table != null) {
-                    c.table.visible = true;
-                    c.table.clear();
-                    c.table.pack();
-                    c.table.setTransform(true);
-                    c.table.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                        Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
-                    c.table.setOrigin(Align.center);
-                    updateTableAlign(c.table);
-                    content.add(c.table);
+        table.table(t -> {
+            t.defaults().size(40);
+            i = 0;
+            current.each(c -> {
+                ImageButton button = t.button(Tex.whiteui, Styles.clearTogglei, 24, () -> {
+                    if(c == selected) {
+                        hideCurrent();
+                        selected = null;
+                        return;
+                    };
+                    setButton(c);
+                    //set up the table
+                    if(c.hasTable) {
+                        content.visible = true;
+                        content.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+                                Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
+                    }
+                    c.cons.get(content, buildings);
+                }).group(group).tooltip(c.name).get();
+                button.getStyle().imageUp = c.icon;
+                button.table().pad(0);
+                if(i++ % 4 == 3){
+                    t.row();
                 }
-                c.cons.get(c.table);
-            }).group(group).tooltip(c.name).get();
-            button.getStyle().imageUp = c.icon;
-            button.table().pad(0);
-            if(i++ % 4 == 3){
-                table.row();
+            });
+
+            if(i % 4 != 0){
+                int remaining = 4 - (i % 4);
+                for(int j = 0; j < remaining; j++){
+                    t.image(Styles.black6);
+                }
             }
         });
-
-        if(i % 4 != 0){
-            int remaining = 4 - (i % 4);
-            for(int j = 0; j < remaining; j++){
-                table.image(Styles.black6);
-            }
-        }
 
         table.row();
         table.add(content);
@@ -156,20 +166,25 @@ public class BlockSelectFrag {
     }
 
     public void hideConfig(){
-        current.clear();
         table.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
+        current.clear();
+        selected = null;
+    }
+
+    public void hideCurrent(){
+        content.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
     }
 
     public class SelectButton{
         public String name;
         public Drawable icon;
         public Boolf<Seq<Building>> cond;
-        public Cons<Table> cons;
-        public Table table;
-        public SelectButton(String name, Drawable icon, boolean hasTable, Boolf<Seq<Building>> cond, Cons<Table> cons){
+        public Cons2<Table, Seq<Building>> cons;
+        public boolean hasTable = false;
+        public SelectButton(String name, Drawable icon, boolean hasTable, Boolf<Seq<Building>> cond, Cons2<Table, Seq<Building>> cons){
             this.name = name;
             this.icon = icon;
-            if(hasTable) table = new Table();
+            this.hasTable = hasTable;
             this.cond = cond;
             this.cons = cons;
         }

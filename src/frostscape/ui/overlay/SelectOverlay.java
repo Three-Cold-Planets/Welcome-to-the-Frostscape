@@ -41,7 +41,7 @@ public class SelectOverlay {
     public void update(){
         changed = false;
 
-        if(Core.input.keyTap(KeyCode.controlLeft) && !Core.scene.hasField() && !Core.scene.hasDialog()) {
+        if(Core.input.keyTap(KeyCode.backtick) && !Core.scene.hasField() && !Core.scene.hasDialog()) {
             FrostUI.select.forceHide();
             if(!awaitingSelect && !selecting) {
                 awaitingSelect = true;
