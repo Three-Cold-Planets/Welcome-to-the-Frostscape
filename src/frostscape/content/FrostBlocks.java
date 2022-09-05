@@ -50,6 +50,30 @@ public class FrostBlocks {
             variants = 3;
         }};
 
+        frostVent = new SteamVentProp("frost-vent"){{
+            parent = blendGroup = frostStone;
+            hasShadow = false;
+            offsets = new Point2[25];
+            int size = 5;
+            for (int x = 0; x < size; x++) {
+                for (int y = 0; y < size; y++) {
+                    offsets[x * 5 + y] = new Point2(x - 2, y - 2);
+                }
+            }
+
+            effects = new EffectData[]{
+                    new EffectData(){{
+                        effect = Fxf.steamEffect(100, 3);
+                        pos = new Point2(-32/4, 32/4);
+                        posRand = new Point2(4, 4);
+                        chance = 0.15f;
+                        rotation = 0;
+                    }}
+            };
+            clipSize = 170;
+            variants = 1;
+        }};
+        
         andesiteFloor = new Floor("andesite-floor"){{
             variants = 3;
         }};
@@ -115,45 +139,130 @@ public class FrostBlocks {
             size = 3;
             health = 54 * size * size;
             reload = 235;
-            minRange = 120;
-            range = 242;
+            minRange = 160;
+            range = 350;
             velocityRnd = 0.05f;
             ammo(
-                    Items.pyratite, FrostBullets.pyraNapalm
+                    Items.pyratite,
+                    new BouncyBulletType(3.5f, 10, "shell"){{
+                        lifetime = 120;
+                        drag = 0.016f;
+                        minLife = 55f;
+                        hitEffect = Fx.blastExplosion;
+                        despawnEffect = Fx.blastExplosion;
+                        width = 20;
+                        height = 20;
+                        shrinkX = 0.4f;
+                        shrinkY = 0.7f;
+                        status = StatusEffects.burning;
+                        statusDuration = 12f * 60f;
+                        frontColor = Pal.lightishOrange;
+                        backColor = Pal.lightOrange;
+                        gravity = 0.0015f;
+                        startingLift = 0.06f;
+                        bounceShake = 0.7f;
+                        bounceEfficiency = 0.65f;
+                        bounceForce = 10;
+                        maxBounces = 4;
+                        hitShake = 6.2f;
+                        hittable = true;
+                        bounceEffect = new MultiEffect(){{
+                            effects = new Effect[]{
+                                    Fx.unitLandSmall,
+                                    Fx.fireHit,
+                                    new Effect(15, e -> {
+                                        Draw.color(Pal.lightPyraFlame);
+                                        Draw.alpha(e.fout() * e.fout());
+                                        Lines.circle(e.x, e.y, e.finpow() * 16);
+                                    })
+                            };
+                        }};
+                        hitEffect = new MultiEffect(){{
+                            effects = new Effect[]{
+                                    new Effect(135, e -> {
+                                        e.scaled(75, e1 -> {
+                                            Draw.color(Pal.lightPyraFlame);
+
+                                            Lines.stroke(e1.fout() * 0.65f);
+                                            Lines.circle(e1.x, e1.y, e1.finpow() * 35);
+
+                                            Lines.stroke(e1.fout() * 3);
+                                            Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 54, (x, y) -> {
+                                                Lines.line(e.x + x * 0.3f, e.y + y * 0.3f, e.x + x, e.y + y);
+                                            });
+                                        });
+
+                                        Draw.color(Pal.darkPyraFlame);
+                                        Draw.alpha(e.fout());
+                                        Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 5), e.fin() * 54 + 6, (x, y) -> {
+
+                                            Fill.circle(e.x + x, e.y + y, 5 * e.fout(Interp.pow4));
+                                        });
+                                    })
+                            };
+                        }};
+                        fragBullet = new BouncyBulletType(3.5f, 5, "bullet"){{
+                            collides = true;
+                            lifetime = 120;
+                            drag = 0.006f;
+                            minLife = 55f;
+                            hitEffect = Fx.blastExplosion;
+                            despawnEffect = Fx.blastExplosion;
+                            width = 16;
+                            height = 32;
+                            shrinkX = 0.4f;
+                            shrinkY = 0.7f;
+                            status = StatusEffects.burning;
+                            statusDuration = 12f * 60f;
+                            frontColor = Pal.lightishOrange;
+                            backColor = Pal.lightOrange;
+                            gravity = 0.0015f;
+                            startingLift = 0.06f;
+                            bounceShake = 0.7f;
+                            bounceEfficiency = 0.65f;
+                            bounceForce = 10;
+                            maxBounces = 4;
+                            hitShake = 3.2f;
+                            incendAmount = 2;
+                            incendChance = 1;
+                            bounceIncend = 1;
+                            bounceIncendChance = 1;
+                            puddleLiquid = Liquids.oil;
+                            puddleAmount = 25;
+                            puddles = 1;
+                            splashDamage = 15;
+                            splashDamageRadius = 16;
+                            knockback = 1;
+                        }};
+                        fragBullets = 5;
+                        fragSpread = 20;
+                        fragRandomSpread = 5;
+                        fragLifeMin = 0.8f;
+                        fragLifeMax = 0.9f;
+                        fragVelocityMin = 1;
+                        fragVelocityMax = 1;
+                        incendAmount = 5;
+                        incendChance = 1;
+                        bounceIncend = 2;
+                        bounceIncendChance = 1;
+                        puddleLiquid = Liquids.oil;
+                        puddleAmount = 6;
+                        splashDamage = 55;
+                        splashDamageRadius = 16;
+                        scaleLife = false;
+                        //Todo: fix calcMinLife
+                        //calcMinLife();
+                    }}
             );
             consumeLiquids(new LiquidStack(Liquids.oil, 1.35f));
 
             shoot = new ShootSpread(){{
                 shotDelay = 5;
-                shots = 3;
-                inaccuracy = 15;
-                spread = 1;
+                shots = 1;
+                inaccuracy = 0;
+                spread = 0;
             }};
             shootSound = Sounds.bang;
-        }};
-
-        frostVent = new SteamVentProp("frost-vent"){{
-            parent = blendGroup = frostStone;
-            hasShadow = false;
-            offsets = new Point2[25];
-            int size = 5;
-            for (int x = 0; x < size; x++) {
-                for (int y = 0; y < size; y++) {
-                    offsets[x * 5 + y] = new Point2(x - 2, y - 2);
-                }
-            }
-
-            effects = new EffectData[]{
-                    new EffectData(){{
-                        effect = Fxf.steamEffect(100, 3);
-                        pos = new Point2(-32/4, 32/4);
-                        posRand = new Point2(4, 4);
-                        chance = 0.15f;
-                        rotation = 0;
-                    }}
-            };
-            clipSize = 170;
-            variants = 1;
         }};
 
         coreBunker = new BuildBeamCore("core-bunker"){{
