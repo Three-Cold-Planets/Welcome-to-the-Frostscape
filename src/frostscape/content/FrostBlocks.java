@@ -1,31 +1,34 @@
 package frostscape.content;
 
-import arc.Core;
 import arc.graphics.Color;
-import arc.graphics.g2d.TextureRegion;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
+import arc.math.Angles;
+import arc.math.Interp;
+import arc.math.Mathf;
 import arc.math.geom.*;
 import arc.struct.Seq;
+import frostscape.entities.BouncyBulletType;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
 import frostscape.world.blocks.defense.ThermalMine;
-import frostscape.world.blocks.defense.UpgradeableMine;
 import frostscape.world.blocks.drawers.DrawUpgradePart;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
 import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
+import mindustry.entities.Effect;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
+import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.legacy.LegacyCommandCenter;
-import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.draw.DrawMulti;
-
-import java.nio.ByteBuffer;
 
 import static frostscape.Frostscape.NAME;
 
