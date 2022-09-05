@@ -24,6 +24,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
+import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
@@ -148,13 +149,13 @@ public class FrostBlocks {
             ammo(
                     Items.pyratite,
                     new BouncyBulletType(3.5f, 10, "shell"){{
-                        lifetime = 120;
+                        lifetime = 100;
                         drag = 0.016f;
                         minLife = 55f;
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.blastExplosion;
-                        width = 20;
-                        height = 20;
+                        width = 16;
+                        height = 16;
                         shrinkX = 0.4f;
                         shrinkY = 0.7f;
                         status = StatusEffects.burning;
@@ -204,27 +205,28 @@ public class FrostBlocks {
                                     })
                             };
                         }};
-                        fragBullet = new BouncyBulletType(3.5f, 5, "bullet"){{
+                        fragBullet = new BouncyBulletType(3.5f, 5, "shell"){{
                             collides = true;
                             lifetime = 120;
                             drag = 0.006f;
                             minLife = 55f;
                             hitEffect = Fx.blastExplosion;
                             despawnEffect = Fx.blastExplosion;
-                            width = 16;
-                            height = 32;
-                            shrinkX = 0.4f;
-                            shrinkY = 0.7f;
+                            width = 8;
+                            height = 8;
+                            shrinkX = 0.7f;
+                            shrinkY = 0.9f;
                             status = StatusEffects.burning;
                             statusDuration = 12f * 60f;
                             frontColor = Pal.lightishOrange;
                             backColor = Pal.lightOrange;
-                            gravity = 0.0015f;
-                            startingLift = 0.06f;
+                            gravity = 0.002f;
+                            startingLift = 0.045f;
                             bounceShake = 0.7f;
                             bounceEfficiency = 0.65f;
                             bounceForce = 10;
                             maxBounces = 4;
+                            visualHeightMax = Layer.effect;
                             hitShake = 3.2f;
                             incendAmount = 2;
                             incendChance = 1;
@@ -236,6 +238,10 @@ public class FrostBlocks {
                             splashDamage = 15;
                             splashDamageRadius = 16;
                             knockback = 1;
+                            trailEffect = Fx.melting;
+                            trailChance = 0.65f;
+                            fragBullets = 3;
+                            fragBullet = FrostBullets.pyraGel.fragBullet;
                         }};
                         fragBullets = 5;
                         fragSpread = 20;
@@ -252,9 +258,9 @@ public class FrostBlocks {
                         puddleAmount = 6;
                         splashDamage = 55;
                         splashDamageRadius = 16;
+                        trailEffect = Fx.smoke;
+                        trailChance = 0.65f;
                         scaleLife = false;
-                        //Todo: fix calcMinLife
-                        //calcMinLife();
                     }}
             );
             consumeLiquids(new LiquidStack(Liquids.oil, 1.35f));

@@ -20,7 +20,6 @@ import java.awt.geom.QuadCurve2D;
 //how many of these am I going to make I don't damm know
 public class BouncyBulletType extends BasicBulletType {
     public static final float shadowTX = -12, shadowTY = -13;
-
     public float gravity;
     public float bounceEfficiency;
     public float startingHeight, startingLift;
@@ -28,6 +27,7 @@ public class BouncyBulletType extends BasicBulletType {
     public float bounceForce;
     //Set to -1 to disable
     public int maxBounces;
+    public float visualHeightMax, visualHeightMin;
 
     public int bounceIncend;
     public float bounceIncendSpread, bounceIncendChance;
@@ -47,6 +47,8 @@ public class BouncyBulletType extends BasicBulletType {
 
     public BouncyBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
+        visualHeightMax = Layer.flyingUnit - 1;
+        visualHeightMin = Layer.bullet;
         gravity = 0.0025f;
         bounceEfficiency = 0.8f;
         startingHeight = 0;
@@ -111,8 +113,8 @@ public class BouncyBulletType extends BasicBulletType {
     public void draw(Bullet b) {
         drawTrail(b);
         float h = getHeight(b);
-        float height = this.height * ((1f - shrinkY) + shrinkY * h);
-        float width = this.width * ((1f - shrinkX) + shrinkX * h);
+        float height = this.height * shrinkY + this.height * shrinkY * h;
+        float width = this.width * shrinkX + this.width * shrinkX * h;
         float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f) + rotationOffset;
 
         Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
@@ -123,7 +125,7 @@ public class BouncyBulletType extends BasicBulletType {
         Draw.z(Layer.darkness);
         Draw.rect(shadowRegion, b.x + shadowTX * h, b.y + shadowTY * h,  width, height,b.rotation() - 90);
 
-        float[] layers = new float[]{Layer.flyingUnit - 1, Layer.bullet};
+        float[] layers = new float[]{visualHeightMax, visualHeightMin};
 
         //What this oes is make the bullet glow the closer it is to the ground.
         for (int i = 0; i < 2; i++) {
