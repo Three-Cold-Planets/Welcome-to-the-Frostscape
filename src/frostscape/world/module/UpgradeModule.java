@@ -23,6 +23,10 @@ public class UpgradeModule extends BlockModule {
 
     }
 
+    public UpgradeState getState(Upgrade upgrade){
+        return states.find(s -> s.upgrade == upgrade);
+    }
+
     public void update(Upgradeable u){
         states.each(s -> {
             if(s.installing == false) u.applyDeltas(s);

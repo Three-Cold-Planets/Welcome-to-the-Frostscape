@@ -21,26 +21,33 @@ import arc.scene.ui.Image;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.ScrollPane;
 import arc.scene.ui.layout.Table;
+import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
 import frostscape.Frostscape;
+import frostscape.type.upgrade.Upgrade;
 import frostscape.type.upgrade.UpgradeableBuilding;
+import frostscape.world.upgrades.UpgradeEntry;
+import frostscape.world.upgrades.UpgradeState;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
+import mindustry.type.ItemSeq;
+import mindustry.type.ItemStack;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.ui.dialogs.SchematicsDialog;
 import mindustry.ui.fragments.BlockConfigFragment;
 import mindustry.world.blocks.units.UnitFactory;
 
-import static mindustry.Vars.control;
-import static mindustry.Vars.player;
+import static mindustry.Vars.*;
+import static mindustry.Vars.state;
 
 public class BlockSelectFrag {
     public Table table = new Table(), content = new Table();
@@ -68,11 +75,43 @@ public class BlockSelectFrag {
             table.background(Styles.black6);
             table.setOrigin(Align.top);
             table.setSize(160, 800);
-            table.pane(Styles.horizontalPane, pane -> {
-                for (int i = 0; i < 50; i++) {
-                    pane.add("RELEASE THE LIIIIONS!");
-                    pane.row();
+            ObjectMap<Upgrade, ItemSeq> currentMap = new ObjectMap<>();
+            Seq<UpgradeableBuilding> buildings = new Seq<>();
+            builds.each(b -> {
+                if(b instanceof UpgradeableBuilding) {
+                    UpgradeableBuilding building = (UpgradeableBuilding) b;
+                    buildings.add(building);
+                    building.type().entries().each(entry -> {
+                        if(!currentMap.containsKey(entry.upgrade)) currentMap.put(entry.upgrade, new ItemSeq());
+                        UpgradeState state = building.upgrades().getState(entry.upgrade);
+                        ItemStack[] add;
+                        if(state == null) add = entry.costs[0];
+                        else if(state.installing || state.level >= entry.stacks()) return;
+                        else add = entry.costs[state.level + 1];
+                        currentMap.get(entry.upgrade).add(add);
+                    });
                 }
+            });
+            table.pane(pane -> {
+                currentMap.each((upgrade, arr) -> {
+                    Log.info(upgrade);
+                    Log.info(arr);
+                    pane.table(t -> {
+                        for(ItemStack s : arr){
+                            t.image(s.item.uiIcon).left().size(iconMed);
+                            t.label(() -> {
+                                Building core = player.core();
+                                if(core == null || state.rules.infiniteResources || core.items.has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
+                                return (core.items.has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items.get(s.item), s.amount) + "[lightgray]/" + s.amount;
+                            }).padLeft(2).left().padRight(4);
+
+                            if(++i % 4 == 0){
+                                t.row();
+                            }
+                        }
+                    }).width(160);
+                    pane.row();
+                });
             }).width(160).height(300);
         });
         buttons.add(upgrades);

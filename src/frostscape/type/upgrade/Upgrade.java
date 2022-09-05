@@ -1,5 +1,6 @@
 package frostscape.type.upgrade;
 
+import arc.Core;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.struct.StringMap;
@@ -30,8 +31,17 @@ public class Upgrade<T> {
         UpgradeHandler.upgrades.add(this);
         this.name = Vars.content.transformName(name);
     }
+
+    public void load(){
+        localisedName = Core.bundle.get(name, name);
+    }
     public boolean unlocked(Team team){
         return Frostscape.research.getData(team, unlockedBy).unlocked;
+    }
+
+    @Override
+    public String toString() {
+        return localisedName;
     }
 
     public interface UpgradeCondition{

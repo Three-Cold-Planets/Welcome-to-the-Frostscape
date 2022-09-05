@@ -1,10 +1,17 @@
 package frostscape.content;
 
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Lines;
+import arc.math.Mathf;
+import arc.util.Time;
+import mindustry.content.Fx;
+import mindustry.gen.Unit;
+import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 
 public class FrostStatusEffects {
     public static StatusEffect[] spriteTests = new StatusEffect[5];
-    public static StatusEffect attackBoost, engineBoost;
+    public static StatusEffect attackBoost, engineBoost, lowGrav;
 
     public static void load(){
         for (int i = 0; i < spriteTests.length; i++) {
@@ -19,5 +26,25 @@ public class FrostStatusEffects {
             speedMultiplier = 2.45f;
             dragMultiplier = 0.5f;
         }};
+
+        lowGrav = new StatusEffect("low-grav"){
+            @Override
+            public void draw(Unit unit) {
+                super.draw(unit);
+                Lines.stroke(unit.elevation);
+                Draw.color(Pal.berylShot);
+                Lines.circle(unit.x, unit.y, unit.type.hitSize + Mathf.sin(Time.time/10, 9));
+                Draw.color(Pal.berylShot);
+                Lines.circle(unit.x, unit.y, unit.type.hitSize + Mathf.sin(Time.time/15, 6));
+            }
+
+            public void update(Unit u, float time){
+                super.update(u, time);
+                if(u.elevation > 0.1f) u.elevation = Mathf.clamp(u.elevation + (u.type.flying ? 0 : u.type.riseSpeed/25 * 24), 0, 1);
+            };
+            {
+                effect = Fx.fallSmoke;
+            }
+        };
     }
 }
