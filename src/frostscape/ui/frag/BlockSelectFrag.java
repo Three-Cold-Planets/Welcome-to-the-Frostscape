@@ -50,6 +50,7 @@ import static mindustry.Vars.*;
 import static mindustry.Vars.state;
 
 public class BlockSelectFrag {
+    private static int i = 0;
     public Table table = new Table(), content = new Table();
     public Seq<SelectButton> buttons = new Seq<>(), current = new Seq<>();
     public SelectButton selected = null;
@@ -57,7 +58,6 @@ public class BlockSelectFrag {
     public void setButton(SelectButton b){
         selected = b;
     }
-    public static int i = 0;
     public void build(Group parent){
         table.visible = false;
         parent.addChild(table);
@@ -93,26 +93,26 @@ public class BlockSelectFrag {
                 }
             });
             table.pane(pane -> {
-                currentMap.each((upgrade, arr) -> {
-                    Log.info(upgrade);
-                    Log.info(arr);
-                    pane.table(t -> {
-                        for(ItemStack s : arr){
-                            t.image(s.item.uiIcon).left().size(iconMed);
-                            t.label(() -> {
-                                Building core = player.core();
-                                if(core == null || state.rules.infiniteResources || core.items.has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
-                                return (core.items.has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items.get(s.item), s.amount) + "[lightgray]/" + s.amount;
-                            }).padLeft(2).left().padRight(4);
-
-                            if(++i % 4 == 0){
-                                t.row();
-                            }
+                float length = 0;
+                pane.image().fillX().height(5).padTop(3);
+                pane.row();
+                pane.table(t -> {
+                    t.background(Tex.button);
+                    i = 0;
+                    currentMap.each((upgrade, arr) -> {
+                        Log.info(upgrade);
+                        Log.info(arr);
+                        t.image(upgrade.region).size(40).pad(8);
+                        if(i++ % 4 == 3){
+                            i = 0;
+                            t.row();
                         }
-                    }).width(160);
-                    pane.row();
+                    });
+
                 });
-            }).width(160).height(300);
+                pane.row();
+                pane.image().fillX().height(5).padBottom(3).bottom();
+            }).width(200).height(300);
         });
         buttons.add(upgrades);
     }
@@ -160,7 +160,7 @@ public class BlockSelectFrag {
         ButtonGroup<ImageButton> group = new ButtonGroup<>();
         group.setMinCheckCount(0);
         table.table(t -> {
-            t.defaults().size(40);
+            t.defaults().size(50);
             i = 0;
             current.each(c -> {
                 ImageButton button = t.button(Tex.whiteui, Styles.clearTogglei, 24, () -> {

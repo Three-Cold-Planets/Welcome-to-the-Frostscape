@@ -33,9 +33,9 @@ public class FrostStatusEffects {
                 super.draw(unit);
                 Lines.stroke(unit.elevation);
                 Draw.color(Pal.berylShot);
-                Lines.circle(unit.x, unit.y, unit.type.hitSize + Mathf.sin(Time.time/10, 9));
+                Lines.circle(unit.x, unit.y, unit.type.hitSize + Mathf.sin(Time.time/10, 1,9));
                 Draw.color(Pal.berylShot);
-                Lines.circle(unit.x, unit.y, unit.type.hitSize + Mathf.sin(Time.time/15, 6));
+                Lines.circle(unit.x, unit.y, unit.type.hitSize + Mathf.sin(Time.time/15, 1,6));
             }
 
             public void update(Unit u, float time){

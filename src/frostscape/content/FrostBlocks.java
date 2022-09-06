@@ -281,11 +281,38 @@ public class FrostBlocks {
             for (int i = 1; i < Geometry.d8.length; i += 2) {
                 mountPoses.add(new Vec2(Geometry.d8[i].x * 29/2, Geometry.d8[i].y * 29/2));
             }
-            entries.addAll(
+            units.addAll(
                     new UnitEntry(null, new ResearchedLockedCond(FrostResearch.improvedWelding), 180, UnitTypes.pulsar),
                     new UnitEntry(new ResearchedLockedCond(FrostResearch.improvedWelding), null, 300, UnitTypes.quasar)
             );
-            defaultEntry = entries.get(0);
+            entries.addAll(
+                    new UpgradeEntry(FrostUpgrades.improvedBase){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.improvedPayload){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.improvedWelding){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.INVINCIBLE){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.wheeeez){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }}
+            );
+            defaultEntry = units.get(0);
         }};
         thermalLandmine = new ThermalMine("thermal-landmine"){{
             requirements(Category.effect, ItemStack.with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
@@ -296,41 +323,41 @@ public class FrostBlocks {
             entries.addAll(
                     new UpgradeEntry(FrostUpgrades.improvedBase){{
                         healthMultiplier = new float[]{
-                                1.1f,
-                                1.5f,
-                                3.5f
+                            1.1f,
+                            1.5f,
+                            3.5f
                         };
                         speedMultiplier = new float[]{
-                                1,
-                                0.85f,
-                                0.65f
+                            1,
+                            0.85f,
+                            0.65f
                         };
                         costs = new ItemStack[][]{
-                                ItemStack.with(Items.graphite, 5, Items.lead, 10),
-                                ItemStack.with(Items.metaglass, 7),
-                                ItemStack.with(Items.titanium, 10, Items.graphite, 15)
+                            ItemStack.with(Items.graphite, 5, Items.lead, 10),
+                            ItemStack.with(Items.metaglass, 7),
+                            ItemStack.with(Items.titanium, 10, Items.graphite, 15)
                         };
                     }},
                     new UpgradeEntry(FrostUpgrades.improvedPayload){{
                         damageMultiplier = new float[]{
-                                1.2f,
-                                1.5f,
-                                1.8f
+                            1.2f,
+                            1.5f,
+                            1.8f
                         };
                         reloadMultiplier = new float[]{
-                                1,
-                                1.3f,
-                                2
+                            1,
+                            1.3f,
+                            2
                         };
                         rangeMultiplier = new float[]{
-                                1.5f,
-                                2.1f,
-                                2.8f
+                            1.5f,
+                            2.1f,
+                            2.8f
                         };
                         costs = new ItemStack[][]{
-                                ItemStack.with(Items.coal, 5),
-                                ItemStack.with(Items.pyratite, 10),
-                                ItemStack.with(Items.coal, 10, Items.pyratite, 25)
+                            ItemStack.with(Items.coal, 5),
+                            ItemStack.with(Items.pyratite, 10),
+                            ItemStack.with(Items.coal, 10, Items.pyratite, 25)
                         };
                     }}
             );

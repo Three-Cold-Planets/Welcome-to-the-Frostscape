@@ -8,7 +8,7 @@ import mindustry.type.Liquid;
 
 public class FrostUpgrades {
 
-    public static Upgrade improvedWelding, INVINCIBLE,
+    public static Upgrade improvedWelding, INVINCIBLE, wheeeez,
             //Landmine-related upgrades
             improvedBase, improvedPayload
             ;
@@ -18,6 +18,9 @@ public class FrostUpgrades {
         }};
 
         INVINCIBLE = new Upgrade("INVINCIBLE"){{
+
+        }};
+        wheeeez = new Upgrade("wheeeez"){{
 
         }};
 
