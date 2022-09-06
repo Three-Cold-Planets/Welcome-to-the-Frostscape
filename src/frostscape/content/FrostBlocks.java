@@ -22,6 +22,7 @@ import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Layer;
@@ -30,6 +31,7 @@ import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
+import mindustry.world.draw.DrawTurret;
 
 import static frostscape.Frostscape.NAME;
 
@@ -146,6 +148,34 @@ public class FrostBlocks {
             minRange = 160;
             range = 350;
             velocityRnd = 0.05f;
+            recoil = 6;
+            rotateSpeed = 2.5f;
+            cooldownTime = 75;
+            shootY = -4;
+            drawer = new DrawTurret("reinforced-"){{
+
+                Color heatc = Pal.turretHeat;
+                heatColor = heatc;
+                liquidDraw = Liquids.oil;
+                parts.addAll(
+                        new RegionPart("-barrel"){{
+                            progress = PartProgress.recoil.curve(Interp.pow2In);
+                            moveY = -9;
+                            heatColor = Color.valueOf("f03b0e");
+                            mirror = false;
+                            layerOffset = -0.00001f;
+                            layerOffset = -0.00002f;
+                        }},
+                        new RegionPart("-liquid-base"){{
+                            progress = PartProgress.recoil;
+                            heatColor = Color.clear;
+                            mirror = false;
+                            layerOffset = -0.00002f;
+                            outlineLayerOffset = -0.00002f;
+                        }}
+                );
+            }};
+            outlineColor = Pal.darkOutline;
             ammo(
                     Items.pyratite,
                     new BouncyBulletType(3.5f, 10, "shell"){{
@@ -154,16 +184,16 @@ public class FrostBlocks {
                         minLife = 55f;
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.blastExplosion;
-                        width = 16;
-                        height = 16;
-                        shrinkX = 0.4f;
+                        width = 6;
+                        height = 6;
+                        shrinkX = 0.2f;
                         shrinkY = 0.7f;
                         status = StatusEffects.burning;
                         statusDuration = 12f * 60f;
                         frontColor = Pal.lightishOrange;
                         backColor = Pal.lightOrange;
-                        gravity = 0.0015f;
-                        startingLift = 0.06f;
+                        gravity = 0.003f;
+                        startingLift = 0.12f;
                         bounceShake = 0.7f;
                         bounceEfficiency = 0.65f;
                         bounceForce = 10;
