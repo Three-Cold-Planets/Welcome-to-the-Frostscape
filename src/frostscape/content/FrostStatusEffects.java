@@ -21,7 +21,7 @@ public class FrostStatusEffects {
         napalm = new StatusEffect("sticky-fire"){{
             damage = 0.18f;
             transitionDamage = 80;
-            speedMultiplier = 0.6f;
+            speedMultiplier = 0.9f;
             effect = Fx.oily;
             opposite(StatusEffects.melting);
             init(() -> {
