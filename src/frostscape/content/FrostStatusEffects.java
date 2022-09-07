@@ -5,18 +5,24 @@ import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.util.Time;
 import mindustry.content.Fx;
+import mindustry.content.StatusEffects;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 
 public class FrostStatusEffects {
     public static StatusEffect[] spriteTests = new StatusEffect[5];
-    public static StatusEffect attackBoost, engineBoost, lowGrav;
+    public static StatusEffect napalm, attackBoost, engineBoost, lowGrav;
 
     public static void load(){
         for (int i = 0; i < spriteTests.length; i++) {
             spriteTests[i] = new StatusEffect("test-" + i){{}};
         }
+
+        napalm = new StatusEffect("stcky-fire"){{
+            damage = 0.15f;
+            opposite(StatusEffects.melting);
+        }};
 
         attackBoost = new StatusEffect("attack-boost"){{
             damageMultiplier = 1.35f;

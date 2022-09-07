@@ -156,7 +156,6 @@ public class FrostBlocks {
             shootWarmupSpeed = 0.08f;
             minWarmup = 0.9f;
             drawer = new DrawTurret("reinforced-"){{
-
                 Color heatc = Pal.turretHeat;
                 heatColor = heatc;
                 liquidDraw = Liquids.oil;
@@ -243,6 +242,7 @@ public class FrostBlocks {
                         maxBounces = 4;
                         hitShake = 6.2f;
                         hittable = true;
+                        hitSound = Sounds.bang;
                         bounceEffect = new MultiEffect(){{
                             effects = new Effect[]{
                                     Fx.unitLandSmall,
@@ -315,6 +315,7 @@ public class FrostBlocks {
                             trailChance = 0.65f;
                             fragBullets = 3;
                             fragBullet = FrostBullets.pyraGel.fragBullet;
+                            hitSound = Sounds.explosion;
                         }};
                         fragBullets = 5;
                         fragSpread = 20;
@@ -364,7 +365,7 @@ public class FrostBlocks {
                 inaccuracy = 0;
                 spread = 0;
             }};
-            shootSound = Sounds.bang;
+            shootSound = Sounds.artillery;
             shootEffect = new Effect(75, e -> {
                 e.scaled(25, e1 -> {
                     Draw.color(Pal.lightPyraFlame);
