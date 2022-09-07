@@ -19,14 +19,14 @@ public class FrostStatusEffects {
         }
 
         napalm = new StatusEffect("sticky-fire"){{
-            damage = 0.15f;
+            damage = 0.18f;
+            transitionDamage = 80;
             speedMultiplier = 0.6f;
             effect = Fx.oily;
             opposite(StatusEffects.melting);
             init(() -> {
-                affinity(StatusEffects.melting, (unit, result, time) -> result.set(StatusEffects.melting, result.time + time));
-                affinity(StatusEffects.burning, (unit, result, time) -> result.set(tarred, result.time + time));
-                affinity(tarred , (unit, result, time) -> result.set(napalm, result.time + time));
+                affinity(StatusEffects.burning, (unit, result, time) -> unit.damagePierce(Math.min(transitionDamage, StatusEffects.burning.damage * time)));
+                affinity(tarred, (unit, result, time) -> result.set(napalm, result.time + time));
             });
         }};
 
