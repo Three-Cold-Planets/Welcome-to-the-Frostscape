@@ -13,10 +13,10 @@ public class FrostContentLoader {
     public static void load(){
         FrostResearch.load();
         Families.load();
+        FrostStatusEffects.load();
         FrostItems.load();
         FrostBullets.load();
         FrostUpgrades.load();
-        FrostStatusEffects.load();
         FrostUnits.load();
         FrostBlocks.load();
         SectorControllers.load();
