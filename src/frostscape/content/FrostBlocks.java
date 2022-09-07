@@ -24,6 +24,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.gen.Bullet;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
@@ -152,25 +153,67 @@ public class FrostBlocks {
             rotateSpeed = 2.5f;
             cooldownTime = 75;
             shootY = -4;
+            shootWarmupSpeed = 0.08f;
+            minWarmup = 0.9f;
             drawer = new DrawTurret("reinforced-"){{
 
                 Color heatc = Pal.turretHeat;
                 heatColor = heatc;
                 liquidDraw = Liquids.oil;
+                liquidCapacity = 300;
                 parts.addAll(
+                        new RegionPart("-liquid-base"){{
+                            progress = PartProgress.recoil;
+                            heatColor = Color.clear;
+                            mirror = false;
+                            layerOffset = -0.00002f;
+                            outlineLayerOffset = -0.00002f;
+                        }},
+                        new RegionPart("-back"){{
+                             progress = PartProgress.warmup;
+                             mirror = true;
+                             moveRot = -15f;
+                             x = (30 - 6) / 4f;
+                             y = (-35f + 6) / 4f;
+                             moveX = 6/4;
+                             moveY = -6/4;
+                             under = true;
+                             heatColor = Color.clear;
+                            children = Seq.with(
+                                     new RegionPart("-back"){
+                                     {
+                                         progress = PartProgress.warmup;
+                                         mirror = true;
+                                         moveRot = 360 -35f;
+                                         x = 0;
+                                         y = 0;
+                                         moveX = 6 / 4;
+                                         moveY = -6 / 4;
+                                         under = true;
+                                         heatColor = Color.clear;
+                                         children = Seq.with(
+                                                 new RegionPart("-fang"){
+                                                     {
+                                                         progress = PartProgress.warmup;
+                                                         mirror = true;
+                                                         moveRot = -15f;
+                                                         x = 0;
+                                                         y = 0;
+                                                         moveX = 4 / 4;
+                                                         moveY = -4 / 4;
+                                                         under = true;
+                                                         heatColor = Color.clear;
+                                                     }}
+                                         );
+                                     }}
+                             );
+                         }},
                         new RegionPart("-barrel"){{
                             progress = PartProgress.recoil.curve(Interp.pow2In);
                             moveY = -9;
                             heatColor = Color.valueOf("f03b0e");
                             mirror = false;
                             layerOffset = -0.00001f;
-                            layerOffset = -0.00002f;
-                        }},
-                        new RegionPart("-liquid-base"){{
-                            progress = PartProgress.recoil;
-                            heatColor = Color.clear;
-                            mirror = false;
-                            layerOffset = -0.00002f;
                             outlineLayerOffset = -0.00002f;
                         }}
                 );
@@ -178,7 +221,7 @@ public class FrostBlocks {
             outlineColor = Pal.darkOutline;
             ammo(
                     Items.pyratite,
-                    new BouncyBulletType(3.5f, 10, "shell"){{
+                    new BouncyBulletType(3.5f, 10, NAME + "-smoke-canister"){{
                         lifetime = 100;
                         drag = 0.016f;
                         minLife = 55f;
@@ -186,14 +229,14 @@ public class FrostBlocks {
                         despawnEffect = Fx.blastExplosion;
                         width = 6;
                         height = 6;
-                        shrinkX = 0.2f;
+                        shrinkX = 0.4f;
                         shrinkY = 0.7f;
                         status = StatusEffects.burning;
                         statusDuration = 12f * 60f;
-                        frontColor = Pal.lightishOrange;
+                        frontColor = Pal.lightPyraFlame;
                         backColor = Pal.lightOrange;
-                        gravity = 0.003f;
-                        startingLift = 0.12f;
+                        gravity = 0.0009f;
+                        startingLift = 0.036f;
                         bounceShake = 0.7f;
                         bounceEfficiency = 0.65f;
                         bounceForce = 10;
@@ -242,9 +285,9 @@ public class FrostBlocks {
                             minLife = 55f;
                             hitEffect = Fx.blastExplosion;
                             despawnEffect = Fx.blastExplosion;
-                            width = 8;
-                            height = 8;
-                            shrinkX = 0.7f;
+                            width = 6;
+                            height = 6;
+                            shrinkX = 0.9f;
                             shrinkY = 0.9f;
                             status = StatusEffects.burning;
                             statusDuration = 12f * 60f;
@@ -288,10 +331,30 @@ public class FrostBlocks {
                         puddleAmount = 6;
                         splashDamage = 55;
                         splashDamageRadius = 16;
-                        trailEffect = Fx.smoke;
-                        trailChance = 0.65f;
                         scaleLife = false;
-                    }}
+                    }
+                    Effect effect = new Effect(55, e -> {
+                        float h = (float) e.data;
+                        float radius = 2.2f * h;
+                        float[] layers = new float[]{visualHeightMax, visualHeightMin};
+                        Draw.color(Pal.lightPyraFlame);
+                        Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 7, e.rotation, 35, (x, y) -> {
+                            float visibility = h/visualHeightRange;
+                            Draw.alpha(visibility * e.fout() * 0.23f);
+                            Draw.z(layers[0]);
+                            Fill.circle(e.x + x, e.y + y, radius);
+                            visibility = 1 - visibility;
+                            Draw.alpha(visibility * e.fout() * 0.23f);
+                            Draw.z(layers[1]);
+                            Fill.circle(e.x + x, e.y + y, radius);
+                        });
+                    });
+                        @Override
+                        public void update(Bullet b) {
+                            super.update(b);
+                            if(Mathf.chanceDelta(0.65f)) effect.at(b.x, b.y, b.rotation(), BouncyBulletType.getHeight(b));
+                        }
+                    }
             );
             consumeLiquids(new LiquidStack(Liquids.oil, 1.35f));
 
@@ -302,6 +365,31 @@ public class FrostBlocks {
                 spread = 0;
             }};
             shootSound = Sounds.bang;
+            shootEffect = new Effect(75, e -> {
+                e.scaled(25, e1 -> {
+                    Draw.color(Pal.lightPyraFlame);
+                    Draw.alpha(e1.foutpow());
+
+                    Lines.stroke(e1.fout() * 0.65f);
+                    Lines.circle(e1.x, e1.y, e1.finpow() * 15);
+
+                    Lines.stroke(e1.fout() * 3);
+                    Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 35, (x, y) -> {
+                        Lines.line(e.x + x * 0.3f, e.y + y * 0.3f, e.x + x, e.y + y);
+                    });
+                });
+
+                Draw.color(Pal.darkerGray);
+                Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 5) + 4), e.finpow() * 45, e.rotation, 25, (x, y) -> {
+                    Fill.circle(e.x + x, e.y + y, 5 * e.fout(Interp.pow4));
+                });
+                Draw.color(Pal.gray);
+                e.scaled(45, e1 -> {
+                    Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e1.finpow() * 85, e.rotation, 25, (x, y) -> {
+                        Fill.circle(e1.x + x, e1.y + y, 2 * e1.fout(Interp.pow4));
+                    });
+                });
+            });
         }};
 
         coreBunker = new BuildBeamCore("core-bunker"){{

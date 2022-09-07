@@ -42,6 +42,7 @@ import mindustry.type.ItemSeq;
 import mindustry.type.ItemStack;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.ui.dialogs.DatabaseDialog;
 import mindustry.ui.dialogs.SchematicsDialog;
 import mindustry.ui.fragments.BlockConfigFragment;
 import mindustry.world.blocks.units.UnitFactory;
@@ -94,24 +95,36 @@ public class BlockSelectFrag {
             });
             table.pane(pane -> {
                 float length = 0;
-                pane.image().fillX().height(5).padTop(3);
+                pane.image().fillX().height(5).padTop(3).top();
                 pane.row();
                 pane.table(t -> {
-                    t.background(Tex.button);
                     i = 0;
                     currentMap.each((upgrade, arr) -> {
                         Log.info(upgrade);
                         Log.info(arr);
-                        t.image(upgrade.region).size(40).pad(8);
+                        ClickListener listener = new ClickListener();
+                        Image image = new Image(upgrade.region);
+                        image.addListener(listener);
+                        image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, Mathf.clamp(0.4f * Time.delta)));
+                        image.addListener(new HandCursorListener());
+                        image.clicked(() -> {
+                            Log.info("hi");
+                        });
+
+                        t.add(image).size(40).pad(2);
                         if(i++ % 4 == 3){
                             i = 0;
                             t.row();
                         }
                     });
-
-                });
+                    if(i % 4 != 3){
+                        for (int j = 0; j < 4 - i; j++) {
+                            t.image().color(Color.clear).size(40).pad(2);
+                        }
+                    }
+                }).top();
                 pane.row();
-                pane.image().fillX().height(5).padBottom(3).bottom();
+                pane.image().fillX().height(5).padBottom(3).top();
             }).width(200).height(300);
         });
         buttons.add(upgrades);

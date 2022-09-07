@@ -3,6 +3,7 @@ package frostscape.entities;
 import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.*;
 import mindustry.Vars;
@@ -43,7 +44,7 @@ public class BouncyBulletType extends BasicBulletType {
 
     public float minLife;
 
-    private float visualHeightRange;
+    public float visualHeightRange;
 
     public BouncyBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
@@ -113,8 +114,8 @@ public class BouncyBulletType extends BasicBulletType {
     public void draw(Bullet b) {
         drawTrail(b);
         float h = getHeight(b);
-        float height = this.height * shrinkY + this.height * shrinkY * h;
-        float width = this.width * shrinkX + this.width * shrinkX * h;
+        float height = this.height + this.height * shrinkY * h;
+        float width = this.width + this.width * shrinkX * h;
         float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f) + rotationOffset;
 
         Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
@@ -145,6 +146,19 @@ public class BouncyBulletType extends BasicBulletType {
         }
         Draw.reset();
 
+    }
+
+    @Override
+    public void createFrags(Bullet b, float x, float y) {
+        HeightHolder h = BouncyBulletType.getHolder(b);
+        if(fragBullet != null){
+            for(int i = 0; i < fragBullets; i++){
+                float len = Mathf.random(1f, 7f);
+                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
+                Bullet bullet = fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
+                bullet.data = new HeightHolder(h.height, h.lift);
+            }
+        }
     }
 
     @Override
@@ -218,8 +232,12 @@ public class BouncyBulletType extends BasicBulletType {
         }
     }
 
-    public float getHeight(Bullet b){
+    public static float getHeight(Bullet b){
         return ((HeightHolder) b.data).height;
+    }
+
+    public static HeightHolder getHolder(Bullet b){
+        return (HeightHolder) b.data;
     }
 
     protected class HeightHolder{

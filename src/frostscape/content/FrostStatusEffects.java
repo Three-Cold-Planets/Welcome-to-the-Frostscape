@@ -40,7 +40,7 @@ public class FrostStatusEffects {
 
             public void update(Unit u, float time){
                 super.update(u, time);
-                if(u.elevation > 0.1f) u.elevation = Mathf.clamp(u.elevation + (u.type.flying ? 0 : u.type.riseSpeed/25 * 24), 0, 1);
+                if(u.elevation > 0.1f) u.elevation = Mathf.clamp(u.elevation + (u.type.flying ? 0 : u.type.fallSpeed/100 * 99), 0, 1);
             };
             {
                 effect = Fx.fallSmoke;
