@@ -9,6 +9,7 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.*;
 import arc.struct.Seq;
+import frostscape.content.*;
 import frostscape.entities.BouncyBulletType;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
@@ -289,7 +290,7 @@ public class FrostBlocks {
                             height = 6;
                             shrinkX = 0.9f;
                             shrinkY = 0.9f;
-                            status = StatusEffects.burning;
+                            status = FrostStatusEffects.napalm;
                             statusDuration = 12f * 60f;
                             frontColor = Pal.lightishOrange;
                             backColor = Pal.lightOrange;
