@@ -26,7 +26,7 @@ public class FrostStatusEffects {
             opposite(StatusEffects.melting);
             init(() -> {
                 affinity(StatusEffects.burning, (unit, result, time) -> unit.damagePierce(Math.min(transitionDamage, StatusEffects.burning.damage * time)));
-                affinity(tarred, (unit, result, time) -> result.set(napalm, result.time + time));
+                affinity(StatusEffects.tarred, (unit, result, time) -> result.set(napalm, result.time + time));
             });
         }};
 
