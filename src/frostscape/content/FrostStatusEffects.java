@@ -4,8 +4,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.util.Time;
-import mindustry.content.Fx;
-import mindustry.content.StatusEffects;
+import mindustry.content.*;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
@@ -21,7 +20,14 @@ public class FrostStatusEffects {
 
         napalm = new StatusEffect("sticky-fire"){{
             damage = 0.15f;
+            speedMultiplier = 0.6f;
+            effect = Fx.oily;
             opposite(StatusEffects.melting);
+            init(() -> {
+                affinity(StatusEffects.melting, (unit, result, time) -> result.set(StatusEffects.melting, result.time + time));
+                affinity(StatusEffects.burning, (unit, result, time) -> result.set(tarred, result.time + time));
+                affinity(tarred , (unit, result, time) -> result.set(napalm, result.time + time));
+            });
         }};
 
         attackBoost = new StatusEffect("attack-boost"){{
