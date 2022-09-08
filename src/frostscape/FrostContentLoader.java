@@ -22,6 +22,7 @@ public class FrostContentLoader {
         SectorControllers.load();
         Events.run(ClientLoadEvent.class, () -> {
             controllers.each(SectorController::load);
+            ImmunityHandler.handle();
         });
     }
 }

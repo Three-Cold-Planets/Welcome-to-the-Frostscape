@@ -4,6 +4,7 @@ import arc.scene.ui.Dialog;
 import arc.util.Reflect;
 import frostscape.ui.dialog.FamilyDescriptionDialog;
 import frostscape.ui.dialog.settings.ControllerSettingDialog;
+import frostscape.ui.frag.BlockSelectButtons;
 import frostscape.ui.frag.BlockSelectFrag;
 import mindustry.Vars;
 import mindustry.game.Rules;
@@ -24,6 +25,7 @@ public class FrostUI {
         SCHSettings = new ControllerSettingDialog("@dialog.SCHsettings");
         select = new BlockSelectFrag();
         select.build(Vars.ui.hudGroup);
+        BlockSelectButtons.setup();
 
         modifyUI();
     }

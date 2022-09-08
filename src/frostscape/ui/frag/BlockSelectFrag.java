@@ -52,10 +52,9 @@ import static mindustry.Vars.state;
 
 //A mixture of the block selection fragment and it's... buttons
 public class BlockSelectFrag {
-    private static int i = 0, currentLevel = 0;
-    private static boolean isValid = false;
+    private static int i = 0;
     public Table table = new Table(), content = new Table();
-    public Seq<SelectButton> buttons = new Seq<>(), current = new Seq<>();
+    public static Seq<SelectButton> buttons = new Seq<>(), current = new Seq<>();
     public SelectButton selected = null;
 
     public static Upgrade tmpUp = null;
@@ -68,94 +67,6 @@ public class BlockSelectFrag {
         parent.addChild(table);
 
         Events.on(EventType.ResetEvent.class, e -> forceHide());
-
-        //Add exit button
-        buttons.add(new SelectButton("Exit", Icon.left, false, (b) -> true, (t, builds) -> hideConfig()));
-        //Enable/Disable
-        buttons.add(new SelectButton("Disable", Icon.cancel, false, (b) -> true, (t, builds) -> builds.each(b -> b.enabled = false)));
-        buttons.add(new SelectButton("Enable", Icon.play, false, (b) -> true, (t, builds) -> builds.each(b -> b.enabled = true)));
-        //Upgrades tables
-        Table infoTable = new Table(), costs = new Table(), list = new Table();
-        int curLevel = 0;
-        SelectButton upgrades = new SelectButton("Upgrades", Icon.hammer, true, (b) -> b.find(build -> build instanceof UpgradeableBuilding) != null, (table, builds) -> {
-            table.clear();
-            infoTable.clear();
-            table.background(Styles.black6);
-            table.setOrigin(Align.top);
-            table.setSize(160, 800);
-            //Code reveiw P L E A S E
-            ObjectMap<Upgrade, ObjectMap<UpgradeEntry, Seq<UpgradeState>>> currentMap = new ObjectMap<>();
-            ObjectMap<UpgradeEntry, Seq<UpgradeState>> currentStates = new ObjectMap<>(), currentStatesClone = new ObjectMap<>();
-            Seq<UpgradeableBuilding> buildings = new Seq<>();
-            builds.each(b -> {
-                if(b instanceof UpgradeableBuilding) {
-                    UpgradeableBuilding building = (UpgradeableBuilding) b;
-                    buildings.add(building);
-                    building.type().entries().each(entry -> {
-                        if(!currentMap.containsKey(entry.upgrade)) currentMap.put(entry.upgrade, new ObjectMap<>());
-                        if(!currentMap.get(entry.upgrade).containsKey(entry)) currentMap.get(entry.upgrade).put(entry, new Seq<>());
-                        UpgradeState state = building.upgrades().getState(entry.upgrade);
-                        currentMap.get(entry.upgrade).get(entry).add(state);
-                    });
-                }
-            });
-            //Gotten when the upgrade building changes
-            Cons<Upgrade> r = u -> {
-                infoTable.clear();
-                currentStates.clear();
-                currentStatesClone.clear();
-                currentStatesClone.merge(currentMap.get(u).copy()).each((entry, states) -> {
-                    isValid = false;
-                    Seq<UpgradeState> curStates = Seq.with();
-                    states.each(s -> {
-                        Log.info(s);
-                        if(!s.installed || s.level < entry.stacks()) curStates.add(s);
-                    });
-                    if(!curStates.isEmpty()) currentStates.put(entry, curStates);
-                });
-                Log.info(currentStates);
-                Log.info(currentMap);
-                i = 0;
-                infoTable.table(topBar -> {
-                    topBar.button(Icon.add, () -> currentLevel++);
-                }).left().height(50).fillX();
-            };
-            table.table(select -> {
-                select.pane(pane -> {
-                    pane.image().fillX().height(5).padTop(3).top();
-                    pane.row();
-                    pane.table(t -> {
-                        i = 0;
-                        currentMap.each((upgrade, arr) -> {
-                            ClickListener listener = new ClickListener();
-                            Image image = new Image(upgrade.region);
-                            image.addListener(listener);
-                            image.update(() -> image.color.lerp(!listener.isOver() ? Color.lightGray : Color.white, Mathf.clamp(0.4f * Time.delta)));
-                            image.addListener(new HandCursorListener());
-                            image.clicked(() -> {
-                                r.get(upgrade);
-                            });
-
-                            t.add(image).size(40).pad(2);
-                            if(i++ % 4 == 3){
-                                i = 0;
-                                t.row();
-                            }
-                        });
-                        if(i % 4 != 3){
-                            for (int j = 0; j < 4 - i; j++) {
-                                t.image().color(Color.clear).size(40).pad(2);
-                            }
-                        }
-                    }).top();
-                    pane.row();
-                    pane.image().fillX().height(5).padBottom(3).top();
-                }).width(200).height(300);
-            }).width(200).height(400);
-            table.image().height(400).width(10);
-            table.add(infoTable).width(400).height(400);
-        });
-        buttons.add(upgrades);
     }
 
     public boolean hasConfigMouse(){
@@ -180,7 +91,7 @@ public class BlockSelectFrag {
         //For whatever higher-being-forsaken reason you remove the exit button I will... release the lions
         if(buttons.size == 0) {
             try {
-                throw new IllegalStateException("RELEASE THE LIONS");
+                throw new IllegalStateException("Buttons is empty, avoid clearing buttons outside unit tests.");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -255,7 +166,7 @@ public class BlockSelectFrag {
         content.actions(Actions.scaleTo(0f, 1f, 0.06f, Interp.pow3Out), Actions.visible(false));
     }
 
-    public class SelectButton{
+    public static class SelectButton{
         public String name;
         public Drawable icon;
         public Boolf<Seq<Building>> cond;
