@@ -65,7 +65,7 @@ public abstract class FrostscapeBuilding extends Building implements Upgradeable
 
     @Override
     public void applyDeltas(UpgradeState state) {
-        if(state.level == -1) return;
+        if(!state.installed) return;
         UpgradeEntry entry = type().entries().find(e -> e.upgrade == state.upgrade);
         if(entry == null) return;
         damageMultiplier *= entry.damageMultiplier[state.level];

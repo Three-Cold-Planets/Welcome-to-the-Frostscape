@@ -43,7 +43,7 @@ public class DrawUpgradePart extends UpgradeDrawer{
         Seq<Upgrade> upgrades = expectUpgradeable(build.block).upgrades();
         UpgradeableBuilding building = (UpgradeableBuilding) build;
         UpgradeState state = building.upgrades().states.find(s -> s.upgrade == upgrade);
-        if(state == null) return null;
+        if(state == null || !state.installed) return null;
         return loaded[state.level];
     }
 

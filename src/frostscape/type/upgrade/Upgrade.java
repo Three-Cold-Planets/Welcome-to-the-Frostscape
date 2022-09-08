@@ -36,7 +36,7 @@ public class Upgrade<T> {
     }
 
     public void load(){
-        localisedName = Core.bundle.get(name, name);
+        localisedName = Core.bundle.get("upgrade." + name + ".name", name);
         region = Core.atlas.find(name);
     }
     public boolean unlocked(Team team){

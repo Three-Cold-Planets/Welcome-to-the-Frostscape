@@ -23,10 +23,10 @@ public class FrostStatusEffects {
             transitionDamage = 80;
             speedMultiplier = 0.9f;
             effect = Fx.oily;
-            opposite(StatusEffects.melting);
+            opposite(StatusEffects.melting, StatusEffects.wet);
             init(() -> {
                 affinity(StatusEffects.burning, (unit, result, time) -> unit.damagePierce(Math.min(transitionDamage, StatusEffects.burning.damage * time)));
-                affinity(StatusEffects.tarred, (unit, result, time) -> result.set(napalm, result.time + time));
+                affinity(StatusEffects.tarred, (unit, result, time) -> result.set(napalm, Math.min(transitionDamage/damage, result.time + time)));
             });
         }};
 

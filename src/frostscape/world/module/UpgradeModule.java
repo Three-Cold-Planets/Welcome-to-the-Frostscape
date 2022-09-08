@@ -24,12 +24,17 @@ public class UpgradeModule extends BlockModule {
     }
 
     public UpgradeState getState(Upgrade upgrade){
-        return states.find(s -> s.upgrade == upgrade);
+        UpgradeState state = states.find(s -> s.upgrade == upgrade);
+        if(state == null) {
+            state = new UpgradeState(upgrade);
+            states.add(state);
+        }
+        return state;
     }
 
     public void update(Upgradeable u){
         states.each(s -> {
-            if(s.installing == false) u.applyDeltas(s);
+            if(!s.installing && s.installed) u.applyDeltas(s);
         });
     }
 
