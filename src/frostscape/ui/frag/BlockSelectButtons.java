@@ -4,7 +4,6 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.scene.event.ClickListener;
 import arc.scene.event.HandCursorListener;
-import arc.scene.ui.Button;
 import arc.scene.ui.Image;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Cell;
@@ -21,6 +20,7 @@ import frostscape.ui.frag.BlockSelectFrag.*;
 import frostscape.world.upgrades.UpgradeEntry;
 import frostscape.world.upgrades.UpgradeState;
 import mindustry.gen.Icon;
+import mindustry.gen.Tex;
 import mindustry.ui.Styles;
 
 import static frostscape.ui.frag.BlockSelectFrag.buttons;
@@ -29,7 +29,7 @@ public class BlockSelectButtons {
     private static int i = 0, currentLevel = 0, maxLevel = 0;
     public static Upgrade currentUpgrade;
     private static boolean isValid = false;
-    public static Table info = new Table(), costs = new Table(), list = new Table(), topBar = new Table(), upgradeList = new Table();
+    public static Table info = new Table(), costs = new Table(), infoList = new Table(), list = new Table(), topBar = new Table(), upgradeList = new Table();
     public static ObjectMap<Upgrade, ObjectMap<UpgradeEntry, Seq<UpgradeState>>> currentMap = new ObjectMap<>();
     public static ObjectMap<UpgradeEntry, Seq<UpgradeState>> currentStates = new ObjectMap<>(), currentStatesClone = new ObjectMap<>();
 
@@ -113,6 +113,7 @@ public class BlockSelectButtons {
         info.clear();
         currentStates.clear();
         currentStatesClone.clear();
+        info.top().left().marginLeft(0);
         maxLevel = 0;
         currentStatesClone.merge(currentMap.get(u).copy()).each((entry, states) -> {
             isValid = false;
@@ -129,12 +130,18 @@ public class BlockSelectButtons {
         Log.info(currentStates);
         Log.info(currentMap);
         i = 0;
-        info.add(topBar).left().height(40).fillX();
+        info.add(topBar).left().top().height(40).width(400);
         rebuildInfoButtons();
+        info.row();
+        info.add(infoList).width(10).height(360);
+        rebuildInfoList();
+        info.add(costs).width(100).height(360);
+        costs.background(Tex.button);
     }
 
     public static void rebuildInfoButtons(){
         topBar.clear();
+        topBar.background(Tex.button);
         Cell<ImageButton> current = topBar.button(Icon.up, () -> {
             currentLevel++;
             rebuildInfo(currentUpgrade, currentLevel);
@@ -147,5 +154,20 @@ public class BlockSelectButtons {
         });
         current.size(80, 40);
         current.get().setDisabled(() -> currentLevel <= 0);
+    }
+
+    public static void rebuildInfoList(){
+        infoList.clear();
+        infoList.top().left();
+        infoList.table(upgradeInfo -> {
+            upgradeInfo.background(Tex.button);
+            upgradeInfo.top().left();
+            upgradeInfo.label(() -> currentUpgrade.localisedName).get().setFontScale(0.85f, 0.85f);
+            upgradeInfo.row();
+            upgradeInfo.image().fillX();
+            upgradeInfo.row();
+            upgradeInfo.image(currentUpgrade.region).size(50);
+        }).fillX().height(100);
+        infoList.background(Tex.button);
     }
 }
