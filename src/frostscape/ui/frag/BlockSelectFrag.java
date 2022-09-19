@@ -30,6 +30,7 @@ import arc.util.Tmp;
 import frostscape.Frostscape;
 import frostscape.type.upgrade.Upgrade;
 import frostscape.type.upgrade.UpgradeableBuilding;
+import frostscape.ui.FrostUI;
 import frostscape.world.upgrades.UpgradeEntry;
 import frostscape.world.upgrades.UpgradeState;
 import mindustry.content.Blocks;
@@ -53,7 +54,7 @@ import static mindustry.Vars.state;
 //A mixture of the block selection fragment and it's... buttons
 public class BlockSelectFrag {
     private static int i = 0;
-    public Table table = new Table(), content = new Table();
+    public Table table = new Table(), content = new Table(), buttonTable = new Table();
     public static Seq<SelectButton> buttons = new Seq<>(), current = new Seq<>();
     public SelectButton selected = null;
 
@@ -109,41 +110,8 @@ public class BlockSelectFrag {
 
         content.setOrigin(Align.center);
 
-        ButtonGroup<ImageButton> group = new ButtonGroup<>();
-        group.setMinCheckCount(0);
-        table.table(t -> {
-            t.defaults().size(50);
-            i = 0;
-            current.each(c -> {
-                ImageButton button = t.button(Tex.whiteui, Styles.clearTogglei, 24, () -> {
-                    if(c == selected) {
-                        hideCurrent();
-                        selected = null;
-                        return;
-                    };
-                    setButton(c);
-                    //set up the table
-                    if(c.hasTable) {
-                        content.visible = true;
-                        content.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
-                                Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
-                    }
-                    c.cons.get(content, buildings);
-                }).group(group).tooltip(c.name).get();
-                button.getStyle().imageUp = c.icon;
-                button.table().pad(0);
-                if(i++ % 4 == 3){
-                    t.row();
-                }
-            });
-
-            if(i % 4 != 0){
-                int remaining = 4 - (i % 4);
-                for(int j = 0; j < remaining; j++){
-                    t.image(Styles.black6);
-                }
-            }
-        });
+        table.add(buttonTable);
+        rebuildButtons(buildings);
 
         table.row();
         table.add(content);
@@ -151,8 +119,46 @@ public class BlockSelectFrag {
         return true;
     };
 
+    public void rebuildButtons(Seq<Building> buildings){
+        buttonTable.clear();
+        ButtonGroup<ImageButton> group = new ButtonGroup<>();
+        group.setMinCheckCount(0);
+        buttonTable.defaults().size(50);
+        i = 0;
+        current.each(c -> {
+            ImageButton button = buttonTable.button(Tex.whiteui, Styles.clearTogglei, 24, () -> {
+                if(c == selected) {
+                    hideCurrent();
+                    selected = null;
+                    return;
+                };
+                setButton(c);
+                //set up the table
+                if(c.hasTable) {
+                    content.visible = true;
+                    content.actions(Actions.scaleTo(0f, 1f), Actions.visible(true),
+                            Actions.scaleTo(1f, 1f, 0.07f, Interp.pow3Out));
+                }
+                c.cons.get(content, buildings);
+            }).group(group).tooltip(c.name).get();
+            button.getStyle().imageUp = c.icon;
+            button.table().pad(0);
+            if(i++ % 4 == 3){
+                buttonTable.row();
+            }
+        });
+
+        if(i % 4 != 0){
+            int remaining = 4 - (i % 4);
+            for(int j = 0; j < remaining; j++){
+                buttonTable.image(Styles.black6);
+            }
+        }
+        if(selected != null && selected.update != null) selected.update.get(content, buildings);
+    }
+
     public void updateTableAlign(Table table) {
-        Vec2 pos = Tmp.v1.set(Core.input.mouseX(), Core.input.mouseY());
+        Vec2 pos = Tmp.v1.set(Core.scene.getWidth()/2, Core.scene.getHeight()/2);
         table.setPosition(pos.x, pos.y, 2);
     }
 
@@ -169,8 +175,13 @@ public class BlockSelectFrag {
     public static class SelectButton{
         public String name;
         public Drawable icon;
+        //Return whether to show the button with the current group of buildings
         public Boolf<Seq<Building>> cond;
+        //Called when initially opening the button's fragment
         public Cons2<Table, Seq<Building>> cons;
+        //Listener for whenever the button is already selected, and buildings are changed.
+
+        public Cons2<Table, Seq<Building>> update;
         public boolean hasTable = false;
         public SelectButton(String name, Drawable icon, boolean hasTable, Boolf<Seq<Building>> cond, Cons2<Table, Seq<Building>> cons){
             this.name = name;
@@ -178,6 +189,10 @@ public class BlockSelectFrag {
             this.hasTable = hasTable;
             this.cond = cond;
             this.cons = cons;
+        }
+
+        public SelectButton(){
+
         }
     }
 }

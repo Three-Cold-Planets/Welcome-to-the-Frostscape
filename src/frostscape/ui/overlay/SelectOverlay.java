@@ -42,7 +42,6 @@ public class SelectOverlay {
         changed = false;
 
         if(Core.input.keyTap(KeyCode.backtick) && !Core.scene.hasField() && !Core.scene.hasDialog()) {
-            FrostUI.select.forceHide();
             if(!awaitingSelect && !selecting) {
                 awaitingSelect = true;
                 Vars.ui.showInfoToast("Block select active! Press Ctrl again to cancel", 1);
@@ -81,7 +80,12 @@ public class SelectOverlay {
                     buildings.add(b);
                 });
                 changed = true;
-                FrostUI.select.showConfig(buildings);
+                if(buildings.size > 0) {
+                    if (!FrostUI.select.table.visible) FrostUI.select.showConfig(buildings);
+                    else {
+                        FrostUI.select.rebuildButtons(buildings);
+                    }
+                }
             }
         }
 
