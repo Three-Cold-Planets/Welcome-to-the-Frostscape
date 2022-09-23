@@ -17,13 +17,13 @@ public class UpgradeState {
     public Upgrade upgrade;
     //Level of the state. If it's -1 it has not been installed yet. Use getLevel to avoid confusion.
     public int level = -1;
-    //The progress on installing an upgrade's next level
+    //The progress on installing an upgrade's next level.
     public float progress;
     public boolean
-        //If the upgrade has been installed on the entity
+        //If the upgrade has been installed on the entity.
         installed = false,
-        //If the upgrade is installing it's next level
-        installing = true;
+        //If the upgrade is installing it's next level. Defaults to false.
+        installing = false;
 
     //NOTE: Only to be used for reading data!
     public UpgradeState(){
@@ -43,6 +43,7 @@ public class UpgradeState {
     public int getLevel(){
         return Math.max(0, level);
     }
+
     public float progress(ProgressType type){
         float total = 0;
         switch (type){

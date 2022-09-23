@@ -94,6 +94,7 @@ public class UpgradeModule extends BlockModule {
         if(Frostscape.upgrades.instantUpgrades){
             current.level++;
             current.installing = false;
+            current.installed = true;
         }else {
             current.installing = true;
             current.progress = 0;

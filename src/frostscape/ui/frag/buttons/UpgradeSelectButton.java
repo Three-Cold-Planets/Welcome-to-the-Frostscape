@@ -4,10 +4,12 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.scene.event.ClickListener;
 import arc.scene.event.HandCursorListener;
+import arc.scene.ui.Button;
 import arc.scene.ui.Image;
 import arc.scene.ui.ImageButton;
 import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
+import arc.struct.IntMap;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Align;
@@ -16,18 +18,27 @@ import arc.util.Time;
 import frostscape.type.upgrade.Upgrade;
 import frostscape.type.upgrade.UpgradeableBuilding;
 import frostscape.ui.frag.BlockSelectFrag;
+import frostscape.world.UpgradesType;
 import frostscape.world.upgrades.UpgradeEntry;
 import frostscape.world.upgrades.UpgradeState;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
+import mindustry.type.ItemSeq;
+import mindustry.type.ItemStack;
 import mindustry.ui.Styles;
+
+import java.util.Iterator;
+
+import static mindustry.Vars.*;
 
 public class UpgradeSelectButton extends BlockSelectFrag.SelectButton {
     private static int i = 0, currentLevel = 0, maxLevel = 0;
     public Upgrade currentUpgrade;
     private boolean isValid = false;
-    public Table info = new Table(), costs = new Table(), infoList = new Table(), list = new Table(), topBar = new Table(), upgradeList = new Table();
+    public Table content = null, info = new Table(), costTable = new Table(), infoList = new Table(), list = new Table(), topBar = new Table(), upgradeList = new Table();
+    public Seq<Building> buildings = new Seq<>();
+    public ObjectMap<Upgrade, IntMap<ItemSeq>> costs = new ObjectMap<>();
     public ObjectMap<Upgrade, ObjectMap<UpgradeEntry, Seq<UpgradeState>>> currentMap = new ObjectMap<>();
     public ObjectMap<UpgradeEntry, Seq<UpgradeState>> currentStates = new ObjectMap<>(), currentStatesClone = new ObjectMap<>();
 
@@ -57,22 +68,51 @@ public class UpgradeSelectButton extends BlockSelectFrag.SelectButton {
     public void rebuild(Table table, Seq<Building> builds){
         //Update the list of upgrades
         info.clear();
+        costTable.clear();
+        infoList.clear();
+        list.clear();
+        topBar.clear();
+        topBar.clear();
+        upgradeList.clear();
+
+        buildings.clear();
         currentMap.clear();
         currentStates.clear();
         currentStatesClone.clear();
-        Seq<UpgradeableBuilding> buildings = new Seq<>();
+        costs.clear();
+
+        content = table;
         //Mess
+        costs.clear();
         builds.each(b -> {
-            if(b instanceof UpgradeableBuilding) {
-                UpgradeableBuilding building = (UpgradeableBuilding) b;
-                buildings.add(building);
-                building.type().entries().each(entry -> {
-                    if(!currentMap.containsKey(entry.upgrade)) currentMap.put(entry.upgrade, new ObjectMap<>());
-                    if(!currentMap.get(entry.upgrade).containsKey(entry)) currentMap.get(entry.upgrade).put(entry, new Seq<>());
-                    UpgradeState state = building.upgrades().getState(entry.upgrade);
-                    currentMap.get(entry.upgrade).get(entry).add(state);
-                });
-            }
+            //if the building isn't an upgradeable building, return
+            if(!(b instanceof UpgradeableBuilding)) return;
+            UpgradeableBuilding building = (UpgradeableBuilding) b;
+
+            buildings.add(b);
+            //Building the map
+            building.type().entries().each(entry -> {
+                if(!currentMap.containsKey(entry.upgrade)) currentMap.put(entry.upgrade, new ObjectMap<>());
+                if(!currentMap.get(entry.upgrade).containsKey(entry)) currentMap.get(entry.upgrade).put(entry, new Seq<>());
+                UpgradeState state = building.upgrades().getState(entry.upgrade);
+                currentMap.get(entry.upgrade).get(entry).add(state);
+
+                //Calculate costs
+                if(!costs.containsKey(entry.upgrade)) costs.put(entry.upgrade, new IntMap());
+
+                IntMap<ItemSeq> mappedCosts = costs.get(entry.upgrade);
+
+                //Entry is at its max level, return
+                if(state.level + 1 > entry.stacks()) return;
+
+                if(!mappedCosts.containsKey(state.level + 1)) mappedCosts.put(state.level + 1, new ItemSeq());
+
+                ItemStack[] add;
+                if(state == null) add = entry.costs[0];
+                else if(state.installing || state.level + 1 >= entry.stacks()) return;
+                else add = entry.costs[state.level + 1];
+                mappedCosts.get(state.level + 1).add(add);
+            });
         });
         rebuildUpgrades();
     }
@@ -115,7 +155,8 @@ public class UpgradeSelectButton extends BlockSelectFrag.SelectButton {
         info.clear();
         currentStates.clear();
         currentStatesClone.clear();
-        info.left().marginLeft(0);
+        info.defaults().left().top().padLeft(0).padTop(0);
+
         maxLevel = 0;
         currentStatesClone.merge(currentMap.get(u).copy()).each((entry, states) -> {
             isValid = false;
@@ -135,15 +176,68 @@ public class UpgradeSelectButton extends BlockSelectFrag.SelectButton {
         info.add(topBar).left().top().height(40).width(400);
         rebuildInfoButtons();
         info.row();
+        info.image().fillX().height(10);
+        info.row();
         info.table(bottomTable -> {
-            bottomTable.background(Tex.button);
-            bottomTable.add(infoList).width(300).height(360);
+            bottomTable.add(infoList).width(300).height(340);
             rebuildInfoList();
-            bottomTable.add(costs).width(100).height(360);
-            costs.background(Tex.button);
-        }).width(400).height(360);
+            bottomTable.image().height(340).width(4).padLeft(8).padRight(8);
+            bottomTable.add(costTable).width(80).height(340);
+            rebuildCosts();
+        }).width(400).height(340).padTop(10);
     }
 
+    public void rebuildCosts(){
+        costTable.clear();
+        if(costs.get(currentUpgrade).get(currentLevel) == null) {
+            //:(
+            costTable.add(":(");
+            return;
+        }
+
+        costTable.pane(Styles.horizontalPane, pane -> {
+            pane.top().left().defaults().padLeft(4);
+
+            ItemSeq current = costs.get(currentUpgrade).get(currentLevel);
+            Iterator<ItemStack> iterator = current.iterator();
+            while (iterator.hasNext()){
+                ItemStack s = iterator.next();
+                pane.image(s.item.uiIcon).left().size(iconMed);
+                pane.label(() -> {
+                    Building core = player.core();
+                    if(core == null || state.rules.infiniteResources || core.items.has(s.item, s.amount)) return "[lightgray]" + s.amount + "";
+                    return (core.items.has(s.item, s.amount) ? "[lightgray]" : "[scarlet]") + Math.min(core.items.get(s.item), s.amount) + "[lightgray]/" + s.amount;
+                }).padLeft(2).left().padRight(4).wrap();
+                pane.row();
+            }
+        }).width(100).height(300);
+        costTable.row();
+        Button button = new Button();
+        button.image(Icon.add);
+        button.setDisabled(() -> !player.core().items.has(costs.get(currentUpgrade).get(currentLevel)));
+        costTable.button(Icon.add, () -> {
+            isValid = false;
+            buildings.each(b -> {
+                UpgradeableBuilding build = (UpgradeableBuilding) b;
+                UpgradesType type = build.type();
+
+                type.entries().each(entry -> {
+                    if(entry.upgrade != currentUpgrade) return;
+                    UpgradeState state = build.upgrades().getState(entry.upgrade);
+                    if(state.installing || state.level != currentLevel - 1) return;
+                    build.upgrades().startUpgrade(entry);
+                    Log.info(entry);
+                    isValid = true;
+                });
+            });
+            if(isValid){
+                rebuild(content, buildings.copy());
+                currentLevel = Math.min(currentLevel + 1, maxLevel);
+
+                rebuildInfo(currentUpgrade, currentLevel);
+            }
+        }).width(100).height(40);
+    }
     public void rebuildInfoButtons(){
         topBar.clear();
         topBar.left();
@@ -162,23 +256,21 @@ public class UpgradeSelectButton extends BlockSelectFrag.SelectButton {
             current.get().setDisabled(() -> currentLevel <= 0);
         }).width(120).height(40);
 
-        topBar.label(() -> "[gray]" + (currentLevel - 1 < 0 ? "NULL" : Integer.toString(currentLevel - 1)) + " < ").padLeft(20).width(70);
+        topBar.label(() -> (costs.get(currentUpgrade).get(currentLevel - 1) == null ? "[gray]" : "[lightgray]") + (currentLevel - 1 < 0 ? "NULL" : Integer.toString(currentLevel - 1)) + " < ").padLeft(20).width(70);
         topBar.label(() -> "LV " + currentLevel + (Time.time % 90 < 45 ? "_" : "")).padLeft(15).width(70);
-        topBar.label(() ->  "[gray] < " + (currentLevel + 1 > maxLevel ? "NULL[]" : Integer.toString(currentLevel + 1))).padLeft(15).width(70);
+        topBar.label(() ->  (costs.get(currentUpgrade).get(currentLevel + 1) == null ? "[gray]" : "[lightgray]") + " < " + (currentLevel + 1 > maxLevel ? "NULL[]" : Integer.toString(currentLevel + 1))).padLeft(15).width(70);
     }
 
     public void rebuildInfoList(){
         infoList.clear();
         infoList.top().left();
         infoList.table(upgradeInfo -> {
-            upgradeInfo.background(Tex.button);
             upgradeInfo.top().left();
             upgradeInfo.label(() -> currentUpgrade.localisedName).get().setFontScale(0.85f, 0.85f);
             upgradeInfo.row();
             upgradeInfo.image().fillX();
             upgradeInfo.row();
             upgradeInfo.image(currentUpgrade.region).size(50);
-        }).width(300).height(100);
-        infoList.background(Tex.button);
+        }).width(280).height(100);
     }
 }
