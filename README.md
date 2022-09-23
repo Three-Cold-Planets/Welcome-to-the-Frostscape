@@ -9,9 +9,9 @@ Currently the next milestone in development that im aiming to hit is finishing t
 ### Required in MVP
 Theese goals will be required before the Minimum Viable Product is released.
 
-[] Upgrades system
+[x] Upgrades system
 
-[] Block selection/actions ui
+[x] Block selection/actions ui
 
 [] Environmental heat systems
 
