@@ -2,6 +2,7 @@ package frostscape.content;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
+import frostscape.content.*;
 import frostscape.entities.BouncyBulletType;
 import mindustry.content.*;
 import mindustry.entities.Effect;
@@ -67,7 +68,7 @@ public class FrostBullets {
                 height = 12f;
                 frontColor = Pal.lightishOrange;
                 backColor = Pal.lightOrange;
-                status = StatusEffects.burning;
+                status = FrostStatusEffects.napalm;
                 hitEffect = new MultiEffect(Fx.hitBulletSmall, Fx.fireHit);
 
                 ammoMultiplier = 5;

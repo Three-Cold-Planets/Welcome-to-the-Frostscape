@@ -4,7 +4,10 @@ import arc.graphics.Color;
 import mindustry.type.Item;
 
 public class FrostItems {
-    public static Item magnetite, ferricPanels;
+    //Ferric tech for all biomes
+    public static Item magnetite, ferricPanels,
+    //Culloi tech for snow
+    culloi;
     public static void load(){
         magnetite = new Item("magnetite-shards"){{
             color = Color.valueOf("e7bdbd");

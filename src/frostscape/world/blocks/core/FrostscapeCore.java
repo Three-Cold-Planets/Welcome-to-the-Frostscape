@@ -2,34 +2,25 @@ package frostscape.world.blocks.core;
 
 import arc.Core;
 import arc.func.Boolf;
-import arc.func.Boolp;
-import arc.func.Prov;
 import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.scene.ui.layout.Scl;
 import arc.struct.IntSeq;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Time;
 import frostscape.Frostscape;
-import frostscape.content.FrostResearch;
-import frostscape.type.upgrade.Upgrade;
+import frostscape.world.UpgradesType;
 import frostscape.world.research.ResearchHandler.ResearchType;
 import mindustry.Vars;
-import mindustry.content.UnitTypes;
 import mindustry.game.Team;
 import mindustry.gen.*;
-import mindustry.graphics.*;
 import mindustry.type.UnitType;
 import mindustry.world.Tile;
-import mindustry.world.blocks.storage.CoreBlock;
 
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
-public class FrostscapeCore extends BaseCore {
+public class FrostscapeCore extends BaseCore implements UpgradesType {
     //Bytebuffer used in sending player data as an array of bytes
     static final ByteBuffer b = ByteBuffer.wrap(new byte[4]);
     protected static boolean canSpawn = false, building = false;
@@ -39,7 +30,7 @@ public class FrostscapeCore extends BaseCore {
     public float cameraMoveSpeed = 0.01f;
     public TextureRegion mountRegion;
 
-    public Seq<UnitEntry> entries = Seq.with();
+    public Seq<UnitEntry> units = Seq.with();
     public UnitEntry defaultEntry;
 
     public FrostscapeCore(String name) {
@@ -92,7 +83,7 @@ public class FrostscapeCore extends BaseCore {
 
         public void updateSpawning(){
             building = false;
-            if(!entry.isValid(team)) entry = entries.find(e -> e.isValid(team));
+            if(!entry.isValid(team)) entry = units.find(e -> e.isValid(team));
             if(que.size > 0 && entry != null) {
                 building = true;
                 progress += Time.delta * warmup;
@@ -136,7 +127,7 @@ public class FrostscapeCore extends BaseCore {
         }
 
         public void setEntry(int entry){
-            setEntry(entries.get(entry));
+            setEntry(units.get(entry));
         }
 
         public void setEntry(UnitEntry entry){
@@ -145,7 +136,7 @@ public class FrostscapeCore extends BaseCore {
                 current = -1;
                 return;
             }
-            current = entries.indexOf(entry);
+            current = units.indexOf(entry);
         }
 
         public void respawn(byte playerId, byte interrupt){

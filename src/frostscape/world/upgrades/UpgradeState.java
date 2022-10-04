@@ -1,5 +1,6 @@
 package frostscape.world.upgrades;
 
+import arc.math.Mathf;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.io.ItemIO;
@@ -7,23 +8,40 @@ import frostscape.type.upgrade.Upgrade;
 import mindustry.gen.Building;
 import mindustry.type.ItemStack;
 
+import java.util.Arrays;
+
 import static frostscape.world.upgrades.UpgradeHandler.upgrades;
 
 public class UpgradeState {
     public ItemStack[] cost, items;
     public Upgrade upgrade;
-    public int level = 0;
+    //Level of the state. If it's -1 it has not been installed yet. Use getLevel to avoid confusion.
+    public int level = -1;
+    //The progress on installing an upgrade's next level.
     public float progress;
-    public boolean installed = false, installing = false;
+    public boolean
+        //If the upgrade has been installed on the entity.
+        installed = false,
+        //If the upgrade is installing it's next level. Defaults to false.
+        installing = false;
 
     //NOTE: Only to be used for reading data!
     public UpgradeState(){
 
     }
+    public UpgradeState(Upgrade upgrade){
+        this.upgrade = upgrade;
+        this.level = -1;
+        this.cost = ItemStack.empty;
+        this.items = ItemStack.empty;
+    }
     public UpgradeState(Upgrade upgrade, ItemStack[] cost){
         this.upgrade = upgrade;
         this.cost = cost;
-        items = ItemStack.mult(cost, 0);
+        this.items = ItemStack.mult(cost, 0);
+    }
+    public int getLevel(){
+        return Math.max(0, level);
     }
 
     public float progress(ProgressType type){
@@ -62,12 +80,25 @@ public class UpgradeState {
 
     public UpgradeState read(Reads read){
         String name = read.str();
-        upgrade = upgrades.find(up -> up.name.equals(name));
+        upgrade = upgrades.find(u -> u.name.equals(name));
         level = read.i();
         progress = read.f();
         cost = ItemIO.readStacks(read);
         items = ItemIO.readStacks(read);
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "UpgradeState{" +
+                "cost=" + Arrays.toString(cost) +
+                ", items=" + Arrays.toString(items) +
+                ", upgrade=" + upgrade +
+                ", level=" + level +
+                ", progress=" + progress +
+                ", installed=" + installed +
+                ", installing=" + installing +
+                '}';
     }
 }
 

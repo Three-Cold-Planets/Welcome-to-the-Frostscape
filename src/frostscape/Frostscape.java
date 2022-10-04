@@ -5,12 +5,14 @@ import arc.graphics.g2d.Draw;
 import arc.struct.Seq;
 import arc.util.*;
 import frostscape.game.ScriptedSectorHandler;
+import frostscape.type.upgrade.Upgrade;
 import frostscape.ui.FrostUI;
 import frostscape.ui.overlay.SelectOverlay;
 import frostscape.util.UIUtils;
 import frostscape.world.environment.FloorDataHandler;
 import frostscape.world.meta.Family;
 import frostscape.world.research.ResearchHandler;
+import frostscape.world.upgrades.UpgradeHandler;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.game.EventType.*;
@@ -29,6 +31,8 @@ public class Frostscape extends Mod{
     public static FloorDataHandler floors = new FloorDataHandler();
     public static ResearchHandler research = new ResearchHandler();
 
+    public static UpgradeHandler upgrades = new UpgradeHandler();
+
     //Initialized during adding processes to the async core
     public static SelectOverlay selection = new SelectOverlay();
 
@@ -36,7 +40,7 @@ public class Frostscape extends Mod{
 
         Events.on(EventType.ClientLoadEvent.class,
                 e -> {
-                    Family.all.each(f -> f.load());
+                    Family.all.each(Family::load);
                 }
         );
 

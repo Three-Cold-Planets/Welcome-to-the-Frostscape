@@ -55,7 +55,9 @@ public class BuildBeamCore extends FrostscapeCore{
                 mountRotations[i] = Angles.moveToward(mountRotations[i], Tmp.v1.set(mountPoses.get(i)).add(x, y).angleTo(constructPos), mountRotSpeed * Time.delta);
             }
             else for (int i = 0; i < mountRotations.length; i++) {
-                mountRotations[i] += Time.delta;
+                mountRotations[i] += Time.delta *
+                        ((0.75f + Mathf.sin(Time.time/10 + i * 90, 1, 3) * 0.25f)
+                        + (0.75f + Mathf.sin(Time.time/15 + i * 90, 1, 3) * 0.25f));
             }
         }
 

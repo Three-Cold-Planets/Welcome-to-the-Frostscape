@@ -6,6 +6,8 @@ public class Palf {
 
     quiteDarkOutline = Color.valueOf("#403e49"),
     hunter = Color.valueOf("#dde6f0"),
-    heat = new Color(1.0F, 0.22F, 0.22F, 0.8F)
+    heat = new Color(1.0F, 0.22F, 0.22F, 0.8F),
+
+    select = Color.valueOf("#a9cc6b");
     ;
 }

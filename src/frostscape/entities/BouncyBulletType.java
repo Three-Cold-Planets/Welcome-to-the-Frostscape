@@ -3,6 +3,7 @@ package frostscape.entities;
 import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
+import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.*;
 import mindustry.Vars;
@@ -20,7 +21,6 @@ import java.awt.geom.QuadCurve2D;
 //how many of these am I going to make I don't damm know
 public class BouncyBulletType extends BasicBulletType {
     public static final float shadowTX = -12, shadowTY = -13;
-
     public float gravity;
     public float bounceEfficiency;
     public float startingHeight, startingLift;
@@ -28,6 +28,7 @@ public class BouncyBulletType extends BasicBulletType {
     public float bounceForce;
     //Set to -1 to disable
     public int maxBounces;
+    public float visualHeightMax, visualHeightMin;
 
     public int bounceIncend;
     public float bounceIncendSpread, bounceIncendChance;
@@ -43,10 +44,12 @@ public class BouncyBulletType extends BasicBulletType {
 
     public float minLife;
 
-    private float visualHeightRange;
+    public float visualHeightRange;
 
     public BouncyBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
+        visualHeightMax = Layer.flyingUnit - 1;
+        visualHeightMin = Layer.bullet;
         gravity = 0.0025f;
         bounceEfficiency = 0.8f;
         startingHeight = 0;
@@ -111,8 +114,8 @@ public class BouncyBulletType extends BasicBulletType {
     public void draw(Bullet b) {
         drawTrail(b);
         float h = getHeight(b);
-        float height = this.height * ((1f - shrinkY) + shrinkY * h);
-        float width = this.width * ((1f - shrinkX) + shrinkX * h);
+        float height = this.height + this.height * shrinkY * h;
+        float width = this.width + this.width * shrinkX * h;
         float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f) + rotationOffset;
 
         Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
@@ -123,7 +126,7 @@ public class BouncyBulletType extends BasicBulletType {
         Draw.z(Layer.darkness);
         Draw.rect(shadowRegion, b.x + shadowTX * h, b.y + shadowTY * h,  width, height,b.rotation() - 90);
 
-        float[] layers = new float[]{Layer.flyingUnit - 1, Layer.bullet};
+        float[] layers = new float[]{visualHeightMax, visualHeightMin};
 
         //What this oes is make the bullet glow the closer it is to the ground.
         for (int i = 0; i < 2; i++) {
@@ -143,6 +146,19 @@ public class BouncyBulletType extends BasicBulletType {
         }
         Draw.reset();
 
+    }
+
+    @Override
+    public void createFrags(Bullet b, float x, float y) {
+        HeightHolder h = BouncyBulletType.getHolder(b);
+        if(fragBullet != null){
+            for(int i = 0; i < fragBullets; i++){
+                float len = Mathf.random(1f, 7f);
+                float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
+                Bullet bullet = fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
+                bullet.data = new HeightHolder(h.height, h.lift);
+            }
+        }
     }
 
     @Override
@@ -216,8 +232,12 @@ public class BouncyBulletType extends BasicBulletType {
         }
     }
 
-    public float getHeight(Bullet b){
+    public static float getHeight(Bullet b){
         return ((HeightHolder) b.data).height;
+    }
+
+    public static HeightHolder getHolder(Bullet b){
+        return (HeightHolder) b.data;
     }
 
     protected class HeightHolder{
