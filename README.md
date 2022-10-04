@@ -9,26 +9,26 @@ Currently the next milestone in development that im aiming to hit is finishing t
 ### Required in MVP
 Theese goals will be required before the Minimum Viable Product is released.
 
-[X] Upgrades system
+- [X] Upgrades system
 
-[X] Block selection/actions ui
+- [X] Block selection/actions ui
 
-[ ] Environmental heat systems
+- [ ] Environmental heat systems
 
-[ ] Light systems (Working on)
+- [ ] Light systems (Working on)
 
-[ ] Stealth systems
+- [ ] Stealth systems
 
 ### Alpha release
 Theese goals will be required before the Alpha release launches
 
-[ ] Tutorial
+- [ ] Tutorial
 
-[ ] Barebones content
+- [ ] Barebones content
 
-[ ] Sector Controllers system(for the editor)
+- [ ] Sector Controllers system(for the editor)
 
-[ ] Further development of heat systems
+- [ ] Further development of heat systems
 
 
 ### Future goals..?
