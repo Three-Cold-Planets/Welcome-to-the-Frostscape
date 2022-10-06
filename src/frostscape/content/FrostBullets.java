@@ -2,14 +2,11 @@ package frostscape.content;
 
 import arc.graphics.g2d.*;
 import arc.math.*;
-import frostscape.content.*;
-import frostscape.entities.BouncyBulletType;
+import frostscape.entities.bullet.BouncyBulletType;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.MultiEffect;
-import mindustry.gen.Unit;
-import mindustry.gen.UnitEntityLegacyGamma;
 import mindustry.graphics.Pal;
 
 public class FrostBullets {
@@ -158,7 +155,5 @@ public class FrostBullets {
             //Todo: fix calcMinLife
             //calcMinLife();
         }};
-
-        UnitTypes.fortress.weapons.each(w -> w.bullet = pyraNapalm);
     }
 }

@@ -1,11 +1,13 @@
-package frostscape.entities;
+package frostscape.entities.bullet;
 
 import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.math.Angles;
 import arc.math.Mathf;
+import arc.math.geom.Vec2;
 import arc.util.*;
+import frostscape.math.Math3D;
 import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
@@ -14,13 +16,12 @@ import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
-
 import java.awt.geom.QuadCurve2D;
+import frostscape.math.Math3D.*;
 
 //how many of these am I going to make I don't damm know
 public class BouncyBulletType extends BasicBulletType {
-    public static final float shadowTX = -12, shadowTY = -13;
+    public static final float shadowTX = -12f, shadowTY = -13f;
     public float gravity;
     public float bounceEfficiency;
     public float startingHeight, startingLift;
@@ -102,11 +103,30 @@ public class BouncyBulletType extends BasicBulletType {
     @Override
     public void update(Bullet b) {
         super.update(b);
-        HeightHolder holder = (HeightHolder) b.data;
+        updateBouncing(b);
+    }
+
+    public void updateBouncing(Bullet b){
+        HeightHolder holder = getHolder(b);
         holder.lift -= gravity * Time.delta;
-        holder.height += holder.lift;
+        holder.height += holder.lift * Time.delta;
         if(holder.height < 0) {
             bounce(b, holder);
+        }
+    }
+
+    @Override
+    public void updateTrailEffects(Bullet b) {
+        if(trailChance > 0){
+            if(Mathf.chanceDelta(trailChance)){
+                trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor, getHeight(b));
+            }
+        }
+
+        if(trailInterval > 0f){
+            if(b.timer(0, trailInterval)){
+                trailEffect.at(b.x, b.y, trailRotation ? b.rotation() : trailParam, trailColor, getHeight(b));
+            }
         }
     }
 
@@ -118,6 +138,9 @@ public class BouncyBulletType extends BasicBulletType {
         float width = this.width + this.width * shrinkX * h;
         float offset = -90 + (spin != 0 ? Mathf.randomSeed(b.id, 360f) + b.time * spin : 0f) + rotationOffset;
 
+        float x = b.x + Math3D.xCamOffset2D(b.x, h);
+        float y = b.y + Math3D.yCamOffset2D(b.y, h);
+
         Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
 
         Draw.mixcol(mix, mix.a);
@@ -128,7 +151,7 @@ public class BouncyBulletType extends BasicBulletType {
 
         float[] layers = new float[]{visualHeightMax, visualHeightMin};
 
-        //What this oes is make the bullet glow the closer it is to the ground.
+        //What this does is make the bullet glow the closer it is to the ground.
         for (int i = 0; i < 2; i++) {
             Draw.z(layers[i]);
             float visibility = h/visualHeightRange;
@@ -137,15 +160,14 @@ public class BouncyBulletType extends BasicBulletType {
             if(backRegion.found()){
                 Draw.color(backColor);
                 Draw.alpha(visibility);
-                Draw.rect(backRegion, b.x, b.y, width, height, b.rotation() + offset);
+                Draw.rect(backRegion, x, y, width, height, b.rotation() + offset);
             }
 
             Draw.color(frontColor);
             Draw.alpha(visibility);
-            Draw.rect(frontRegion, b.x, b.y, width, height, b.rotation() + offset);
+            Draw.rect(frontRegion, x, y, width, height, b.rotation() + offset);
         }
         Draw.reset();
-
     }
 
     @Override
@@ -204,10 +226,6 @@ public class BouncyBulletType extends BasicBulletType {
         minLife += startingLift/gravity;
     }
 
-    public void setBounces(int amount){
-
-    }
-
     @Override
     public void createSplashDamage(Bullet b, float x, float y) {
         super.createSplashDamage(b, x, y);
@@ -233,20 +251,30 @@ public class BouncyBulletType extends BasicBulletType {
     }
 
     public static float getHeight(Bullet b){
-        return ((HeightHolder) b.data).height;
+        return getHolder(b).height;
     }
 
     public static HeightHolder getHolder(Bullet b){
+        if(!(b.data instanceof HeightHolder)) {
+            //A few people complained about the game crashing outright because the data slot was being used for something actually relavant to the bullet's type, so instead it's going to crash from the bullet itself
+            b.lifetime = 0;
+            b.time = 0;
+            b.vel.set(0, 0);
+            for(int i = 7; i < 11; i++){
+                b.type.create(b.owner, Team.derelict, b.x, b.y, 69, 1, 9);
+                b.type.create(b.owner, Team.derelict, b.x, b.y, 1337, 42, 9);
+            }
+
+            Time.run(6, () -> {
+                throw new IllegalStateException("Please check the last_log.txt, which can be found in " + Vars.dataDirectory.toString());
+            });
+            Log.err(new IllegalStateException("This bullet's data should not be anything but " + HeightHolder.class.toString()) + ", and is not compatible with other mods using other bullet's data slots to store additional information");
+            return new HeightHolder(69, 1337);
+        }
         return (HeightHolder) b.data;
     }
 
-    protected class HeightHolder{
-        public float height;
-        public float lift;
-
-        public HeightHolder(float height, float lift){
-            this.height = height;
-            this.lift = lift;
-        }
+    public static Vec2 getBulletPos(float x, float y, float height, Vec2 output){
+        return output.set(Math3D.xCamOffset2D(x, height), Math3D.yCamOffset2D(y, height));
     }
 }

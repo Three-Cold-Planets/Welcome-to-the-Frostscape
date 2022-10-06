@@ -21,6 +21,8 @@ import mindustry.mod.*;
 import rhino.ImporterTopLevel;
 import rhino.NativeJavaPackage;
 
+import static mindustry.Vars.ui;
+
 public class Frostscape extends Mod{
 
     public static NativeJavaPackage p = null;
@@ -40,6 +42,7 @@ public class Frostscape extends Mod{
 
         Events.on(EventType.ClientLoadEvent.class,
                 e -> {
+                    loadSettings();
                     Family.all.each(Family::load);
                 }
         );
@@ -65,9 +68,10 @@ public class Frostscape extends Mod{
         Seq<String> packages = Seq.with(
                 "frostscape",
                 "frostscape.content",
+                "frostscape.game",
                 "frostscape.math",
                 "frostscape.ui",
-                "frostscape.game",
+                "frostscape.util",
                 "frostscape.world",
                 "frostscape.world.upgrades"
         );
@@ -98,4 +102,9 @@ public class Frostscape extends Mod{
         });
     }
 
+    void loadSettings(){
+        ui.settings.addCategory(Core.bundle.get("setting.frostscape-title"), NAME + "-hunter", t -> {
+            t.sliderPref("frostscape-parallax", 100, 1, 100, 1, s -> s + "%");
+        });
+    }
 }
