@@ -256,7 +256,6 @@ public class BouncyBulletType extends BasicBulletType {
 
     public static HeightHolder getHolder(Bullet b){
         if(!(b.data instanceof HeightHolder)) {
-            //A few people complained about the game crashing outright because the data slot was being used for something actually relavant to the bullet's type, so instead it's going to crash from the bullet itself
             b.lifetime = 0;
             b.time = 0;
             b.vel.set(0, 0);
