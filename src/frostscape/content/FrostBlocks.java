@@ -39,8 +39,6 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
 
-import static arc.graphics.g2d.Draw.color;
-import static arc.math.Angles.randLenVectors;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
@@ -314,7 +312,7 @@ public class FrostBlocks {
                         });
                         trailChance = 0.65f;
                         trailRotation = true;
-                        fragBullet = new BouncyBulletType(3.5f, 5, "shell"){{
+                        fragBullet = new BasicBulletType(3.5f, 5, "shell"){{
                             collides = true;
                             lifetime = 120;
                             drag = 0.006f;
@@ -338,13 +336,7 @@ public class FrostBlocks {
                             splashDamage = 15;
                             splashDamageRadius = 16;
                             knockback = 1;
-                            trailEffect = new Effect(40f, e -> {
-                                color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
-
-                                randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
-                                    Fill.circle(e.x + x, e.y + y, .2f + e.fout() * 1.2f);
-                                });
-                            });
+                            trailEffect = Fx.melting;
                             trailChance = 0.65f;
                             fragBullets = 3;
                             fragBullet = FrostBullets.pyraGel.fragBullet;
