@@ -9,8 +9,12 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.*;
 import arc.struct.Seq;
-import frostscape.content.*;
-import frostscape.entities.BouncyBulletType;
+import arc.util.Log;
+import arc.util.Tmp;
+import frostscape.entities.bullet.BouncyBulletType;
+import frostscape.entities.bullet.CanisterBulletType;
+import frostscape.math.Math3D;
+import frostscape.util.DrawUtils;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
@@ -22,6 +26,7 @@ import frostscape.world.blocks.environment.SteamVentProp;
 import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
+import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
@@ -35,12 +40,17 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
 
+import static arc.graphics.g2d.Draw.color;
+import static arc.math.Angles.randLenVectors;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
-    public static Floor frostStone, frostSnow, andesiteFloor, volcanicAndesiteFloor, paileanFloor;
+    public static Floor frostStone, frostSnow,
+            andesiteFloor, volcanicAndesiteFloor, sulphanatedAndesite,
+            tephra;
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite;
+    public static StaticTree tephraWall;
     public static SteamVentProp frostVent;
 
     public static CoreSiphon coreSiphon;
@@ -90,6 +100,14 @@ public class FrostBlocks {
             variants = 3;
         }};
 
+        sulphanatedAndesite = new Floor("sulphanated-andesite-floor"){{
+            variants = 3;
+        }};
+
+        tephra = new Floor("tephra"){{
+            variants = 4;
+        }};
+
         crackedAndesiteFloor = new CrackedBlock("cracked-andesite-floor"){{
             variants = 5;
             blendGroup = volcanicAndesiteFloor;
@@ -104,10 +122,6 @@ public class FrostBlocks {
             maxBlinkTime = 60 * 6;
         }};
 
-        paileanFloor = new Floor("pailean-floor"){{
-            variants = 2;
-        }};
-
         frostWall = new StaticWall("frost-wall"){{
             variants = 3;
         }};
@@ -119,6 +133,10 @@ public class FrostBlocks {
         magnetiteAndesite = new StaticWall("magnetite-andesite"){{
             variants = 3;
             itemDrop = FrostItems.magnetite;
+        }};
+
+        tephraWall = new StaticTree("tephra-wall"){{
+            variants = 2;
         }};
 
         coreSiphon = new CoreSiphon("core-siphon"){{
@@ -221,26 +239,24 @@ public class FrostBlocks {
             outlineColor = Pal.darkOutline;
             ammo(
                     Items.pyratite,
-                    new BouncyBulletType(3.5f, 10, NAME + "-smoke-canister"){{
+                    new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
                         lifetime = 100;
                         drag = 0.016f;
                         minLife = 55f;
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.blastExplosion;
-                        width = 6;
-                        height = 6;
-                        shrinkX = 0.4f;
-                        shrinkY = 0.7f;
+                        width = 8;
+                        height = 8;
+                        shrinkX = 1f;
+                        shrinkY = 1f;
                         status = StatusEffects.burning;
                         statusDuration = 12f * 60f;
-                        frontColor = Pal.lightPyraFlame;
-                        backColor = Pal.lightOrange;
-                        gravity = 0.0009f;
-                        startingLift = 0.036f;
+                        gravity = 0.00036f;
+                        startingLift = 0.0144f;
                         bounceShake = 0.7f;
                         bounceEfficiency = 0.65f;
                         bounceForce = 10;
-                        maxBounces = 4;
+                        maxBounces = 0;
                         hitShake = 6.2f;
                         hittable = true;
                         hitSound = Sounds.bang;
@@ -273,14 +289,35 @@ public class FrostBlocks {
                                         Draw.color(Pal.darkPyraFlame);
                                         Draw.alpha(e.fout());
                                         Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 5), e.fin() * 54 + 6, (x, y) -> {
-
                                             Fill.circle(e.x + x, e.y + y, 5 * e.fout(Interp.pow4));
                                         });
                                     })
                             };
                         }};
+
+                        trailEffect = new Effect(55, e -> {
+                            float h = (float) e.data;
+                            float radius = 8.8f * h;
+                            float[] layers = new float[]{visualHeightMax, visualHeightMin};
+                            Draw.color(Liquids.oil.color);
+                            DrawUtils.speckOffset(e.x, e.y, h, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                            float ox = Tmp.v1.x, oy = Tmp.v1.y;
+                            Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 35, (x, y) -> {
+                                float visibility = h/visualHeightRange;
+                                Draw.alpha(visibility * e.fout() * 0.23f);
+                                Draw.z(layers[0]);
+                                Fill.circle(x + ox, y + oy, radius);
+                                visibility = 1 - visibility;
+                                Draw.alpha(visibility * e.fout() * 0.23f);
+                                Draw.z(layers[1]);
+                                Fill.circle(x + ox, y + oy, radius);
+                            });
+                        });
+                        trailChance = 0.65f;
+                        trailRotation = true;
                         fragBullet = new BouncyBulletType(3.5f, 5, "shell"){{
-                            collides = true;
+                            collidesBounce = true;
+                            pierceBuilding = false;
                             lifetime = 120;
                             drag = 0.006f;
                             minLife = 55f;
@@ -292,27 +329,34 @@ public class FrostBlocks {
                             shrinkY = 0.9f;
                             status = FrostStatusEffects.napalm;
                             statusDuration = 12f * 60f;
-                            frontColor = Pal.lightishOrange;
-                            backColor = Pal.lightOrange;
-                            gravity = 0.002f;
-                            startingLift = 0.045f;
+                            gravity = 0.00432f;
+                            startingLift = 0.066f;
                             bounceShake = 0.7f;
                             bounceEfficiency = 0.65f;
                             bounceForce = 10;
-                            maxBounces = 4;
-                            visualHeightMax = Layer.effect;
+                            maxBounces = 3;
+                            keepLift = false;
+                            keepHeight = false;
+                            frontColor = Pal.lightishOrange;
+                            backColor = Pal.lightOrange;
                             hitShake = 3.2f;
+                            bounceEffect = Fx.explosion;
                             incendAmount = 2;
                             incendChance = 1;
-                            bounceIncend = 1;
-                            bounceIncendChance = 1;
                             puddleLiquid = Liquids.oil;
                             puddleAmount = 25;
                             puddles = 1;
                             splashDamage = 15;
                             splashDamageRadius = 16;
                             knockback = 1;
-                            trailEffect = Fx.melting;
+                            trailEffect = new Effect(40f, e -> {
+                                color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
+                                float height = (float) e.data;
+                                DrawUtils.speckOffset(e.x, e.y, height, e.fin() * 40, DrawUtils.smokeWeight, Tmp.v1);
+                                randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
+                                    Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, .2f + e.fout() * 1.2f);
+                                });
+                            });
                             trailChance = 0.65f;
                             fragBullets = 3;
                             fragBullet = FrostBullets.pyraGel.fragBullet;
@@ -335,27 +379,6 @@ public class FrostBlocks {
                         splashDamageRadius = 16;
                         scaleLife = false;
                     }
-                    Effect effect = new Effect(55, e -> {
-                        float h = (float) e.data;
-                        float radius = 2.2f * h;
-                        float[] layers = new float[]{visualHeightMax, visualHeightMin};
-                        Draw.color(Pal.lightPyraFlame);
-                        Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 7, e.rotation, 35, (x, y) -> {
-                            float visibility = h/visualHeightRange;
-                            Draw.alpha(visibility * e.fout() * 0.23f);
-                            Draw.z(layers[0]);
-                            Fill.circle(e.x + x, e.y + y, radius);
-                            visibility = 1 - visibility;
-                            Draw.alpha(visibility * e.fout() * 0.23f);
-                            Draw.z(layers[1]);
-                            Fill.circle(e.x + x, e.y + y, radius);
-                        });
-                    });
-                        @Override
-                        public void update(Bullet b) {
-                            super.update(b);
-                            if(Mathf.chanceDelta(0.65f)) effect.at(b.x, b.y, b.rotation(), BouncyBulletType.getHeight(b));
-                        }
                     }
             );
             consumeLiquids(new LiquidStack(Liquids.oil, 1.35f));
@@ -366,9 +389,10 @@ public class FrostBlocks {
                 inaccuracy = 0;
                 spread = 0;
             }};
+            float passiveRise = 0.2f, rise = 0.85f, riseShort = 0.35f;
             shootSound = Sounds.artillery;
-            shootEffect = new Effect(75, e -> {
-                e.scaled(25, e1 -> {
+            shootEffect = new Effect(185, e -> {
+                e.scaled(50, e1 -> {
                     Draw.color(Pal.lightPyraFlame);
                     Draw.alpha(e1.foutpow());
 
@@ -382,13 +406,16 @@ public class FrostBlocks {
                 });
 
                 Draw.color(Pal.darkerGray);
-                Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 5) + 4), e.finpow() * 45, e.rotation, 25, (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, 5 * e.fout(Interp.pow4));
+                Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 5) + 4), e.finpow() * 165, e.rotation, 25, (x, y) -> {
+                    DrawUtils.speckOffset(e.x + x, e.y + y, e.fin() * passiveRise + rise * Mathf.dst(x, y)/165, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                    Fill.circle(Tmp.v1.x, Tmp.v1.y, 5 * e.fout(Interp.pow4));
                 });
-                Draw.color(Pal.gray);
-                e.scaled(45, e1 -> {
-                    Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e1.finpow() * 85, e.rotation, 25, (x, y) -> {
-                        Fill.circle(e1.x + x, e1.y + y, 2 * e1.fout(Interp.pow4));
+
+                e.scaled(90, e1 -> {
+                    Draw.color(Pal.gray);
+                    Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e1.finpow() * 205, e.rotation, 25, (x, y) -> {
+                        DrawUtils.speckOffset(e.x + x, e.y + y, e.fin() * passiveRise + riseShort * Mathf.dst(x, y)/205, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                        Fill.circle(Tmp.v1.x, Tmp.v1.y, 5 * e1.fout(Interp.pow4));
                     });
                 });
             });
