@@ -42,9 +42,12 @@ import mindustry.world.draw.DrawTurret;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
-    public static Floor frostStone, frostSnow, andesiteFloor, volcanicAndesiteFloor, paileanFloor;
+    public static Floor frostStone, frostSnow,
+            andesiteFloor, volcanicAndesiteFloor, sulphanatedAndesite,
+            tephra;
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite;
+    public static StaticTree tephraWall;
     public static SteamVentProp frostVent;
 
     public static CoreSiphon coreSiphon;
@@ -94,6 +97,14 @@ public class FrostBlocks {
             variants = 3;
         }};
 
+        sulphanatedAndesite = new Floor("sulphanated-andesite-floor"){{
+            variants = 3;
+        }};
+
+        tephra = new Floor("tephra"){{
+            variants = 4;
+        }};
+
         crackedAndesiteFloor = new CrackedBlock("cracked-andesite-floor"){{
             variants = 5;
             blendGroup = volcanicAndesiteFloor;
@@ -108,10 +119,6 @@ public class FrostBlocks {
             maxBlinkTime = 60 * 6;
         }};
 
-        paileanFloor = new Floor("pailean-floor"){{
-            variants = 2;
-        }};
-
         frostWall = new StaticWall("frost-wall"){{
             variants = 3;
         }};
@@ -123,6 +130,10 @@ public class FrostBlocks {
         magnetiteAndesite = new StaticWall("magnetite-andesite"){{
             variants = 3;
             itemDrop = FrostItems.magnetite;
+        }};
+
+        tephraWall = new StaticTree("tephra-wall"){{
+            variants = 2;
         }};
 
         coreSiphon = new CoreSiphon("core-siphon"){{
