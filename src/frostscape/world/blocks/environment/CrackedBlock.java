@@ -5,6 +5,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.util.Time;
+import arc.util.noise.Simplex;
 import frostscape.content.Fxf;
 import mindustry.Vars;
 import mindustry.content.Blocks;
@@ -15,6 +16,7 @@ public class CrackedBlock extends Floor {
 
     public Effect glowEffect = Fxf.glowEffect;
     public float blinkTimeRange = 35, maxBlinkTime = 105;
+    public int octaves = 3;
     public Floor cracked = (Floor) Blocks.slag;
     public TextureRegion[] topVariantRegions;
 
@@ -63,8 +65,6 @@ public class CrackedBlock extends Floor {
 
     //Think of it like a shader for effect delay
     public float lava(int x, int y){
-        return
-                Mathf.cos(x + y + Time.time/maxBlinkTime)
-                ;
+        return Simplex.noise2d(69, octaves, 1, 1, x, y);
     }
 }

@@ -18,8 +18,8 @@ import mindustry.world.blocks.environment.*;
 
 import static mindustry.Vars.tilesize;
 
-public class SteamVentProp extends SteamVent {
-
+public class SteamVentProp extends Floor {
+    public Block parent = Blocks.air;
     public Point2[] offsets;
     private static EffectData data;
     public EffectData[] effects;
@@ -29,7 +29,6 @@ public class SteamVentProp extends SteamVent {
         placeableOn = false;
     }
 
-    @Override
     public boolean checkAdjacent(Tile tile){
         for(Point2 point : offsets){
             Tile other = Vars.world.tile(tile.x + point.x, tile.y + point.y);
