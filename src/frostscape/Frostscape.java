@@ -105,6 +105,7 @@ public class Frostscape extends Mod{
     void loadSettings(){
         ui.settings.addCategory(Core.bundle.get("setting.frostscape-title"), NAME + "-hunter", t -> {
             t.sliderPref("frostscape-parallax", 100, 1, 100, 1, s -> s + "%");
+            t.sliderPref("frostscape-wind-visual-force", 100, 0, 800, 1, s -> s + "%");
         });
     }
 }

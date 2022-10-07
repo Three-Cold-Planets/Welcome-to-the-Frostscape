@@ -6,6 +6,7 @@ import arc.graphics.g2d.*;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import arc.struct.Seq;
 import arc.util.*;
 import frostscape.math.Math3D;
 import mindustry.Vars;
@@ -34,8 +35,11 @@ public class BouncyBulletType extends BasicBulletType {
     public int bounceIncend;
     public float bounceIncendSpread, bounceIncendChance;
 
+    public boolean collidesBounce;
     public boolean useMinLife;
     public boolean useRotation;
+
+    public boolean keepLift, keepHeight;
     public float shadowAlpha;
     public float bounceEffectScale;
     public float bounceShake;
@@ -46,7 +50,6 @@ public class BouncyBulletType extends BasicBulletType {
     public float minLife;
 
     public float visualHeightRange;
-
     public BouncyBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
         visualHeightMax = Layer.flyingUnit - 1;
@@ -60,8 +63,11 @@ public class BouncyBulletType extends BasicBulletType {
         bounceIncend = 0;
         bounceIncendSpread = 5;
         bounceIncendChance = 0;
+        collidesBounce = false;
         useMinLife = true;
         useRotation = false;
+        keepLift = true;
+        keepHeight = true;
         shadowAlpha = 1;
         bounceEffectScale = 0.04f;
         bounceShake = 0.5f;
@@ -69,6 +75,7 @@ public class BouncyBulletType extends BasicBulletType {
         bounceEffect = Fx.unitLandSmall;
         trailEffect = Fx.artilleryTrail;
         collides = false;
+        pierceBuilding = true;
         minLife = 0;
     }
 
@@ -178,7 +185,14 @@ public class BouncyBulletType extends BasicBulletType {
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
                 Bullet bullet = fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
-                bullet.data = new HeightHolder(h.height, h.lift);
+                if(fragBullet instanceof BouncyBulletType){
+                    //Bouncy!
+                    BouncyBulletType bouncy = ((BouncyBulletType) fragBullet);
+                    float height = bouncy.keepHeight ? h.height : bouncy.startingHeight;
+                    float lift = bouncy.keepLift ? h.lift : bouncy.startingLift;
+                    bullet.data = new HeightHolder(height, lift);
+                }
+                else bullet.data = new HeightHolder(h.height, h.lift);
             }
         }
     }
@@ -244,10 +258,29 @@ public class BouncyBulletType extends BasicBulletType {
             Damage.createIncend(b.x, b.y, bounceIncendSpread, bounceIncend);
         }
         b.fdata++;
+        if(collidesBounce){
+            bounceCollision(b);
+        }
         if(b.fdata > maxBounces && maxBounces != -1) {
             b.hit();
             b.remove();
         }
+    }
+
+    public void bounceCollision(Bullet b){
+        Seq<Unit> units = Groups.unit.intersect(b.x, b.y, hitSize, hitSize).sort(u -> u.dst(b));
+        if(units.size > 0) {
+            Unit u = units.get(0);
+
+            b.collision(u, b.x, b.y);
+        }
+        Building build = Vars.world.buildWorld(b.x, b.y);
+        if(build != null) {
+            hitTile(b, build, b.x, b.y, build.health, true);
+            b.collided.add(build.id);
+            if(!pierceBuilding) b.remove();
+        }
+        if(!b.isAdded()) return;
     }
 
     public static float getHeight(Bullet b){

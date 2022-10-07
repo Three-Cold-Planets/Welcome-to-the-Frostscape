@@ -14,6 +14,7 @@ import arc.util.Tmp;
 import frostscape.entities.bullet.BouncyBulletType;
 import frostscape.entities.bullet.CanisterBulletType;
 import frostscape.math.Math3D;
+import frostscape.util.DrawUtils;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
@@ -39,6 +40,8 @@ import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
 
+import static arc.graphics.g2d.Draw.color;
+import static arc.math.Angles.randLenVectors;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
@@ -286,7 +289,6 @@ public class FrostBlocks {
                                         Draw.color(Pal.darkPyraFlame);
                                         Draw.alpha(e.fout());
                                         Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 5), e.fin() * 54 + 6, (x, y) -> {
-
                                             Fill.circle(e.x + x, e.y + y, 5 * e.fout(Interp.pow4));
                                         });
                                     })
@@ -298,7 +300,8 @@ public class FrostBlocks {
                             float radius = 8.8f * h;
                             float[] layers = new float[]{visualHeightMax, visualHeightMin};
                             Draw.color(Liquids.oil.color);
-                            float ox = e.x + BouncyBulletType.getBulletPos(e.x, e.y, h, Tmp.v1).x, oy = e.y + Tmp.v1.y;
+                            DrawUtils.speckOffset(e.x, e.y, h, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                            float ox = Tmp.v1.x, oy = Tmp.v1.y;
                             Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 35, (x, y) -> {
                                 float visibility = h/visualHeightRange;
                                 Draw.alpha(visibility * e.fout() * 0.23f);
@@ -312,8 +315,9 @@ public class FrostBlocks {
                         });
                         trailChance = 0.65f;
                         trailRotation = true;
-                        fragBullet = new BasicBulletType(3.5f, 5, "shell"){{
-                            collides = true;
+                        fragBullet = new BouncyBulletType(3.5f, 5, "shell"){{
+                            collidesBounce = true;
+                            pierceBuilding = false;
                             lifetime = 120;
                             drag = 0.006f;
                             minLife = 55f;
@@ -325,9 +329,18 @@ public class FrostBlocks {
                             shrinkY = 0.9f;
                             status = FrostStatusEffects.napalm;
                             statusDuration = 12f * 60f;
+                            gravity = 0.00432f;
+                            startingLift = 0.066f;
+                            bounceShake = 0.7f;
+                            bounceEfficiency = 0.65f;
+                            bounceForce = 10;
+                            maxBounces = 3;
+                            keepLift = false;
+                            keepHeight = false;
                             frontColor = Pal.lightishOrange;
                             backColor = Pal.lightOrange;
                             hitShake = 3.2f;
+                            bounceEffect = Fx.explosion;
                             incendAmount = 2;
                             incendChance = 1;
                             puddleLiquid = Liquids.oil;
@@ -336,7 +349,14 @@ public class FrostBlocks {
                             splashDamage = 15;
                             splashDamageRadius = 16;
                             knockback = 1;
-                            trailEffect = Fx.melting;
+                            trailEffect = new Effect(40f, e -> {
+                                color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
+                                float height = (float) e.data;
+                                DrawUtils.speckOffset(e.x, e.y, height, e.fin() * 40, DrawUtils.smokeWeight, Tmp.v1);
+                                randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
+                                    Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, .2f + e.fout() * 1.2f);
+                                });
+                            });
                             trailChance = 0.65f;
                             fragBullets = 3;
                             fragBullet = FrostBullets.pyraGel.fragBullet;
@@ -387,17 +407,15 @@ public class FrostBlocks {
 
                 Draw.color(Pal.darkerGray);
                 Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 5) + 4), e.finpow() * 165, e.rotation, 25, (x, y) -> {
-                    float ox = e.x + Math3D.xCamOffset2D(e.x, e.fin() * passiveRise + rise * Mathf.dst(x, y)/165),
-                            oy = e.y + Math3D.yCamOffset2D(e.y, e.fin() * passiveRise + rise * Mathf.dst(x, y)/165);
-
-                    Fill.circle(ox + x, oy + y, 5 * e.fout(Interp.pow4));
+                    DrawUtils.speckOffset(e.x + x, e.y + y, e.fin() * passiveRise + rise * Mathf.dst(x, y)/165, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                    Fill.circle(Tmp.v1.x, Tmp.v1.y, 5 * e.fout(Interp.pow4));
                 });
+
                 e.scaled(90, e1 -> {
                     Draw.color(Pal.gray);
                     Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e1.finpow() * 205, e.rotation, 25, (x, y) -> {
-                        float ox1 = e.x + Math3D.xCamOffset2D(e.x, e.fin() * passiveRise + riseShort * Mathf.dst(x, y)/205),
-                                oy1 = e.y + Math3D.yCamOffset2D(e.y, e.fin() * passiveRise + riseShort * Mathf.dst(x, y)/205);
-                        Fill.circle(ox1 + x, oy1 + y, 2 * e1.fout(Interp.pow4));
+                        DrawUtils.speckOffset(e.x + x, e.y + y, e.fin() * passiveRise + riseShort * Mathf.dst(x, y)/205, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                        Fill.circle(Tmp.v1.x, Tmp.v1.y, 5 * e1.fout(Interp.pow4));
                     });
                 });
             });
