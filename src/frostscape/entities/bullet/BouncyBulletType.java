@@ -13,11 +13,14 @@ import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import java.awt.geom.QuadCurve2D;
+import java.util.Iterator;
+
 import frostscape.math.Math3D.*;
 
 //how many of these am I going to make I don't damm know
@@ -103,7 +106,26 @@ public class BouncyBulletType extends BasicBulletType {
 
     @Override
     public void init(Bullet b) {
-        super.init(b);
+        if (this.killShooter) {
+            Entityc var3 = b.owner();
+            if (var3 instanceof Healthc) {
+                Healthc h = (Healthc)var3;
+                h.kill();
+            }
+        }
+
+        if (this.instantDisappear) {
+            b.time = this.lifetime + 1.0F;
+        }
+
+        if (this.spawnBullets.size > 0) {
+            Iterator ittr = this.spawnBullets.iterator();
+
+            while(ittr.hasNext()) {
+                BulletType bullet = (BulletType)ittr.next();
+                handleData(b, bullet.create(b, b.x, b.y, b.rotation()));
+            }
+        }
         b.data = new HeightHolder(startingHeight, startingLift);
     }
 
@@ -179,20 +201,11 @@ public class BouncyBulletType extends BasicBulletType {
 
     @Override
     public void createFrags(Bullet b, float x, float y) {
-        HeightHolder h = BouncyBulletType.getHolder(b);
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
-                Bullet bullet = fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
-                if(fragBullet instanceof BouncyBulletType){
-                    //Bouncy!
-                    BouncyBulletType bouncy = ((BouncyBulletType) fragBullet);
-                    float height = bouncy.keepHeight ? h.height : bouncy.startingHeight;
-                    float lift = bouncy.keepLift ? h.lift : bouncy.startingLift;
-                    bullet.data = new HeightHolder(height, lift);
-                }
-                else bullet.data = new HeightHolder(h.height, h.lift);
+                handleData(b, fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax)));
             }
         }
     }
@@ -245,6 +258,17 @@ public class BouncyBulletType extends BasicBulletType {
         super.createSplashDamage(b, x, y);
     }
 
+    public void handleData(Bullet b, Bullet bullet){
+        HeightHolder h = BouncyBulletType.getHolder(b);
+        if(bullet.type instanceof BouncyBulletType){
+            //Bouncy!
+            BouncyBulletType bouncy = ((BouncyBulletType) fragBullet);
+            float height = bouncy.keepHeight ? h.height : bouncy.startingHeight;
+            float lift = bouncy.keepLift ? h.lift : bouncy.startingLift;
+            bullet.data = new HeightHolder(height, lift);
+        }
+        else b.data = new HeightHolder(h.height, h.lift);
+    }
     public void bounce(Bullet b, HeightHolder holder){
         bounceEffect.at(b.x, b.y, useRotation ? b.rotation() : bounceEffectScale, Vars.world.floorWorld(b.x, b.y).mapColor);
 

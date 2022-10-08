@@ -27,6 +27,7 @@ import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
@@ -237,8 +238,59 @@ public class FrostBlocks {
                 );
             }};
             outlineColor = Pal.darkOutline;
+
             ammo(
                     Items.pyratite,
+                    new BulletType(){{
+                        speed = 3.5f;
+                        lifetime = 200;
+                        instantDisappear = true;
+                        for (int i = 0; i < 4; i++) {
+                            final float j = i;
+                            spawnBullets.add(new BouncyBulletType(3.5f + j/7, 5, "shell"){{
+                                    collidesBounce = true;
+                                    pierceBuilding = false;
+                                    lifetime = 200;
+                                    drag = 0.006f;
+                                    minLife = 55f;
+                                    hitEffect = Fx.blastExplosion;
+                                    despawnEffect = Fx.blastExplosion;
+                                    width = 6;
+                                    height = 6;
+                                    shrinkX = 0.9f;
+                                    shrinkY = 0.9f;
+                                    status = FrostStatusEffects.napalm;
+                                    statusDuration = 12f * 60f;
+                                    gravity = 0.00216f;
+                                    startingLift = 0.066f + j/100;
+                                    bounceShake = 0.7f;
+                                    bounceEfficiency = 0.85f;
+                                    bounceForce = 10;
+                                    maxBounces = 1;
+                                    keepLift = false;
+                                    keepHeight = false;
+                                    frontColor = Pal.lightishOrange;
+                                    backColor = Pal.lightOrange;
+                                    hitShake = 3.2f;
+                                    bounceEffect = Fx.explosion;
+                                    incendAmount = 2;
+                                    incendChance = 1;
+                                    puddleLiquid = Liquids.oil;
+                                    puddleAmount = 25;
+                                    puddles = 1;
+                                    splashDamage = 15;
+                                    splashDamageRadius = 16;
+                                    knockback = 1;
+                                    trailEffect = Fxf.emberTrail;
+                                    trailChance = 0.65f;
+                                    fragBullets = 3;
+                                    fragBullet = FrostBullets.pyraGel.fragBullet;
+                                    hitSound = Sounds.explosion;
+                                }}
+                            );
+                        }
+                    }},
+                    Items.blastCompound,
                     new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
                         lifetime = 100;
                         drag = 0.016f;
@@ -349,14 +401,7 @@ public class FrostBlocks {
                             splashDamage = 15;
                             splashDamageRadius = 16;
                             knockback = 1;
-                            trailEffect = new Effect(40f, e -> {
-                                color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
-                                float height = (float) e.data;
-                                DrawUtils.speckOffset(e.x, e.y, height, e.fin() * 40, DrawUtils.smokeWeight, Tmp.v1);
-                                randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
-                                    Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, .2f + e.fout() * 1.2f);
-                                });
-                            });
+                            trailEffect = Fxf.emberTrail;
                             trailChance = 0.65f;
                             fragBullets = 3;
                             fragBullet = FrostBullets.pyraGel.fragBullet;

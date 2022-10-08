@@ -1,18 +1,23 @@
 package frostscape.content;
 
 import arc.graphics.Blending;
+import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.Time;
 import arc.util.Tmp;
 import frostscape.entities.effect.LifetimeEffect;
 import frostscape.math.Interps;
+import frostscape.util.DrawUtils;
 import mindustry.Vars;
+import mindustry.content.Liquids;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.gen.Tex;
 import mindustry.graphics.Layer;
 
+import static arc.graphics.g2d.Draw.color;
+import static arc.math.Angles.randLenVectors;
 import static frostscape.util.WeatherUtils.windDirection;
 import static mindustry.content.Fx.rand;
 
@@ -31,6 +36,15 @@ public class Fxf {
             Lines.lineAngle(e.x + Angles.trnsx(angle, len), e.y + Angles.trnsy(angle, len), angle, 12 * fin);
         }
         if(Vars.state.isPlaying() && Mathf.chance(e.fin() * 0.65f * Time.delta)) Effect.shake(e.fin() * 4.85f, 15, e.x, e.y);
+    }),
+
+    emberTrail = new Effect(40f, e -> {
+        color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
+        float height = (float) e.data;
+        DrawUtils.speckOffset(e.x, e.y, height, e.fin() * 40, DrawUtils.smokeWeight, Tmp.v1);
+        randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
+            Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, .2f + e.fout() * 1.2f);
+        });
     });
 
     public static Effect
