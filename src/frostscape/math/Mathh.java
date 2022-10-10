@@ -11,4 +11,9 @@ public class Mathh {
         float newDst = Mathf.approach(distance, 0, speed);
         return a.sub(b).clamp(0, newDst).add(b);
     }
+
+    //Returns the point at which two lines intersect, or null if not valid
+    public static Vec2 intersection(Vec2 pos1, Vec2 end1, Vec2 pos2, Vec2 end2){
+
+    }
 }

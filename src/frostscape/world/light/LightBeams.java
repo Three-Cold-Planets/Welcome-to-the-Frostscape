@@ -5,11 +5,11 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
-import arc.math.geom.Point2;
-import arc.math.geom.Vec2;
-import arc.math.geom.Vec3;
+import arc.math.geom.*;
 import arc.struct.Seq;
 import arc.util.Log;
+import mindustry.Vars;
+import mindustry.entities.Damage;
 import mindustry.graphics.Layer;
 
 import java.awt.geom.Point2D;
@@ -63,6 +63,8 @@ public class LightBeams {
     }
 
     public void updateBeams(){
+        if(!Vars.state.isPlaying() && !shouldUpdate) return;
+        shouldUpdate = false;
         lights.each(l -> {
             Seq<LightSource> sources = l.getSources();
             if(sources.size == 0) return;
@@ -73,8 +75,9 @@ public class LightBeams {
                 boolean enabled = true;
                 int bounces = 0, maxBounces = 20;
 
+                //Light
                 while (enabled && bounces < maxBounces){
-
+                    Polygon
                 }
             });
         });
@@ -96,5 +99,22 @@ public class LightBeams {
     public ColorData applyFalloff(ColorData color, float distance){
         //
         return color;
+    }
+
+    public static int[] d4x0 = {1, 1, 0, 0};
+    public static int[] d4y0 = {0, 1, 1, 0};
+
+    public float[] vertices(Shape2D shape){
+        if(shape instanceof Rect rect){
+            //Rectangles have four points
+            float[] ret = new float[8];
+            for (int i = 0; i < 4; i++) {
+                //X ofset by width
+                ret[i * 2] = d4x0[i] * rect.x + rect.width;
+                //X ofset by height
+                ret[i*2 + 1] = d4y0[i] * rect.y + rect.height;
+            }
+            return ret;
+        }
     }
 }

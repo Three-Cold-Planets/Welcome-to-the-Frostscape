@@ -10,6 +10,7 @@ import frostscape.ui.FrostUI;
 import frostscape.ui.overlay.SelectOverlay;
 import frostscape.util.UIUtils;
 import frostscape.world.environment.FloorDataHandler;
+import frostscape.world.light.LightBeams;
 import frostscape.world.meta.Family;
 import frostscape.world.research.ResearchHandler;
 import frostscape.world.upgrades.UpgradeHandler;
@@ -35,8 +36,9 @@ public class Frostscape extends Mod{
 
     public static UpgradeHandler upgrades = new UpgradeHandler();
 
-    //Initialized during adding processes to the async core
     public static SelectOverlay selection = new SelectOverlay();
+
+    public static LightBeams lights = new LightBeams();
 
     public Frostscape(){
 
@@ -52,12 +54,14 @@ public class Frostscape extends Mod{
         });
 
         Events.run(Trigger.update, () -> {
+            lights.updateBeams();
             if(!Vars.state.isPlaying()) return;
             selection.update();
         });
 
         Events.run(Trigger.draw, () -> {
             Draw.draw(Layer.overlayUI, selection::drawSelect);
+            Draw.draw(Layer.light + 1, lights::draw);
         });
     }
 
