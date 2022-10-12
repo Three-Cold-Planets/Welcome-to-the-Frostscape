@@ -13,7 +13,17 @@ public class Mathh {
     }
 
     //Returns the point at which two lines intersect, or null if not valid
-    public static Vec2 intersection(Vec2 pos1, Vec2 end1, Vec2 pos2, Vec2 end2){
+    public static Vec2 intersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4){
 
+        float det = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4))/det;
+        float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) /det;
+
+        if (t < 0 || t > 1 || u < 0) {
+            //Lines are parallel (somehow)
+            return null;
+        } else {
+            return new Vec2(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+        }
     }
 }

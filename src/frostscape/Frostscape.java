@@ -2,15 +2,18 @@ package frostscape;
 
 import arc.*;
 import arc.graphics.g2d.Draw;
+import arc.math.geom.Shape2D;
 import arc.struct.Seq;
 import arc.util.*;
 import frostscape.game.ScriptedSectorHandler;
-import frostscape.type.upgrade.Upgrade;
 import frostscape.ui.FrostUI;
 import frostscape.ui.overlay.SelectOverlay;
 import frostscape.util.UIUtils;
 import frostscape.world.environment.FloorDataHandler;
 import frostscape.world.light.LightBeams;
+import frostscape.world.light.LightBeams.ColorData;
+import frostscape.world.light.LightBeams.LightSource;
+import frostscape.world.light.Lightc;
 import frostscape.world.meta.Family;
 import frostscape.world.research.ResearchHandler;
 import frostscape.world.upgrades.UpgradeHandler;
@@ -57,6 +60,44 @@ public class Frostscape extends Mod{
             lights.updateBeams();
             if(!Vars.state.isPlaying()) return;
             selection.update();
+        });
+
+        lights.lights.add(new Lightc() {
+            @Override
+            public float rotation() {
+                return 45;
+            }
+
+            @Override
+            public Seq<LightSource> getSources() {
+                return Seq.with(
+                        new LightSource(0, 1, new ColorData(1, 1, 1), 45){{
+                            x = 0;
+                            y = 1;
+                            rotation = 90;
+                        }}
+                );
+            }
+
+            @Override
+            public LightBeams.CollisionData collision(float x, float y, float direction, ColorData color, LightBeams.CollisionData collision) {
+                return null;
+            }
+
+            @Override
+            public Shape2D[] hitboxes() {
+                return new Shape2D[0];
+            }
+
+            @Override
+            public float getX() {
+                return 0;
+            }
+
+            @Override
+            public float getY() {
+                return 0;
+            }
         });
 
         Events.run(Trigger.draw, () -> {
