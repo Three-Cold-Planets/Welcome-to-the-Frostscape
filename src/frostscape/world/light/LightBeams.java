@@ -8,11 +8,21 @@ import arc.math.geom.*;
 import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Tmp;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import mindustry.Vars;
 import mindustry.entities.Damage;
 import mindustry.graphics.Layer;
+import mindustry.io.SaveFileReader;
 
-public class LightBeams {
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+
+public class LightBeams implements SaveFileReader.CustomChunk {
+
+    //Falloff per world unit for light beams.
+    public ColorData falloff = new ColorData(0.01f, 0.01f, 0.01f);
     //Change to true while game is paused and a light module is updated
     public boolean shouldUpdate = false;
 
@@ -89,6 +99,7 @@ public class LightBeams {
             if(sources.size == 0) return;
 
             sources.each(s -> {
+                if(!s.emitting) return;
                 updateSource(l, s);
             });
             l.afterLight();
@@ -118,8 +129,9 @@ public class LightBeams {
         boolean enabled = true;
         int bounces = 0, maxBounces = 20;
         while (enabled && bounces < maxBounces){
-            Damage.linecast()
+            enabled = false;
         }
+
     }
 
     public void draw(){
@@ -162,4 +174,27 @@ public class LightBeams {
                 0, 0
         };
     }
+
+
+    @Override
+    public void write(DataOutput dataOutput) throws IOException {
+        Writes write = new Writes(dataOutput);
+        write.f(falloff.r);
+        write.f(falloff.b);
+        write.f(falloff.g);
+    }
+
+    @Override
+    public void read(DataInput dataInput) throws IOException {
+        Reads read = new Reads(dataInput);
+        falloff.r = read.f();
+        falloff.b = read.f();
+        falloff.g = read.f();
+    }
+
+    @Override
+    public boolean shouldWrite() {
+        return SaveFileReader.CustomChunk.super.shouldWrite();
+    }
+
 }
