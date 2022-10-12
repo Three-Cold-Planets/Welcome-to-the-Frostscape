@@ -9,6 +9,7 @@ import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Tmp;
 import mindustry.Vars;
+import mindustry.entities.Damage;
 import mindustry.graphics.Layer;
 
 public class LightBeams {
@@ -23,6 +24,7 @@ public class LightBeams {
         public float x, y;
         public ColorData color;
         public float rotation;
+        public boolean emitting = true;
 
         public Seq<CollisionData> beam = new Seq<>();
 
@@ -87,33 +89,37 @@ public class LightBeams {
             if(sources.size == 0) return;
 
             sources.each(s -> {
-
-                Seq<CollisionData> beam = s.beam;
-                beam.clear();
-
-                float x = l.getX() + Tmp.v1.trns(l.rotation(), s.x, s.y).x;
-                float y = l.getY() + Tmp.v1.y;
-                Log.info(x + ", " + y);
-
-                //Add collision data at the start of the beam
-                beam.add(new CollisionData(x, y, s.rotation, s.color){{
-                    rotAfter = rotBefore;
-                    after = before;
-                }});
-
-                /*
-
-                //Main loop for testing collisions
-
-
-                boolean enabled = true;
-                int bounces = 0, maxBounces = 20;
-                while (enabled && bounces < maxBounces){
-
-                }
-                 */
+                updateSource(l, s);
             });
+            l.afterLight();
         });
+    }
+
+    //Left separate in the case that a light source needs to update itself
+    public void updateSource(Lightc l, LightSource s){
+
+        Seq<CollisionData> beam = s.beam;
+        beam.clear();
+
+        float x = l.getX() + Tmp.v1.trns(l.rotation(), s.x, s.y).x;
+        float y = l.getY() + Tmp.v1.y;
+        Log.info(x + ", " + y);
+
+        //Add collision data at the start of the beam
+        CollisionData last = new CollisionData(x, y, s.rotation, s.color){{
+            rotAfter = rotBefore;
+            after = before;
+        }};
+        beam.add(last);
+
+        //Main loop for testing collisions
+
+        //Disable if light falloff is too much
+        boolean enabled = true;
+        int bounces = 0, maxBounces = 20;
+        while (enabled && bounces < maxBounces){
+            Damage.linecast()
+        }
     }
 
     public void draw(){
