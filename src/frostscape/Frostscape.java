@@ -2,10 +2,15 @@ package frostscape;
 
 import arc.*;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.math.Mathf;
 import arc.math.geom.Shape2D;
 import arc.struct.Seq;
 import arc.util.*;
+import frostscape.entities.effect.DataEffect;
+import frostscape.entities.effect.FrostEffect;
 import frostscape.game.ScriptedSectorHandler;
+import frostscape.mods.Compatibility;
 import frostscape.ui.FrostUI;
 import frostscape.ui.overlay.SelectOverlay;
 import frostscape.util.UIUtils;
@@ -18,10 +23,16 @@ import frostscape.world.meta.Family;
 import frostscape.world.research.ResearchHandler;
 import frostscape.world.upgrades.UpgradeHandler;
 import mindustry.Vars;
+import mindustry.content.Blocks;
+import mindustry.content.Fx;
+import mindustry.content.Items;
+import mindustry.entities.bullet.BulletType;
 import mindustry.game.EventType;
 import mindustry.game.EventType.*;
+import mindustry.gen.EffectState;
 import mindustry.graphics.Layer;
 import mindustry.mod.*;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
 import rhino.ImporterTopLevel;
 import rhino.NativeJavaPackage;
 
@@ -62,44 +73,6 @@ public class Frostscape extends Mod{
             selection.update();
         });
 
-        lights.lights.add(new Lightc() {
-            @Override
-            public float rotation() {
-                return 45;
-            }
-
-            @Override
-            public Seq<LightSource> getSources() {
-                return Seq.with(
-                        new LightSource(0, 1, new ColorData(1, 1, 1), 45){{
-                            x = 0;
-                            y = 1;
-                            rotation = 90;
-                        }}
-                );
-            }
-
-            @Override
-            public LightBeams.CollisionData collision(float x, float y, float direction, ColorData color, LightBeams.CollisionData collision) {
-                return null;
-            }
-
-            @Override
-            public Shape2D[] hitboxes() {
-                return new Shape2D[0];
-            }
-
-            @Override
-            public float getX() {
-                return 0;
-            }
-
-            @Override
-            public float getY() {
-                return 0;
-            }
-        });
-
         Events.run(Trigger.draw, () -> {
             Draw.draw(Layer.overlayUI, selection::drawSelect);
             Draw.draw(Layer.light + 1, lights::draw);
@@ -136,6 +109,7 @@ public class Frostscape extends Mod{
         final float time = Time.millis() - current;
 
         Events.run(ClientLoadEvent.class, () -> {
+
             //Log content loading time in ClientLoadEvent
             Log.info(String.format("Loaded Frostscape content in: %s", time));
 
@@ -144,6 +118,11 @@ public class Frostscape extends Mod{
             UIUtils.loadAdditions();
 
             Log.info(String.format("Loaded Frostscape ui in: %s", (Time.millis() - current1)));
+
+            current1 = Time.millis();
+            //Run after all content has loaded
+            Compatibility.handle();
+            Log.info(String.format("Loaded Frostscape compat in: %s", (Time.millis() - current1)));
         });
     }
 

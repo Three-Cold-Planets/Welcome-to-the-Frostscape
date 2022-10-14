@@ -6,14 +6,11 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.Time;
 import arc.util.Tmp;
-import frostscape.entities.effect.LifetimeEffect;
-import frostscape.math.Interps;
 import frostscape.util.DrawUtils;
 import mindustry.Vars;
 import mindustry.content.Liquids;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
-import mindustry.gen.Tex;
 import mindustry.graphics.Layer;
 
 import static arc.graphics.g2d.Draw.color;

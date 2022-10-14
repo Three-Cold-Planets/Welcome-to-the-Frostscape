@@ -9,6 +9,7 @@ import mindustry.mod.Mods.ModMeta;
 import static frostscape.Frostscape.VERSION;
 
 public class ModCompatibility {
+    //...What the fuck
     public void start(){
         Fi[] files = Vars.modDirectory.list();
         for (int i = 0; i < files.length; i++) {

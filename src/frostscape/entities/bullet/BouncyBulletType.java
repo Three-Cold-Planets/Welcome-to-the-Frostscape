@@ -51,7 +51,6 @@ public class BouncyBulletType extends BasicBulletType {
     public TextureRegion shadowRegion;
 
     public float minLife;
-
     public float visualHeightRange;
     public BouncyBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
@@ -78,6 +77,8 @@ public class BouncyBulletType extends BasicBulletType {
         bounceEffect = Fx.unitLandSmall;
         trailEffect = Fx.artilleryTrail;
         collides = false;
+        hittable = false;
+        absorbable = false;
         pierceBuilding = true;
         minLife = 0;
     }
