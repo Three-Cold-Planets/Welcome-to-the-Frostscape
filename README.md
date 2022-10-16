@@ -47,8 +47,10 @@ Thanks to
 
 -Sh1penfire#0868 (Hey that's me!)
 
--NiChrosia#3367 on discord for helping me throughout development (And generaly being a friend :D)
+- [NiChrosia#3367](https://github.com/NiChrosia) on discord for helping me throughout development (And generaly being a friend :D)
 
--Determiedmech1#6702, Ssem#4539, PsychicFireSong#5026 for being active on mod suggestions in Mod Centre (Join the server [here](https://discord.gg/XrFhAZys7T))
+- [🔅StaBU🔆#1820](https://github.com/xStaBUx) for fixing the buildscript
+
+-Determiedmech1#6702, Ssem#4539, PsychicFireSong#5026 on discord for being active on mod suggestions in Mod Centre (Join the server [here](https://discord.gg/XrFhAZys7T))
 
 -You for using the mod! (Maybe)
