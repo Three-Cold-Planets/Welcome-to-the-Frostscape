@@ -9,15 +9,10 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.*;
 import arc.struct.Seq;
-import arc.util.Log;
-import arc.util.Time;
 import arc.util.Tmp;
 import frostscape.entities.bullet.BouncyBulletType;
-import frostscape.entities.bullet.CanisterBulletType;
-import frostscape.entities.effect.DataEffect;
-import frostscape.entities.effect.FrostEffect;
-import frostscape.math.Math3D;
 import frostscape.util.DrawUtils;
+import frostscape.world.blocks.light.SolarReflector;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
@@ -29,19 +24,14 @@ import frostscape.world.blocks.environment.SteamVentProp;
 import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
-import mindustry.gen.Bullet;
-import mindustry.gen.EffectState;
 import mindustry.gen.Sounds;
-import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
-import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
@@ -62,8 +52,9 @@ public class FrostBlocks {
     public static CoreSiphon coreSiphon;
     public static ItemTurret pyroclast;
     public static FrostscapeCore coreBunker;
-
     public static ThermalMine thermalLandmine;
+
+    public static SolarReflector solarReflector;
 
     public static void load(){
         frostStone = new Floor("frost-stone"){{
@@ -578,6 +569,10 @@ public class FrostBlocks {
                             FrostUpgrades.improvedPayload
                     )
             );
+        }};
+
+        solarReflector = new SolarReflector("solar-reflector"){{
+            requirements(Category.effect, ItemStack.with());
         }};
     }
 }

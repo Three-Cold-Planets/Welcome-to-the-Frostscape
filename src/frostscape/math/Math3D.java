@@ -28,6 +28,13 @@ public class Math3D {
         return (y - Core.camera.position.y) * height/spacing;
     }
 
+    //I'd love to explain how this works but just check desmos
+    public static float rotReflectionX(float rotation){
+        return Math.abs(360 + 180 - rotation) % 360;
+    }
+    public static float rotReflectionY(float rotation){
+        return Math.abs(360 + 180 - rotation + 90) % 360 + 90;
+    }
 
     public static class HeightHolder{
         public float height;

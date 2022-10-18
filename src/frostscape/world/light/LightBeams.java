@@ -5,8 +5,8 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.math.geom.*;
+import arc.struct.FloatSeq;
 import arc.struct.IntMap;
-import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Tmp;
@@ -14,7 +14,9 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.math.Mathh;
 import mindustry.Vars;
+import mindustry.core.World;
 import mindustry.entities.Damage;
+import mindustry.entities.bullet.RailBulletType;
 import mindustry.graphics.Layer;
 import mindustry.io.SaveFileReader;
 
@@ -22,56 +24,64 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+//Todo: Allow for light beams to branch off in a tree-like system.
 public class LightBeams implements SaveFileReader.CustomChunk {
-
-    //Temparary float array passed down to LightModules when they are intersected by a light beam.s
-    public static float[] positions = new float[7];
 
     //Falloff *per world unit* for light beams.
     public ColorData falloff = new ColorData(0.01f, 0.01f, 0.01f);
-    //Change to true while game is paused and a light module is updated
+    //Change to true while game is paused and a light source is updated
     public boolean shouldUpdate = false;
 
-    public Seq<Lightc> lights = new Seq();
+    public Seq<Lightc> lights = new Seq<>();
 
     //Most of this data is used for world interactions, if I were to implement light unable to interact with the world, this would look different
-    public static class LightSource{
-        //The position is offset from main module instead of representing coordinates in the world.
-        public float x, y;
+    public static abstract class LightSource implements Position{
         public ColorData color;
         public float rotation;
         public boolean emitting = true;
 
         public Seq<CollisionData> beam = new Seq<>();
 
-        public LightSource(float x, float y, ColorData color, float rotation){
-            this.x = x;
-            this.y = y;
+        public LightSource(ColorData color, float rotation){
             this.color = color;
             this.rotation = rotation;
         }
     }
 
-    public class LightBeam{
-        public Seq<CollisionData> rays = new Seq<>();
-    }
+    public static class CollisionData{
+        //To be used
+        public CollisionData(float x, float y, float rotation, ColorData color){
+            this.x = x;
+            this.y = y;
+            this.rotBefore = this.rotAfter = rotation;
+            this.before = this.after = color;
+            collision = false;
+        }
 
-    public class CollisionData{
-        public CollisionData(float x, float y, float rotBefore, ColorData before){
+        public CollisionData(float x, float y, float rotBefore, float rotAfter, ColorData before, ColorData after, boolean collision){
             this.x = x;
             this.y = y;
             this.rotBefore = rotBefore;
+            this.rotAfter = rotAfter;
             this.before = before;
-        };
+            this.after = after;
+            this.collision = collision;
+        }
         public ColorData before, after;
         public float x, y;
         public float rotBefore, rotAfter;
+        //Whether this is an actual "Collision" or a change of state in the light beam. Used exclusively for rendering.
+        public boolean collision;
     }
 
     public static class ColorData{
         public float r;
         public float g;
         public float b;
+
+        public ColorData(){
+            r = b = g = 1;
+        }
 
         public ColorData(float r, float g, float b){
             this.r = r;
@@ -91,6 +101,15 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             this.b = b;
             return this;
         }
+
+        @Override
+        public String toString() {
+            return "ColorData{" +
+                    "r=" + r +
+                    ", g=" + g +
+                    ", b=" + b +
+                    '}';
+        }
     }
 
     public interface WorldShape{
@@ -104,18 +123,45 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         return new Color(col.r, col.g, col.b);
     }
 
+    //Handles adding CollisionData instances for each point a color in the beam hits zero.
+    public void handleFalloffPoints(Vec2 closest, Vec2 furthest, float rotation, Seq<CollisionData> beam, CollisionData last, ColorData closestCol){
+        //Find the color at the falloff point
+
+        //Add collision data for the closest point.
+        beam.add(new CollisionData(closest.x, closest.y, rotation, closestCol));
+
+        ColorData newCol = new ColorData();
+        //Find the new closest point
+        Vec2 newClosest = closestFalloffPoint(closestCol, closest, rotation, newCol);
+
+        Log.info("x: " + last.x + ", " + "y: " + last.y);
+        Log.info(closest);
+        Log.info(newClosest);
+        Log.info(furthest);
+
+        //One of the colours has already faded, so if the point isn't the same as the ending that means there is only one remaining
+        if(newClosest.equals(furthest)) return;
+        beam.add(new CollisionData(newClosest.x, newClosest.y, rotation, applyFalloff(newCol, newClosest.dst(furthest))));
+
+        //After this, only one colour should remain (Or two if new closest equals furthest)
+    }
+
     //Handle collision with the hit light module, and add the returned collision data
-    public void handleCollision(float x, float y, float rotation, int sideIndex, Seq<CollisionData> beam, Lightc module){
-        CollisionData last = beam.first();
-        //This statement should never be reached if the falloff will make it reach 0, 0, 0
+    public void handleCollision(float x, float y, float rotation, int shape, int side, Seq<CollisionData> beam, Lightc module){
+        //Get last collision point
+        CollisionData last = beam.get(beam.size - 1);
+        //Apply falloff to the light beam.
         ColorData color = applyFalloff(last.after, Mathf.dst(last.x, last.y, x, y));
 
+        //Add the returned collision data to the beam
         beam.add(
-            module.collision(x, y, rotation, color, new CollisionData(x, y, last.rotAfter, color))
+            module.collision(x, y, rotation, shape, side, color, new CollisionData(x, y, last.rotAfter, color))
         );
     }
 
     public void updateBeams(){
+        //Todo: Finish main loop
+        if(true) return;
         if(!Vars.state.isPlaying() && !shouldUpdate) return;
         shouldUpdate = false;
         lights.each(l -> {
@@ -123,7 +169,10 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             if(sources.size == 0) return;
 
             sources.each(s -> {
-                if(!s.emitting) return;
+                if(!s.emitting) {
+                    s.beam.clear();
+                    return;
+                }
                 updateSource(l, s);
             });
             l.afterLight();
@@ -133,36 +182,39 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     //Left separate in the case that a light source needs to update itself
     public void updateSource(Lightc l, LightSource s){
 
+        //Clear previous collision points
         Seq<CollisionData> beam = s.beam;
         beam.clear();
 
-        float x = l.getX() + Tmp.v1.trns(l.rotation(), s.x, s.y).x;
-        float y = l.getY() + Tmp.v1.y;
+        float x = s.getX();
+        float y = s.getY();
         Log.info(x + ", " + y);
 
-        //Add collision data at the start of the beam
-        CollisionData last = new CollisionData(x, y, s.rotation, s.color){{
-            rotAfter = rotBefore;
-            after = before;
-        }};
-        beam.add(last);
+        //Add collision data at the start of the beam. This technically isn't a "Collision" but you can blame it on bad naming I suppose.
+        CollisionData start = new CollisionData(x, y, s.rotation, s.color);
+        beam.add(start);
 
         //Main loop for testing collisions
 
+        //If light beams continued forever I'd be dammed
         int maxBounces = 1;
+
         Seq<WorldShape> shapes = new Seq<>();
         int[] intOut = new int[2];
         Vec2 pointOut = new Vec2();
+        //Remember last collision point
+        CollisionData last = start;
 
         for (int i = 0; i < maxBounces; i++) {
-            CollisionData first = beam.first();
-            float bx1 = first.x, by1 = first.y;
-            ColorData tempData = new ColorData(first.after);
+            float bx1 = last.x, by1 = last.y;
+            float rotation = last.rotAfter;
+            ColorData tempData = new ColorData(last.after);
 
             //Find the furthest point to form the end of the line segment.
-            Tmp.v1.set(furthestFalloffPoint(first.after, Tmp.v1.set(bx1, by1), first.rotAfter, tempData));
+            Vec2 furthestFade = (furthestFalloffPoint(last.after, Tmp.v1.set(bx1, by1), rotation)), end = furthestFade;
 
-            float bx2 = Tmp.v1.x, by2 = Tmp.v1.y;
+            //Asign variables to the ending cords of the beam
+            float bx2 = furthestFade.x, by2 = furthestFade.y;
 
             //Map the shape's indexes to their Lightc owners
             IntMap<Lightc> shapeMap = new IntMap<>();
@@ -176,11 +228,31 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
             shapes.sort(hitbox -> Mathf.dst2(bx1, by1, hitbox.getX(), hitbox.getY()));
 
-            if(!linecastClosest(bx1, by1, bx2, by2, shapes, intOut, pointOut)) continue;
-            handleCollision(pointOut.x, pointOut.y, Mathf.angle(bx2 - bx1, by2 - by1), intOut[0], beam, shapeMap.get(intOut[1]));
+            //Check for if the beam intersects anything. If it does, set a new target position and handle falloff.
+            boolean hitTarget = linecastClosest(bx1, by1, bx2, by2, shapes, intOut, pointOut);
+            if(hitTarget){
+                end.set(pointOut);
 
-            Log.info(intOut);
-            Log.info(pointOut);
+                //If the beam's closest fading point is reached before bouncing, handle that first
+                Vec2 closestFade = closestFalloffPoint(last.after, Tmp.v1.set(bx1, by1), rotation, tempData);
+                if(closestFade.dst(bx1, by1) < end.dst(bx1, by1)){
+                    handleFalloffPoints(closestFade, end, rotation, beam, last, tempData);
+                }
+
+                handleCollision(pointOut.x, pointOut.y, Mathf.angle(bx2 - bx1, by2 - by1), intOut[0], intOut[1], beam, shapeMap.get(intOut[0]));
+
+                //End it here, if the condition for the if statement was not met, use the logic after this.
+                continue;
+            }
+
+            //Handle falloff unless falloff is equal
+            Vec2 closestFade = closestFalloffPoint(last.after, Tmp.v1.set(bx1, by1), rotation, tempData);
+            if(closestFade.dst(bx1, by1) < end.dst(bx1, by1)){
+                handleFalloffPoints(closestFade, end, rotation, beam, last, tempData);
+            }
+
+            //Add ending point where beam fades out
+            beam.add(new CollisionData(end.x, end.y, rotation, new ColorData(0, 0, 0)));
         }
     }
 
@@ -239,6 +311,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                 Seq<CollisionData> beams = source.beam;
                 for (int i = 0; i < beams.size - 1; i++) {
                     CollisionData before = beams.get(i), after = beams.get(i + 1);
+                    Draw.blend();
                     Lines.line(before.x, before.y, after.x, after.y);
                 }
             });
@@ -246,22 +319,45 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     }
 
     public ColorData applyFalloff(ColorData color, float distance){
-        color.r -= falloff.r * distance;
-        color.g -= falloff.g * distance;
-        color.b -= falloff.b * distance;
+        color.r = Mathf.maxZero(color.r - falloff.r * distance);
+        color.g = Mathf.maxZero(color.g - falloff.g * distance);
+        color.b = Mathf.maxZero(color.b - falloff.b * distance);
         return color;
     }
 
-    //Find the furthest point away from the origin that a color will stay non-negative.
-    public Vec2 furthestFalloffPoint(ColorData color, Vec2 position, float rotation, ColorData out){
+    //Find the furthest point away from the origin before the light fades out of existience.
+    public Vec2 furthestFalloffPoint(ColorData color, Vec2 position, float rotation){
         //Falloff should N E V E R. Be 0 in any of it's fields. If it is, light should be disabled.
         if(falloff.r == 0 || falloff.g == 0 || falloff.b == 0) throw new IllegalStateException("Light Falloff should never be 0.");
+        //Find max distances before fading
         float r = color.r/falloff.r, g = color.g/falloff.g, b = color.b/falloff.b;
-        out.r = r;
-        out.g = g;
-        out.b = b;
+
         //Translate it by the rotation of the beam, and max length of the colours before they fall off completely, then add the original beam's position.
-        return new Vec2().trns(rotation, Math.min(Math.min(r, b), g)).add(position);
+        return new Vec2().trns(rotation, Math.max(Math.max(r, b), g)).add(position);
+    }
+
+    /**Find the closest point away from the origin that a colour will fade to 0. Use {@link frostscape.world.light.LightBeams#furthestFalloffPoint} instead if finding furthest point.
+     */
+    public Vec2 closestFalloffPoint(ColorData color, Vec2 position, float rotation, ColorData out){
+        //Falloff should N E V E R. Be 0 in any of it's fields. If it is, light should be disabled.
+        if(falloff.r == 0 || falloff.g == 0 || falloff.b == 0) throw new IllegalStateException("Light Falloff should never be 0.");
+
+        //Kind of a hacky solution, but it works ig. Stores color data in the first half and the falloff values in the second to avoid allocating memory for two separate arrays.
+        float[] colors = new float[]{color.r, color.g, color.b, falloff.r, falloff.b, falloff.g};
+        float distance = 0;
+        boolean found = false;
+        //Find the max distance away from the start the beam can go, ignoring components already zero
+        for (int i = 0; i < colors.length/2; i++) {
+            float comp = colors[i];
+            float dst = comp/colors[i + 3];
+            if(comp != 0 && (!found || dst < distance)) distance = dst;
+        }
+
+        //Apply falloff and write it to out
+        applyFalloff(out.set(color.r, color.g, color.b), distance);
+
+        //Translate it by the rotation of the beam, and max length of the colours before they fall off completely, then add the original beam's position.
+        return new Vec2().trns(rotation, distance).add(position);
     }
 
     public static int[] d4x0 = {1, 1, 0, 0};
