@@ -43,9 +43,9 @@ import static frostscape.Frostscape.NAME;
 public class FrostBlocks {
     public static Floor frostStone, frostSnow,
             andesiteFloor, volcanicAndesiteFloor, sulphanatedAndesite,
-            tephra;
+            graystoneFloor, graystoneSlatedFloor, tephra;
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
-    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite;
+    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall;
     public static StaticTree tephraWall;
     public static SteamVentProp frostVent;
 
@@ -101,6 +101,14 @@ public class FrostBlocks {
             variants = 3;
         }};
 
+        graystoneFloor = new Floor("graystone-floor"){{
+            variants = 3;
+        }};
+        
+        graystoneSlatedFloor = new Floor("graystone-slated-floor"){{
+            variants = 8;
+        }};
+
         tephra = new Floor("tephra"){{
             variants = 4;
         }};
@@ -130,6 +138,10 @@ public class FrostBlocks {
         magnetiteAndesite = new StaticWall("magnetite-andesite"){{
             variants = 3;
             itemDrop = FrostItems.magnetite;
+        }};
+
+        grayWall = new StaticWall("graystone-wall"){{
+            variants = 4;
         }};
 
         tephraWall = new StaticTree("tephra-wall"){{
