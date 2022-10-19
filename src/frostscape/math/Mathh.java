@@ -17,9 +17,9 @@ public class Mathh {
 
         float det = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
         float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4))/det;
-        float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) /det;
+        float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3))/det;
 
-        if (t < 0 || t > 1 || u < 0) {
+        if (t < 0 || t > 1 || u < 0 || u > 1) {
             //Lines are parallel (somehow)
             return null;
         } else {

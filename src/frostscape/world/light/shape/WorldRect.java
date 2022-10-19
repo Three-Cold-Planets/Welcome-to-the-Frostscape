@@ -12,11 +12,22 @@ public class WorldRect implements WorldShape {
     public float width;
     public float height;
 
+    public WorldRect(){
+
+    }
     public WorldRect(float x, float y, float width, float height){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+    }
+
+    public WorldRect set(float x, float y, float width, float height){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        return this;
     }
 
     @Override
@@ -34,9 +45,9 @@ public class WorldRect implements WorldShape {
         float[] ret = new float[8];
         for (int i = 0; i < 4; i++) {
             //X ofset by width
-            ret[i * 2] = d4x0[i] * x + width;
+            ret[i * 2] = x + width * d4x0[i];
             //X ofset by height
-            ret[i*2 + 1] = d4y0[i] * y + height;
+            ret[i*2 + 1] = y + height* d4y0[i];
         }
         return ret;
     }

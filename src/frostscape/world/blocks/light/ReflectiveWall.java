@@ -1,6 +1,7 @@
 package frostscape.world.blocks.light;
 
 import arc.math.geom.Rect;
+import arc.util.Log;
 import frostscape.Frostscape;
 import frostscape.math.Mathh;
 import frostscape.world.FrostscapeBlock;
@@ -14,21 +15,21 @@ import frostscape.world.light.shape.WorldRect;
 import static mindustry.Vars.tilesize;
 
 public class ReflectiveWall extends FrostscapeBlock {
-
     public ReflectiveWall(String name) {
         super(name);
     }
 
     public class ReflectiveWallBuild extends FrostscapeBuilding implements Lightc {
+
+        public WorldRect hitbox = new WorldRect(x - size/2 * tilesize, y - size/2 * tilesize, size * tilesize, size * tilesize);
         @Override
         public void created() {
             Frostscape.lights.handle(this);
         }
 
         @Override
-        public void onRemoved() {
-            Frostscape.lights.lights.remove(this);
-            super.onRemoved();
+        public boolean exists() {
+            return added;
         }
 
         @Override
@@ -48,7 +49,7 @@ public class ReflectiveWall extends FrostscapeBlock {
 
         @Override
         public WorldShape[] hitboxes(){
-            return new WorldShape[]{new WorldRect(x - size * tilesize/2, y - size * tilesize/2, size * tilesize, size * tilesize)};
+            return new WorldShape[]{hitbox.set(x - size * tilesize/2, y - size * tilesize/2, size * tilesize, size * tilesize)};
         }
         @Override
         public LightBeams.CollisionData collision(float x, float y, float rotation, int shape, int side, LightBeams.ColorData color, LightBeams.CollisionData collision) {

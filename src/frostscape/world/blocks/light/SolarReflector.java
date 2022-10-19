@@ -1,6 +1,7 @@
 package frostscape.world.blocks.light;
 
 import arc.struct.Seq;
+import arc.util.Time;
 import frostscape.Frostscape;
 import frostscape.world.FrostscapeBlock;
 import frostscape.world.FrostscapeBuilding;
@@ -42,15 +43,20 @@ public class SolarReflector extends FrostscapeBlock {
         public float rotation = 0;
 
         @Override
+        public void update() {
+            super.update();
+            source.rotation += Time.delta;
+        }
+
+        @Override
         public void created() {
             source = new ReflectorSource(new LightBeams.ColorData(1, 1, 1), rotation, x, y);
             Frostscape.lights.handle(this);
         }
 
         @Override
-        public void onRemoved() {
-            Frostscape.lights.lights.remove(this);
-            super.onRemoved();
+        public boolean exists() {
+            return added;
         }
 
         @Override

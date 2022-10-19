@@ -9,6 +9,8 @@ import static frostscape.world.light.LightBeams.*;
 
 public interface Lightc extends Position {
 
+    //Haha  exists
+    boolean exists();
     Seq<LightSource> empty = Seq.with();
     default Seq<LightSource> getSources(){return empty;};
 
