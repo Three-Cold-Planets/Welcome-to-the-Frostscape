@@ -1,12 +1,14 @@
 package frostscape.world.blocks.light;
 
 import arc.struct.Seq;
+import frostscape.Frostscape;
 import frostscape.world.FrostscapeBlock;
 import frostscape.world.FrostscapeBuilding;
 import frostscape.world.UpgradesType;
 import frostscape.world.light.LightBeams;
 import frostscape.world.light.LightBeams.LightSource;
 import frostscape.world.light.Lightc;
+import frostscape.world.light.WorldShape;
 
 public class SolarReflector extends FrostscapeBlock {
 
@@ -42,6 +44,7 @@ public class SolarReflector extends FrostscapeBlock {
         @Override
         public void created() {
             source = new ReflectorSource(new LightBeams.ColorData(1, 1, 1), rotation, x, y);
+            Frostscape.lights.handle(this);
         }
 
         @Override
@@ -60,7 +63,7 @@ public class SolarReflector extends FrostscapeBlock {
         }
 
         @Override
-        public LightBeams.WorldShape[] hitboxes() {
+        public WorldShape[] hitboxes() {
             return Lightc.super.hitboxes();
         }
 

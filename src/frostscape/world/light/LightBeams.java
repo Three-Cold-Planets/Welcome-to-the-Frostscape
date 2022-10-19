@@ -112,15 +112,13 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         }
     }
 
-    public interface WorldShape{
-        float getX();
-        float getY();
-        float[] edges();
-    }
-
     //Returns the beam's color as a Color object. Mostly used for drawing.
     public static Color toColor(ColorData col){
         return new Color(col.r, col.g, col.b);
+    }
+
+    public void handle(Lightc comp){
+        lights.add(comp);
     }
 
     //Handles adding CollisionData instances for each point a color in the beam hits zero.
@@ -161,7 +159,6 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
     public void updateBeams(){
         //Todo: Finish main loop
-        if(true) return;
         if(!Vars.state.isPlaying() && !shouldUpdate) return;
         shouldUpdate = false;
         lights.each(l -> {
@@ -209,6 +206,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             float bx1 = last.x, by1 = last.y;
             float rotation = last.rotAfter;
             ColorData tempData = new ColorData(last.after);
+            shapes.clear();
 
             //Find the furthest point to form the end of the line segment.
             Vec2 furthestFade = (furthestFalloffPoint(last.after, Tmp.v1.set(bx1, by1), rotation)), end = furthestFade;
@@ -225,6 +223,9 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                     shapeMap.put(j, lightc);
                 }
             });
+
+            Log.info(shapes);
+            Log.info(shapeMap);
 
             shapes.sort(hitbox -> Mathf.dst2(bx1, by1, hitbox.getX(), hitbox.getY()));
 
@@ -279,12 +280,13 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
         for (int i = 0; i < shapes.size; i++) {
             WorldShape shape = shapes.get(i);
-            for (int j = 0; j < shape.edges().length; j += 2) {
+            int size = shape.edges().length;
+            for (int j = 0; j < size; j += 2) {
                 //Find the segment's start and end positions.
-                float x3 = shape.edges()[i];
-                float y3 = shape.edges()[i+1];
-                float x4 = shape.edges()[i+2];
-                float y4 = shape.edges()[i+3];
+                float x3 = shape.edges()[(i) % size];
+                float y3 = shape.edges()[(i+1) % size];
+                float x4 = shape.edges()[(i+2) % size];
+                float y4 = shape.edges()[(i+3) % size];
                 Tmp.r2.set(x3, y3, x4 - x3, y4 - y3);
 
                 //If segments don't intersect, move to next.

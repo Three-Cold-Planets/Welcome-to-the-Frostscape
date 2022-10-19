@@ -26,4 +26,13 @@ public class Mathh {
             return new Vec2(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
         }
     }
+
+    //I'd love to explain how this works but just check desmos
+    public static float rotReflectionX(float rotation){
+        return Math.abs(360 + 180 - rotation);
+    }
+
+    public static float rotReflectionY(float rotation){
+        return Math.abs(360 + 180 - rotation + 90) % 360 + 90;
+    }
 }

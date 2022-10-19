@@ -12,6 +12,7 @@ import arc.struct.Seq;
 import arc.util.Tmp;
 import frostscape.entities.bullet.BouncyBulletType;
 import frostscape.util.DrawUtils;
+import frostscape.world.blocks.light.ReflectiveWall;
 import frostscape.world.blocks.light.SolarReflector;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
@@ -55,6 +56,8 @@ public class FrostBlocks {
     public static ThermalMine thermalLandmine;
 
     public static SolarReflector solarReflector;
+
+    public static ReflectiveWall reflectiveWall;
 
     public static void load(){
         frostStone = new Floor("frost-stone"){{
@@ -584,6 +587,10 @@ public class FrostBlocks {
         }};
 
         solarReflector = new SolarReflector("solar-reflector"){{
+            requirements(Category.effect, ItemStack.with());
+        }};
+
+        reflectiveWall = new ReflectiveWall("reflective-wall"){{
             requirements(Category.effect, ItemStack.with());
         }};
     }

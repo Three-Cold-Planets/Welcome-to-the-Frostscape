@@ -67,6 +67,10 @@ public class Frostscape extends Mod{
 
         });
 
+        Events.run(EventType.SaveWriteEvent.class, () -> {
+            lights.lights.clear();
+        });
+
         Events.run(Trigger.update, () -> {
             lights.updateBeams();
             if(!Vars.state.isPlaying()) return;
