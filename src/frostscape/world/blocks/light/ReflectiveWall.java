@@ -24,6 +24,13 @@ public class ReflectiveWall extends FrostscapeBlock {
         public void created() {
             Frostscape.lights.handle(this);
         }
+
+        @Override
+        public void onRemoved() {
+            Frostscape.lights.lights.remove(this);
+            super.onRemoved();
+        }
+
         @Override
         public void hitbox(Rect out) {
             super.hitbox(out);

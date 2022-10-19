@@ -14,6 +14,7 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.math.Mathh;
 import mindustry.Vars;
+import mindustry.content.Fx;
 import mindustry.core.World;
 import mindustry.entities.Damage;
 import mindustry.entities.bullet.RailBulletType;
@@ -33,6 +34,8 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     public boolean shouldUpdate = false;
 
     public Seq<Lightc> lights = new Seq<>();
+
+    public static Rect r1 = new Rect(), r2 = new Rect();
 
     //Most of this data is used for world interactions, if I were to implement light unable to interact with the world, this would look different
     public static abstract class LightSource implements Position{
@@ -220,7 +223,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             lights.each(lightc -> {
                 for (int j = 0; j < lightc.hitboxes().length; j++) {
                     shapes.add(lightc.hitboxes());
-                    shapeMap.put(j, lightc);
+                    shapeMap.put(shapeMap.size, lightc);
                 }
             });
 
@@ -231,7 +234,9 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
             //Check for if the beam intersects anything. If it does, set a new target position and handle falloff.
             boolean hitTarget = linecastClosest(bx1, by1, bx2, by2, shapes, intOut, pointOut);
-            if(hitTarget){
+            Log.info(pointOut);
+            //Todo: Finish collision
+            if(hitTarget && false){
                 end.set(pointOut);
 
                 //If the beam's closest fading point is reached before bouncing, handle that first
@@ -273,7 +278,12 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     public boolean linecastClosest(float x1, float y1, float x2, float y2, Seq<WorldShape> shapes, int[] dataOut, Vec2 pointOut){
 
         //Set up the rects (Corner opposite to the x and y points are offset by the width and height.)
-        Tmp.r1.set(x1, y1, x2 - x1, y2 - y1);
+        r1.set(x1, y1, x2 - x1, y2 - y1);
+        Fx.smoke.at(r1.x, r1.y);
+        Fx.smokeCloud.at(r1.x + r1.width, r1.y + r1.height);
+        Log.info("Cords: " + Tmp.v1.set(x1, y1));
+        Log.info("End Cords: " + Tmp.v1.set(x2, y2));
+        Log.info("Rect width: " + r1.width + ", Rect height: " + r1.height);
 
         boolean found = false;
         pointOut.set(0, 0);
@@ -287,10 +297,12 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                 float y3 = shape.edges()[(i+1) % size];
                 float x4 = shape.edges()[(i+2) % size];
                 float y4 = shape.edges()[(i+3) % size];
-                Tmp.r2.set(x3, y3, x4 - x3, y4 - y3);
+                r2.set(x3, y3, x4 - x3, y4 - y3);
+                Log.info("Side: " + j/2);
 
                 //If segments don't intersect, move to next.
-                if(!Tmp.r1.overlaps(Tmp.r2)) continue;
+                Log.info("Intersecting Rects collide: " + !r1.overlaps(r2));
+                if(!r1.overlaps(r2)) continue;
 
                 Vec2 point = Mathh.intersection(x1, y1, x2, y2, x3, y3, x4, y4);
 

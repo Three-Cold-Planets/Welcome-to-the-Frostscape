@@ -48,6 +48,12 @@ public class SolarReflector extends FrostscapeBlock {
         }
 
         @Override
+        public void onRemoved() {
+            Frostscape.lights.lights.remove(this);
+            super.onRemoved();
+        }
+
+        @Override
         public UpgradesType type() {
             return (UpgradesType) block;
         }
