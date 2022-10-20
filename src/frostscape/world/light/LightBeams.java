@@ -14,12 +14,14 @@ import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.math.Mathh;
+import frostscape.world.blocks.light.SolarReflector;
 import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.core.World;
 import mindustry.entities.Damage;
 import mindustry.entities.bullet.RailBulletType;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.io.SaveFileReader;
 
@@ -36,6 +38,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     public boolean shouldUpdate = false;
 
     public Seq<Lightc> lights = new Seq<>(), removeable = new Seq<>();
+    public Seq<WorldShape> tmps = new Seq<WorldShape>(), shapes = new Seq<WorldShape>();
 
     public static Rect r1 = new Rect(), r2 = new Rect();
 
@@ -119,7 +122,11 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
     //Returns the beam's color as a Color object. Mostly used for drawing.
     public static Color toColor(ColorData col){
-        return new Color(col.r, col.g, col.b);
+        float total = col.r + col.b + col.g;
+        float r = col.r / total * 255;
+        float b = col.r / total * 255;
+        float g = col.r / total * 255;
+        return Color.rgb(col.r, col.g, col.b);
     }
 
     public void handle(Lightc comp){
@@ -152,8 +159,11 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         ColorData color = applyFalloff(last.after, Mathf.dst(last.x, last.y, x, y));
 
         //Add the returned collision data to the beam
+
+        CollisionData returned = module.collision(x, y, rotation, shape, side, color, new CollisionData(x, y, last.rotAfter, color));
+
         beam.add(
-            module.collision(x, y, rotation, shape, side, color, new CollisionData(x, y, last.rotAfter, color))
+                returned
         );
     }
 
@@ -197,15 +207,15 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         //Main loop for testing collisions
 
         //If light beams continued forever I'd be dammed
-        int maxBounces = 2;
+        int maxBounces = 6;
 
-        Seq<WorldShape> shapes = new Seq<>();
         int[] intOut = new int[2];
         Vec2 pointOut = new Vec2();
         //Remember last collision point
         CollisionData last = start;
 
         for (int i = 0; i < maxBounces; i++) {
+
             float bx1 = last.x, by1 = last.y;
             float rotation = last.rotAfter;
             ColorData tempData = new ColorData(last.after);
@@ -221,10 +231,13 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             IntMap<Lightc> shapeMap = new IntMap<>();
             
             lights.each(lightc -> {
-                for (int j = 0; j < lightc.hitboxes().length; j++) {
-                    shapes.add(lightc.hitboxes()[j]);
+                if(!lightc.collides()) return;
+                lightc.hitboxes(tmps);
+                for (int j = 0; j < tmps.size; j++) {
+                    shapes.add(tmps.get(j));
                     shapeMap.put(shapeMap.size, lightc);
                 }
+                tmps.clear();
             });
 
             shapes.sort(hitbox -> Mathf.dst2(bx1, by1, hitbox.getX(), hitbox.getY()));
@@ -243,6 +256,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
                 handleCollision(pointOut.x, pointOut.y, Mathf.angle(bx2 - bx1, by2 - by1), intOut[0], intOut[1], beam, shapeMap.get(intOut[0]));
 
+                last = beam.get(beam.size - 1);
                 //End it here, if the condition for the if statement was not met, use the logic after this.
                 continue;
             }
@@ -318,18 +332,23 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                 for (int i = 0; i < beams.size - 1; i++) {
                     CollisionData before = beams.get(i), after = beams.get(i + 1);
                     Draw.blend();
+                    Tmp.v1.trns(before.rotAfter, 1).rotate(90);
+                    float x1 = before.x + Tmp.v1.x, y1 = before.y + Tmp.v1.y, float x2 = before.x - Tmp.v1.x, y2 = before.y - Tmp.v1.y;
+                    Fill.quad();
                     Lines.line(before.x, before.y, after.x, after.y);
+                    Drawf.light(before.x, before.y, after.x, after.y);
                     Fill.circle(before.x, before.y, 1);
                 }
                 CollisionData data = beams.get(beams.size - 1);
                 Fill.circle(data.x, data.y, 1);
             });
 
-            WorldShape[] shapes = l.hitboxes();
-            for (int i = 0; i < shapes.length; i++) {
-                WorldShape shape = shapes[i];
-                int size = shapes[i].edges().length;
-                for (int j = 0; j < shapes[i].edges().length; j += 2) {
+            tmps.clear();
+            l.hitboxes(tmps);
+            for (int i = 0; i < tmps.size; i++) {
+                WorldShape shape = tmps.get(i);
+                int size = shape.edges().length;
+                for (int j = 0; j < shape.edges().length; j += 2) {
                     float x3 = shape.edges()[(j) % size];
                     float y3 = shape.edges()[(j+1) % size];
                     float x4 = shape.edges()[(j+2) % size];

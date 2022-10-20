@@ -9,8 +9,11 @@ import static frostscape.world.light.LightBeams.*;
 
 public interface Lightc extends Position {
 
-    //Haha  exists
     boolean exists();
+
+    default boolean collides(){
+        return false;
+    }
     Seq<LightSource> empty = Seq.with();
     default Seq<LightSource> getSources(){return empty;};
 
@@ -21,9 +24,9 @@ public interface Lightc extends Position {
 
     LightBeams.CollisionData collision(float x, float y, float rotation, int shape, int side, ColorData color, LightBeams.CollisionData collision);
 
-    //Hitboxes of entity. Defaults to an empty array, which means it can't be intersected.
-    default WorldShape[] hitboxes() {
-        return new WorldShape[0];
+    //Hitboxes of entity. Defaults to an empty array, which means it can't be intersected. The array should likely be a static array filled with elements to avoid unescecary alocation.
+    default void hitboxes(Seq<WorldShape> seq) {
+
     }
 
     //Called after lights have been updated. Mostly used to apply changes after being hit by light beams

@@ -17,6 +17,11 @@ public class SolarReflector extends FrostscapeBlock {
         super(name);
     }
 
+    @Override
+    public void load() {
+        super.load();
+    }
+
     public static class ReflectorSource extends LightSource{
         float x, y;
         public ReflectorSource(LightBeams.ColorData color, float rotation, float x, float y) {
@@ -72,11 +77,6 @@ public class SolarReflector extends FrostscapeBlock {
         @Override
         public LightBeams.CollisionData collision(float x, float y, float rotation, int shape, int side, LightBeams.ColorData color, LightBeams.CollisionData collision) {
             return null;
-        }
-
-        @Override
-        public WorldShape[] hitboxes() {
-            return Lightc.super.hitboxes();
         }
 
         @Override

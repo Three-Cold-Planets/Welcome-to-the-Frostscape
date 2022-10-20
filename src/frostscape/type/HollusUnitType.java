@@ -31,6 +31,11 @@ public class HollusUnitType extends UnitType{
     }
 
     @Override
+    public void load() {
+        super.load();
+    }
+
+    @Override
     public void init() {
         super.init();
         families.each(family -> family.members.add(this));

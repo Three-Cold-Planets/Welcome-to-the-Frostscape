@@ -1,6 +1,7 @@
 package frostscape.world.blocks.light;
 
 import arc.math.geom.Rect;
+import arc.struct.Seq;
 import arc.util.Log;
 import frostscape.Frostscape;
 import frostscape.math.Mathh;
@@ -15,13 +16,15 @@ import frostscape.world.light.shape.WorldRect;
 import static mindustry.Vars.tilesize;
 
 public class ReflectiveWall extends FrostscapeBlock {
+
+    public static WorldShape[] tmp = new WorldShape[1];
     public ReflectiveWall(String name) {
         super(name);
     }
 
     public class ReflectiveWallBuild extends FrostscapeBuilding implements Lightc {
 
-        public WorldRect hitbox = new WorldRect(x - size/2 * tilesize, y - size/2 * tilesize, size * tilesize, size * tilesize);
+        public WorldRect hitbox = new WorldRect();
         @Override
         public void created() {
             Frostscape.lights.handle(this);
@@ -29,6 +32,11 @@ public class ReflectiveWall extends FrostscapeBlock {
 
         @Override
         public boolean exists() {
+            return added;
+        }
+
+        @Override
+        public boolean collides() {
             return added;
         }
 
@@ -48,19 +56,16 @@ public class ReflectiveWall extends FrostscapeBlock {
         }
 
         @Override
-        public WorldShape[] hitboxes(){
-            return new WorldShape[]{hitbox.set(x - size * tilesize/2, y - size * tilesize/2, size * tilesize, size * tilesize)};
+        public void hitboxes(Seq<WorldShape> sequence){
+            sequence.add(hitbox.set(x - size * tilesize/2, y - size * tilesize/2, size * tilesize, size * tilesize));
         }
         @Override
         public LightBeams.CollisionData collision(float x, float y, float rotation, int shape, int side, LightBeams.ColorData color, LightBeams.CollisionData collision) {
             float newRot = rotation;
 
-            float difX = Math.abs(this.x - x);
-            float difY = Math.abs(this.y - y);
+            boolean flipX = false, flipY = true;
 
-            boolean flipX = false;
-            boolean flipY = true;
-            if(difX > difY) {
+            if((side/2 % 2) == 0) {
                 flipX = true;
                 flipY = false;
             };
@@ -68,7 +73,9 @@ public class ReflectiveWall extends FrostscapeBlock {
             if(flipX) newRot = Mathh.rotReflectionX(rotation);
             if(flipY) newRot = Mathh.rotReflectionY(rotation);
 
-            return new LightBeams.CollisionData(x, y, newRot, new LightBeams.ColorData(color));
+            collision.rotAfter = newRot;
+
+            return collision;
         }
     }
 }

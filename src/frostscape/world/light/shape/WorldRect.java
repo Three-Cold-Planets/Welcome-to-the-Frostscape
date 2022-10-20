@@ -1,6 +1,7 @@
 package frostscape.world.light.shape;
 
 
+import arc.graphics.g2d.Fill;
 import frostscape.world.light.WorldShape;
 
 import static frostscape.world.light.LightBeams.d4x0;
@@ -11,6 +12,8 @@ public class WorldRect implements WorldShape {
     public float y;
     public float width;
     public float height;
+
+    public float[] edges = new float[8];
 
     public WorldRect(){
 
@@ -42,13 +45,12 @@ public class WorldRect implements WorldShape {
 
     @Override
     public float[] edges() {
-        float[] ret = new float[8];
         for (int i = 0; i < 4; i++) {
             //X ofset by width
-            ret[i * 2] = x + width * d4x0[i];
+            edges[i * 2] = x + width * d4x0[i];
             //X ofset by height
-            ret[i*2 + 1] = y + height* d4y0[i];
+            edges[i*2 + 1] = y + height* d4y0[i];
         }
-        return ret;
+        return edges;
     }
 }
