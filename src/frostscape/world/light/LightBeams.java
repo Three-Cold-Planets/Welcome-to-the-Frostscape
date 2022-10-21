@@ -123,10 +123,10 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     //Returns the beam's color as a Color object. Mostly used for drawing.
     public static Color toColor(ColorData col){
         float total = col.r + col.b + col.g;
-        float r = col.r / total * 255;
-        float b = col.r / total * 255;
-        float g = col.r / total * 255;
-        return Color.rgb(col.r, col.g, col.b);
+        float r = col.r / total * 3;
+        float b = col.r / total * 3;
+        float g = col.r / total * 3;
+        return new Color(r, g, b, total/3);
     }
 
     public void handle(Lightc comp){
@@ -156,11 +156,11 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         //Get last collision point
         CollisionData last = beam.get(beam.size - 1);
         //Apply falloff to the light beam.
-        ColorData color = applyFalloff(last.after, Mathf.dst(last.x, last.y, x, y));
+        ColorData color = applyFalloff(new ColorData(last.after), Mathf.dst(last.x, last.y, x, y));
 
         //Add the returned collision data to the beam
 
-        CollisionData returned = module.collision(x, y, rotation, shape, side, color, new CollisionData(x, y, last.rotAfter, color));
+        CollisionData returned = module.collision(x, y, rotation, shape, side, color, new CollisionData(x, y, last.rotAfter, last.rotAfter, last.after, color, true));
 
         beam.add(
                 returned
@@ -330,16 +330,21 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
                 Seq<CollisionData> beams = source.beam;
                 for (int i = 0; i < beams.size - 1; i++) {
+                    Draw.color();
                     CollisionData before = beams.get(i), after = beams.get(i + 1);
-                    Draw.blend();
+                    Color start = toColor(before.after), end = toColor(after.before);
+
                     Tmp.v1.trns(before.rotAfter, 1).rotate(90);
-                    float x1 = before.x + Tmp.v1.x, y1 = before.y + Tmp.v1.y, float x2 = before.x - Tmp.v1.x, y2 = before.y - Tmp.v1.y;
-                    Fill.quad();
-                    Lines.line(before.x, before.y, after.x, after.y);
-                    Drawf.light(before.x, before.y, after.x, after.y);
+                    float x1 = before.x + Tmp.v1.x, y1 = before.y + Tmp.v1.y, x2 = before.x - Tmp.v1.x, y2 = before.y - Tmp.v1.y;
+                    Tmp.v1.trns(before.rotAfter, 1).rotate(90);
+                    float x3 = after.x - Tmp.v1.x, y3 = after.y - Tmp.v1.y, x4 = after.x + Tmp.v1.x, y4 = after.y + Tmp.v1.y;
+                    Fill.quad(x1, y1, start.toFloatBits(), x2, y2, start.toFloatBits(), x3, y3, end.toFloatBits(), x4, y4, end.toFloatBits());
+
+                    Draw.color(start);
                     Fill.circle(before.x, before.y, 1);
                 }
                 CollisionData data = beams.get(beams.size - 1);
+                Draw.color(toColor(data.after));
                 Fill.circle(data.x, data.y, 1);
             });
 

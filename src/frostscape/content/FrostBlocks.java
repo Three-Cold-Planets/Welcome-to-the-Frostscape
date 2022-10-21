@@ -12,6 +12,7 @@ import arc.struct.Seq;
 import arc.util.Tmp;
 import frostscape.entities.bullet.BouncyBulletType;
 import frostscape.util.DrawUtils;
+import frostscape.world.blocks.environment.ParticleFloor;
 import frostscape.world.blocks.light.ReflectiveWall;
 import frostscape.world.blocks.light.SolarReflector;
 import frostscape.world.blocks.core.BuildBeamCore;
@@ -30,6 +31,7 @@ import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
+import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
@@ -42,7 +44,8 @@ import static arc.math.Angles.randLenVectors;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
-    public static Floor frostStone, frostSnow,
+    public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
+            frostStone, frostSnow,
             andesiteFloor, volcanicAndesiteFloor, sulphanatedAndesite,
             graystoneFloor, graystoneSlatedFloor, tephra;
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
@@ -60,6 +63,36 @@ public class FrostBlocks {
     public static ReflectiveWall reflectiveWall;
 
     public static void load(){
+
+        sulphuricWater = new ParticleFloor("sulphuric-water"){{
+            cacheLayer = CacheLayer.water;
+            variants = 4;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+        }};
+
+        deepSulphuricWater = new ParticleFloor("deep-sulphuric-water"){{
+            cacheLayer = CacheLayer.water;
+            variants = 4;
+            blendGroup = sulphuricWater;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+        }};
+
+        sulphuricAndesiteWater = new ParticleFloor("sulphuric-andesite-water"){{
+            cacheLayer = CacheLayer.water;
+            variants = 3;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+        }};
+
+        sulphuricGraystoneWater = new ParticleFloor("sulphuric-graystone-water"){{
+            cacheLayer = CacheLayer.water;
+            variants = 3;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+        }};
+
         frostStone = new Floor("frost-stone"){{
             variants = 4;
         }};

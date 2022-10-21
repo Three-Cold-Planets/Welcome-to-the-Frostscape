@@ -6,6 +6,9 @@ import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.util.Time;
 import arc.util.Tmp;
+import frostscape.graphics.Draww;
+import frostscape.math.Math3D;
+import frostscape.math.MultiInterp;
 import frostscape.util.DrawUtils;
 import mindustry.Vars;
 import mindustry.content.Liquids;
@@ -19,6 +22,8 @@ import static frostscape.util.WeatherUtils.windDirection;
 import static mindustry.content.Fx.rand;
 
 public class Fxf {
+    public static MultiInterp
+            smokeFade = new MultiInterp(new float[]{0, 0.8f}, new Interp[]{Interp.pow2, Interp.pow2Out});
     public static Effect
     chargeExplode = new Effect(200, e -> {
         Fill.circle(e.x, e.y, e.fslope() * e.fslope() * 5 + e.finpow() * 20);
@@ -56,15 +61,19 @@ public class Fxf {
         Draw.blend(Blending.additive);
         Draw.rect(region, e.x, e.y, e.rotation);
         Draw.blend();
-    });
+    }),
 
-    public static Effect steamEffect(float lifetime, float radius, Interp interp){
-        return new Effect(lifetime, e -> {
-            float a = interp.apply(e.fin());
-            Fill.circle(e.x + Tmp.v1.set(windDirection()).x * a, e.y + Tmp.v1.y * a, radius * 1 - a);
+    sulphuricSmoke = new Effect(450, 100, e -> {
+        Draw.color(Palf.sulphur);
+        Draw.alpha(smokeFade.apply(e.fin()));
+        float size = Mathf.randomSeed(e.id, 2, 4);
+        Draw.z(Mathf.lerp(Layers.smokeLow, Layers.smokeHigh, e.fin()));
+
+        Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 360, (x, y) -> {
+            DrawUtils.speckOffset(e.x + x, e.y + y, e.fin(), e.time, DrawUtils.smokeWeight, Tmp.v1);
+            Fill.circle(Tmp.v1.x, Tmp.v1.y, size * e.fout(Interp.pow4));
         });
-    };
-
+    });
 
     public static Effect steamEffect(float lifetime, float radius){
         return new Effect(lifetime, e -> {

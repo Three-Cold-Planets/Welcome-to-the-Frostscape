@@ -13,6 +13,8 @@ import frostscape.world.light.WorldShape;
 
 public class SolarReflector extends FrostscapeBlock {
 
+    public LightBeams.ColorData data = new LightBeams.ColorData(1, 1, 1);
+
     public SolarReflector(String name) {
         super(name);
     }
@@ -55,7 +57,7 @@ public class SolarReflector extends FrostscapeBlock {
 
         @Override
         public void created() {
-            source = new ReflectorSource(new LightBeams.ColorData(1, 1, 1), rotation, x, y);
+            source = new ReflectorSource(data, rotation, x, y);
             Frostscape.lights.handle(this);
         }
 
