@@ -11,7 +11,7 @@ import mindustry.type.StatusEffect;
 
 public class FrostStatusEffects {
     public static StatusEffect[] spriteTests = new StatusEffect[5];
-    public static StatusEffect napalm, attackBoost, engineBoost, lowGrav;
+    public static StatusEffect napalm, causticCoating, attackBoost, engineBoost, lowGrav;
 
     public static void load(){
         for (int i = 0; i < spriteTests.length; i++) {
@@ -23,11 +23,21 @@ public class FrostStatusEffects {
             transitionDamage = 80;
             speedMultiplier = 0.9f;
             effect = Fx.oily;
+            color = Palf.heat;
             opposite(StatusEffects.melting, StatusEffects.wet);
             init(() -> {
                 affinity(StatusEffects.burning, (unit, result, time) -> unit.damagePierce(Math.min(transitionDamage, StatusEffects.burning.damage * time)));
                 affinity(StatusEffects.tarred, (unit, result, time) -> result.set(napalm, Math.min(transitionDamage/damage, result.time + time)));
             });
+        }};
+
+        causticCoating = new StatusEffect("caustic-coating"){{
+            color = Palf.sulphur;
+            effect = Fxf.sulphurDrops;
+            damage = 0.43f;
+            damageMultiplier = 0.35f;
+            speedMultiplier = 0.85f;
+            dragMultiplier =  0.85f;
         }};
 
         attackBoost = new StatusEffect("attack-boost"){{

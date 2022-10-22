@@ -47,9 +47,9 @@ public class WorldRect implements WorldShape {
     public float[] edges() {
         for (int i = 0; i < 4; i++) {
             //X ofset by width
-            edges[i * 2] = x + width * d4x0[i];
+            edges[i * 2] = width * d4x0[i];
             //X ofset by height
-            edges[i*2 + 1] = y + height* d4y0[i];
+            edges[i*2 + 1] = height* d4y0[i];
         }
         return edges;
     }

@@ -35,4 +35,10 @@ public class Mathh {
     public static float rotReflectionY(float rotation){
         return Math.abs(360 + 180 - rotation + 90) % 360 + 90;
     }
+
+    public static float rotReflection(float rotation, float angle){
+        float reflection = rotation;
+        reflection = 360 + rotation - (rotation - angle) * 2 + 180;
+        return reflection;
+    }
 }

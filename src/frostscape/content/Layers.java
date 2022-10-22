@@ -7,5 +7,5 @@ public class Layers {
     smokeLow = 35,
     smokeHigh = 105,
     //Used for light beams *shaders used*
-    light = 95;
+    light = 82;
 }

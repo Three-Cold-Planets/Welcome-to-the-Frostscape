@@ -18,6 +18,7 @@ import frostscape.type.upgrade.UpgradeableBuilding;
 import frostscape.ui.FrostUI;
 import frostscape.ui.frag.BlockSelectFrag.*;
 import frostscape.ui.frag.buttons.UpgradeSelectButton;
+import frostscape.world.blocks.light.SolarReflector;
 import frostscape.world.upgrades.UpgradeEntry;
 import frostscape.world.upgrades.UpgradeState;
 import mindustry.gen.Icon;
@@ -36,6 +37,12 @@ public class BlockSelectButtons {
         //Enable/Disable
         buttons.add(new SelectButton("Disable", Icon.cancel, false, (b) -> true, (t, builds) -> builds.each(b -> b.enabled = false)));
         buttons.add(new SelectButton("Enable", Icon.play, false, (b) -> true, (t, builds) -> builds.each(b -> b.enabled = true)));
+        buttons.add(new SelectButton("Enable", Icon.play, false, (b) -> {boolean found = false;
+            for (int i = 0; i < b.size; i++) {
+                if(b.get(i) instanceof SolarReflector.SolarReflectorBuild);
+            }
+
+        }, (t, builds) -> builds.each(b -> b.enabled = true)));
         //Upgrades tables
         buttons.add(new UpgradeSelectButton());
     }

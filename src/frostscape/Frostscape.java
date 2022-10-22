@@ -85,6 +85,9 @@ public class Frostscape extends Mod{
 
     @Override
     public void init() {
+
+        Vars.mods.getScripts().runConsole(
+                "function buildWorldP(){return Vars.world.buildWorld(Vars.player.x, Vars.player.y)}");
         ImporterTopLevel scope = (ImporterTopLevel) Vars.mods.getScripts().scope;
 
         Seq<String> packages = Seq.with(
@@ -95,6 +98,7 @@ public class Frostscape extends Mod{
                 "frostscape.ui",
                 "frostscape.util",
                 "frostscape.world",
+                "frostscape.world.light",
                 "frostscape.world.upgrades"
         );
 

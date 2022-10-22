@@ -37,7 +37,7 @@ public class ReflectiveWall extends FrostscapeBlock {
 
         @Override
         public boolean collides() {
-            return added;
+            return true;
         }
 
         @Override

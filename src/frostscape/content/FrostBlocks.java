@@ -12,6 +12,8 @@ import arc.struct.Seq;
 import arc.util.Tmp;
 import frostscape.entities.bullet.BouncyBulletType;
 import frostscape.util.DrawUtils;
+import frostscape.world.blocks.core.CoreBunker;
+import frostscape.world.blocks.drawers.ReflectorDrawer;
 import frostscape.world.blocks.environment.ParticleFloor;
 import frostscape.world.blocks.light.ReflectiveWall;
 import frostscape.world.blocks.light.SolarReflector;
@@ -23,6 +25,7 @@ import frostscape.world.blocks.drawers.DrawUpgradePart;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
+import frostscape.world.light.LightBeams;
 import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
@@ -32,9 +35,11 @@ import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
 import mindustry.graphics.CacheLayer;
+import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
@@ -48,6 +53,7 @@ public class FrostBlocks {
             frostStone, frostSnow,
             andesiteFloor, volcanicAndesiteFloor, sulphanatedAndesite,
             graystoneFloor, graystoneSlatedFloor, tephra;
+
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall;
     public static StaticTree tephraWall;
@@ -55,7 +61,7 @@ public class FrostBlocks {
 
     public static CoreSiphon coreSiphon;
     public static ItemTurret pyroclast;
-    public static FrostscapeCore coreBunker;
+    public static CoreBunker coreBunker;
     public static ThermalMine thermalLandmine;
 
     public static SolarReflector solarReflector;
@@ -65,32 +71,57 @@ public class FrostBlocks {
     public static void load(){
 
         sulphuricWater = new ParticleFloor("sulphuric-water"){{
-            cacheLayer = CacheLayer.water;
+            isLiquid = true;
+            liquidDrop = Liquids.water;
             variants = 4;
             effect = Fxf.sulphuricSmoke;
             chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 120.0F;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9F;
+            supportsOverlay = true;
         }};
 
         deepSulphuricWater = new ParticleFloor("deep-sulphuric-water"){{
-            cacheLayer = CacheLayer.water;
+            isLiquid = true;
+            liquidDrop = Liquids.water;
             variants = 4;
             blendGroup = sulphuricWater;
             effect = Fxf.sulphuricSmoke;
             chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 120.0F;
+            drownTime = 200.0F;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9F;
+            supportsOverlay = true;
         }};
 
         sulphuricAndesiteWater = new ParticleFloor("sulphuric-andesite-water"){{
-            cacheLayer = CacheLayer.water;
+            isLiquid = true;
+            liquidDrop = Liquids.water;
             variants = 3;
             effect = Fxf.sulphuricSmoke;
             chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 120.0F;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9F;
+            supportsOverlay = true;
         }};
 
         sulphuricGraystoneWater = new ParticleFloor("sulphuric-graystone-water"){{
-            cacheLayer = CacheLayer.water;
+            isLiquid = true;
+            liquidDrop = Liquids.water;
             variants = 3;
             effect = Fxf.sulphuricSmoke;
             chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 120.0F;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9F;
+            supportsOverlay = true;
         }};
 
         frostStone = new Floor("frost-stone"){{
@@ -510,7 +541,22 @@ public class FrostBlocks {
             });
         }};
 
-        coreBunker = new BuildBeamCore("core-bunker"){{
+        coreBunker = new CoreBunker("core-bunker"){{
+
+            float centerOffset = 55/4, floatMirrorSide = 17/4;
+
+            hitboxEdges = new float[]{
+                    -floatMirrorSide, centerOffset,
+                    floatMirrorSide, centerOffset,
+                    centerOffset, floatMirrorSide,
+                    centerOffset, -floatMirrorSide,
+                    floatMirrorSide, -centerOffset,
+                    -floatMirrorSide, -centerOffset,
+                    -centerOffset, -floatMirrorSide,
+                    -centerOffset, floatMirrorSide
+            };
+
+
             requirements(Category.effect, ItemStack.empty);
             size = 5;
             mountPoses = new Seq<>();
@@ -550,6 +596,7 @@ public class FrostBlocks {
             );
             defaultEntry = units.get(0);
         }};
+
         thermalLandmine = new ThermalMine("thermal-landmine"){{
             requirements(Category.effect, ItemStack.with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
             health = 55;
@@ -621,6 +668,18 @@ public class FrostBlocks {
 
         solarReflector = new SolarReflector("solar-reflector"){{
             requirements(Category.effect, ItemStack.with());
+            data = new LightBeams.ColorData(2.4f, 2f, 1.6f);
+            drawer = new DrawMulti(
+                    new DrawUpgradePart(
+                            name + "-base0",
+                            new String[]{
+                                    name + "-base0",
+                                    name + "-base1"
+                            },
+                            FrostUpgrades.improvedBase
+                    ),
+                    new ReflectorDrawer(name, Layer.blockBuilding,  Layers.light + 0.1f)
+            );
         }};
 
         reflectiveWall = new ReflectiveWall("reflective-wall"){{

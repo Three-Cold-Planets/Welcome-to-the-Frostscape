@@ -1,9 +1,7 @@
 package frostscape.world.light;
 
 import arc.math.geom.Position;
-import arc.math.geom.Shape2D;
 import arc.struct.Seq;
-import mindustry.gen.Rotc;
 
 import static frostscape.world.light.LightBeams.*;
 
@@ -15,7 +13,10 @@ public interface Lightc extends Position {
         return false;
     }
     Seq<LightSource> empty = Seq.with();
-    default Seq<LightSource> getSources(){return empty;};
+
+    default void getSources(Seq<LightSource> out) {
+
+    }
 
     //Returns reflectivity at that specific point in the object. Defaults to one.
     default float reflectivity(int shape, int side){

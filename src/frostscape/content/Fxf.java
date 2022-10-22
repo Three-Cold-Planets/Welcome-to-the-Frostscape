@@ -12,6 +12,7 @@ import frostscape.math.MultiInterp;
 import frostscape.util.DrawUtils;
 import mindustry.Vars;
 import mindustry.content.Liquids;
+import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
@@ -72,6 +73,17 @@ public class Fxf {
         Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 360, (x, y) -> {
             DrawUtils.speckOffset(e.x + x, e.y + y, e.fin(), e.time, DrawUtils.smokeWeight, Tmp.v1);
             Fill.circle(Tmp.v1.x, Tmp.v1.y, size * e.fout(Interp.pow4));
+        });
+    }),
+
+    sulphurDrops = new Effect(55, e -> {
+        Draw.color(Palf.sulphur);
+        Draw.alpha(smokeFade.apply(e.fin()));
+        Draw.z(Mathf.lerp(Layers.smokeLow, Layers.smokeHigh, e.fin()));
+
+        Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 360, (x, y) -> {
+            DrawUtils.speckOffset(e.x + x, e.y + y, e.fin(), e.time, DrawUtils.smokeWeight, Tmp.v1);
+            Fill.circle(Tmp.v1.x, Tmp.v1.y, e.fout() * 1);
         });
     });
 
