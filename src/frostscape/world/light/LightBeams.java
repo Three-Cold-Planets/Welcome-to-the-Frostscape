@@ -407,9 +407,9 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                 }
             });
             out.clear();
-            Draw.blend();
             tmps.clear();
             Draw.color();
+            Draw.blend();
             l.hitboxes(tmps);
             for (int i = 0; i < tmps.size; i++) {
                 WorldShape shape = tmps.get(i);

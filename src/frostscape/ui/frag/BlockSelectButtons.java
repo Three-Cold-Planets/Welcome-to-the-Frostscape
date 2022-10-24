@@ -37,13 +37,17 @@ public class BlockSelectButtons {
         //Enable/Disable
         buttons.add(new SelectButton("Disable", Icon.cancel, false, (b) -> true, (t, builds) -> builds.each(b -> b.enabled = false)));
         buttons.add(new SelectButton("Enable", Icon.play, false, (b) -> true, (t, builds) -> builds.each(b -> b.enabled = true)));
-        buttons.add(new SelectButton("Enable", Icon.play, false, (b) -> {boolean found = false;
+        buttons.add(new SelectButton("Rotate", Icon.rotate, false, (b) -> {
             for (int i = 0; i < b.size; i++) {
-                if(b.get(i) instanceof SolarReflector.SolarReflectorBuild);
+                if(b.get(i) instanceof SolarReflector.SolarReflectorBuild){
+                    return true;
+                };
             }
-
-        }, (t, builds) -> builds.each(b -> b.enabled = true)));
-        //Upgrades tables
+            return false;
+        }, (t, builds) -> {
+            FrostUI.select.hideConfig();
+        }));
+        //Upgrades button
         buttons.add(new UpgradeSelectButton());
     }
 

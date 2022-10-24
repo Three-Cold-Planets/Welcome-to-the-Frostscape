@@ -51,8 +51,10 @@ import static frostscape.Frostscape.NAME;
 public class FrostBlocks {
     public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
             frostStone, frostSnow,
-            andesiteFloor, volcanicAndesiteFloor, sulphanatedAndesite,
+            andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
             graystoneFloor, graystoneSlatedFloor, tephra;
+
+    public static Prop algae, wornBoulderHuge;
 
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall;
@@ -81,13 +83,13 @@ public class FrostBlocks {
             cacheLayer = CacheLayer.water;
             albedo = 0.9F;
             supportsOverlay = true;
+            speedMultiplier = 0.8f;
         }};
 
         deepSulphuricWater = new ParticleFloor("deep-sulphuric-water"){{
             isLiquid = true;
             liquidDrop = Liquids.water;
             variants = 4;
-            blendGroup = sulphuricWater;
             effect = Fxf.sulphuricSmoke;
             chance = 0.00012f;
             status = FrostStatusEffects.causticCoating;
@@ -96,6 +98,7 @@ public class FrostBlocks {
             cacheLayer = CacheLayer.water;
             albedo = 0.9F;
             supportsOverlay = true;
+            speedMultiplier = 0.6f;
         }};
 
         sulphuricAndesiteWater = new ParticleFloor("sulphuric-andesite-water"){{
@@ -109,6 +112,7 @@ public class FrostBlocks {
             cacheLayer = CacheLayer.water;
             albedo = 0.9F;
             supportsOverlay = true;
+            speedMultiplier = 0.92f;
         }};
 
         sulphuricGraystoneWater = new ParticleFloor("sulphuric-graystone-water"){{
@@ -122,6 +126,7 @@ public class FrostBlocks {
             cacheLayer = CacheLayer.water;
             albedo = 0.9F;
             supportsOverlay = true;
+            speedMultiplier = 0.92f;
         }};
 
         frostStone = new Floor("frost-stone"){{
@@ -162,6 +167,11 @@ public class FrostBlocks {
 
         volcanicAndesiteFloor = new Floor("volcanic-andesite-floor"){{
             variants = 3;
+        }};
+
+        volcanicPebbledAndesiteFloor = new Floor("volcanic-pebbled-andesite-floor"){{
+            variants = 4;
+            blendGroup = volcanicAndesiteFloor;
         }};
 
         sulphanatedAndesite = new Floor("sulphanated-andesite-floor"){{
@@ -213,6 +223,15 @@ public class FrostBlocks {
 
         tephraWall = new StaticTree("tephra-wall"){{
             variants = 2;
+        }};
+
+        algae = new WobbleProp("algae"){{
+            variants = 3;
+            hasShadow = false;
+        }};
+
+        wornBoulderHuge = new Prop("worn-boulder-huge"){{
+
         }};
 
         coreSiphon = new CoreSiphon("core-siphon"){{
