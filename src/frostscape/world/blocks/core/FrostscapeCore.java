@@ -28,7 +28,6 @@ public class FrostscapeCore extends BaseCore implements UpgradesType {
     public float constructTime = 150;
     public float targetScale = Scl.scl(1);
     public float cameraMoveSpeed = 0.01f;
-    public TextureRegion mountRegion;
 
     public Seq<UnitEntry> units = Seq.with();
     public UnitEntry defaultEntry;

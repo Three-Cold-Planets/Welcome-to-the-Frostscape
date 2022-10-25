@@ -21,6 +21,8 @@ public class BuildBeamCore extends FrostscapeCore{
 
     public Seq<Vec2> mountPoses = Seq.with();
 
+    public TextureRegion mountRegion;
+
     public BuildBeamCore(String name) {
         super(name);
     }
@@ -61,9 +63,8 @@ public class BuildBeamCore extends FrostscapeCore{
             }
         }
 
-        @Override
-        public void draw() {
-            super.draw();
+
+        public void drawMounts(){
             float cx = constructPos.x, cy = constructPos.y;
             float invalidWarmup = 1 - warmup;
 
@@ -103,6 +104,12 @@ public class BuildBeamCore extends FrostscapeCore{
                 Drawf.buildBeam(Tmp.v1.x, Tmp.v1.y, cx, cy, entry.type.hitSize);
             }
             Fill.square(cx, cy, entry.type.hitSize);
+        }
+
+        @Override
+        public void draw() {
+            super.draw();
+            drawMounts();
         }
     }
 }

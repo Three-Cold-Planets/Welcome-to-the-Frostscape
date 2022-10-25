@@ -4,7 +4,7 @@ import arc.graphics.Color;
 public class Palf {
     public static Color
 
-    sulphur = Color.valueOf("#a0927d"),
+    sulphur = Color.valueOf("#beab77"),
 
     quiteDarkOutline = Color.valueOf("#403e49"),
     hunter = Color.valueOf("#dde6f0"),

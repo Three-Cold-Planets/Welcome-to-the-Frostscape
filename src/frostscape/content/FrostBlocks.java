@@ -38,6 +38,7 @@ import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.environment.*;
@@ -56,8 +57,10 @@ public class FrostBlocks {
 
     public static Prop algae, wornBoulderHuge;
 
+    public static OverlayFloor wornBoulderHugeBottom;
+
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
-    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall;
+    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone;
     public static StaticTree tephraWall;
     public static SteamVentProp frostVent;
 
@@ -221,6 +224,11 @@ public class FrostBlocks {
             variants = 4;
         }};
 
+        sulphurGraystone = new StaticWall("sulphur-graystone"){{
+            variants = 3;
+            itemDrop = FrostItems.sulphur;
+        }};
+
         tephraWall = new StaticTree("tephra-wall"){{
             variants = 2;
         }};
@@ -231,7 +239,13 @@ public class FrostBlocks {
         }};
 
         wornBoulderHuge = new Prop("worn-boulder-huge"){{
+            variants = 0;
+            size = 1;
+            breakable = alwaysReplace = false;
+        }};
 
+        wornBoulderHugeBottom = new OverlayFloor("worn-boulder-huge-bottom"){{
+            variants = 0;
         }};
 
         coreSiphon = new CoreSiphon("core-siphon"){{
@@ -561,6 +575,9 @@ public class FrostBlocks {
         }};
 
         coreBunker = new CoreBunker("core-bunker"){{
+
+            consumeLiquid(Liquids.water, 0.01f);
+            liquidPadding = 5;
 
             float centerOffset = 55/4, floatMirrorSide = 17/4;
 
