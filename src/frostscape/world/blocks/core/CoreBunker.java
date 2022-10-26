@@ -11,6 +11,7 @@ import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
 import frostscape.Frostscape;
+import frostscape.content.Fxf;
 import frostscape.content.Palf;
 import frostscape.graphics.Draww;
 import frostscape.math.Mathh;
@@ -21,6 +22,7 @@ import frostscape.world.light.WorldShape;
 import frostscape.world.light.shape.WorldPoly;
 import frostscape.world.light.shape.WorldRect;
 import mindustry.content.Liquids;
+import mindustry.entities.Effect;
 import mindustry.graphics.Drawf;
 import mindustry.type.Liquid;
 import mindustry.ui.Bar;
@@ -34,6 +36,8 @@ public class CoreBunker extends BuildBeamCore{
 
     public TextureRegion bottomRegion, liquidRegion, shineRegion, topRegion, turbineRegion;
 
+    public Effect steamEffect = Fxf.steamSmoke;
+
     public float[] hitboxEdges;
 
     //Conversion of R value in light to steamgenWarmup
@@ -42,6 +46,8 @@ public class CoreBunker extends BuildBeamCore{
 
     public float liquidPadding = 0.0f;
     public float powerProduction = 5;
+    public float effectChance = 0.65f;
+    public float rotationSpeed = 2.5f;
 
     public CoreBunker(String name) {
         super(name);
@@ -83,6 +89,8 @@ public class CoreBunker extends BuildBeamCore{
             steamgenWarmup = Mathf.clamp(steamgenWarmup - steamgenWarmdown * Time.delta);
             productionEfficiency = Mathf.lerpDelta(Mathf.clamp(productionEfficiency - heatLoss * Time.delta), 1, steamgenWarmup);
             totalProgress += productionEfficiency;
+
+            if(Mathf.randomBoolean(productionEfficiency * effectChance)) steamEffect.at(x, y);
         }
 
         @Override
@@ -145,7 +153,7 @@ public class CoreBunker extends BuildBeamCore{
                 Draw.alpha(1);
                 Draw.color();
                 Draw.rect(region, x, y);
-                Drawf.spinSprite(turbineRegion, x, y, totalProgress);
+                Drawf.spinSprite(turbineRegion, x, y, totalProgress * rotationSpeed);
                 Draw.rect(topRegion, x, y);
                 Draww.drawShine(shineRegion, x, y, 0, 1);
                 drawTeamTop();

@@ -33,6 +33,7 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.gen.EntityMapping;
 import mindustry.gen.Sounds;
 import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Layer;
@@ -60,7 +61,7 @@ public class FrostBlocks {
     public static OverlayFloor wornBoulderHugeBottom;
 
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
-    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone;
+    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall;
     public static StaticTree tephraWall;
     public static SteamVentProp frostVent;
 
@@ -227,6 +228,10 @@ public class FrostBlocks {
         sulphurGraystone = new StaticWall("sulphur-graystone"){{
             variants = 3;
             itemDrop = FrostItems.sulphur;
+        }};
+
+        wornWall = new StaticWall("worn-wall"){{
+            variants = 3;
         }};
 
         tephraWall = new StaticTree("tephra-wall"){{

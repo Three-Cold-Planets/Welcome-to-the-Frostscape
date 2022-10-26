@@ -377,8 +377,8 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     public void draw(boolean debug){
         Draw.mixcol();
         Draw.z(Layer.light + 5);
+        Draw.blend(Blending.additive);
         lights.each(l -> {
-            Draw.blend(Blending.additive);
             out.clear();
             l.getSources(out);
             out.each(source -> {
@@ -402,13 +402,14 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                 }
                 CollisionData data = beams.get(beams.size - 1);
                 if(data.collision) {
-                    Draw.color(toColor(data.after));
+                    Draw.color(toColor(data.before));
                     Fill.circle(data.x, data.y, source.beamWidth);
                 }
             });
             out.clear();
             tmps.clear();
             Draw.color();
+            if(!debug) return;
             Draw.blend();
             l.hitboxes(tmps);
             for (int i = 0; i < tmps.size; i++) {
@@ -422,6 +423,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                     Lines.line(x3, y3, x4, y4);
                 }
             }
+            Draw.blend(Blending.additive);
         });
         Draw.blend();
     }

@@ -16,6 +16,7 @@ import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
@@ -69,6 +70,18 @@ public class Fxf {
         Draw.alpha(smokeFade.apply(e.fin()));
         float size = Mathf.randomSeed(e.id, 2, 4);
         Draw.z(Mathf.lerp(Layers.smokeLow, Layers.smokeHigh, e.fin()));
+
+        Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 360, (x, y) -> {
+            DrawUtils.speckOffset(e.x + x, e.y + y, e.fin(), e.time, DrawUtils.smokeWeight, Tmp.v1);
+            Fill.circle(Tmp.v1.x, Tmp.v1.y, size * e.fout(Interp.pow4));
+        });
+    }),
+
+    steamSmoke = new Effect(85, 100, e -> {
+        Draw.color(Pal.lightishGray);
+        Draw.alpha(smokeFade.apply(e.fin()) * 0.8f);
+        float size = Mathf.randomSeed(e.id, 2, 4);
+        Draw.z(Mathf.lerp(Layer.blockOver, Layer.blockBuilding - 1, e.fin()));
 
         Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 360, (x, y) -> {
             DrawUtils.speckOffset(e.x + x, e.y + y, e.fin(), e.time, DrawUtils.smokeWeight, Tmp.v1);
