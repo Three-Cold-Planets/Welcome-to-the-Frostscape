@@ -61,7 +61,7 @@ public class FrostBlocks {
     public static OverlayFloor wornBoulderHugeBottom;
 
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
-    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall;
+    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall;
     public static StaticTree tephraWall;
     public static SteamVentProp frostVent;
 
@@ -232,6 +232,10 @@ public class FrostBlocks {
 
         wornWall = new StaticWall("worn-wall"){{
             variants = 3;
+        }};
+
+        volcanicDaciteWall = new StaticWall("volcanic-dacite-wall"){{
+            variants = 2;
         }};
 
         tephraWall = new StaticTree("tephra-wall"){{
