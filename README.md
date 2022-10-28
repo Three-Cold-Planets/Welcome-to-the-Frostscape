@@ -15,7 +15,7 @@ Theese goals will be required before the Minimum Viable Product is released.
 
 - [ ] Environmental heat systems
 
-- [ ] Light systems (Working on)
+- [X] Light systems
 
 - [ ] Stealth systems
 
@@ -35,6 +35,8 @@ Theese goals will be required before the Alpha release launches
 Theese goals are VAPID, but expandable goals for future progression and development of the mod
 
 Main Planet implementation
+
+Moon campaigns
 
 Roguelike planetgen
 
