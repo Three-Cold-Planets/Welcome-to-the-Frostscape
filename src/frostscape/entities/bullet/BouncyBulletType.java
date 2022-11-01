@@ -8,6 +8,7 @@ import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.*;
+import frostscape.graphics.Draww;
 import frostscape.math.Math3D;
 import mindustry.Vars;
 import mindustry.content.Fx;
@@ -16,6 +17,7 @@ import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.*;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import java.awt.geom.QuadCurve2D;
@@ -41,6 +43,8 @@ public class BouncyBulletType extends BasicBulletType {
     public boolean collidesBounce;
     public boolean useMinLife;
     public boolean useRotation;
+
+    public boolean spinsprite;
 
     public boolean keepLift, keepHeight;
     public float shadowAlpha;
@@ -68,6 +72,7 @@ public class BouncyBulletType extends BasicBulletType {
         collidesBounce = false;
         useMinLife = true;
         useRotation = false;
+        spinsprite = false;
         keepLift = true;
         keepHeight = true;
         shadowAlpha = 1;
@@ -170,6 +175,7 @@ public class BouncyBulletType extends BasicBulletType {
 
         float x = b.x + Math3D.xCamOffset2D(b.x, h);
         float y = b.y + Math3D.yCamOffset2D(b.y, h);
+        float rotation = b.rotation() + offset;
 
         Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
 
@@ -177,25 +183,26 @@ public class BouncyBulletType extends BasicBulletType {
 
         Draw.color(Pal.shadow, Pal.shadow.a * shadowAlpha);
         Draw.z(Layer.darkness);
-        Draw.rect(shadowRegion, b.x + shadowTX * h, b.y + shadowTY * h,  width, height,b.rotation() - 90);
+        Draw.rect(shadowRegion, b.x + shadowTX * h, b.y + shadowTY * h,  width, height, rotation);
 
-        float[] layers = new float[]{visualHeightMax, visualHeightMin};
+        float[] layers = new float[]{visualHeightMin, visualHeightMax};
 
-        //What this does is make the bullet glow the closer it is to the ground.
+        //What this does is fade the layers in or out.
         for (int i = 0; i < 2; i++) {
             Draw.z(layers[i]);
-            float visibility = h/visualHeightRange;
-            if(i == 1) visibility = 1 - visibility;
+            float visibility = 1;
+            if(i == 1) visibility = h/visualHeightRange;
 
             if(backRegion.found()){
                 Draw.color(backColor);
                 Draw.alpha(visibility);
-                Draw.rect(backRegion, x, y, width, height, b.rotation() + offset);
+                Draw.rect(backRegion, x, y, width, height, rotation);
             }
 
             Draw.color(frontColor);
             Draw.alpha(visibility);
-            Draw.rect(frontRegion, x, y, width, height, b.rotation() + offset);
+            if(spinsprite) Draww.spinSprite(frontRegion, x, y, rotation, width, height);
+            else Draw.rect(frontRegion, x, y, width, height, rotation);
         }
         Draw.reset();
     }
