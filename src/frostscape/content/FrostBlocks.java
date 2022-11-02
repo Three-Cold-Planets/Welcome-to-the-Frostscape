@@ -45,6 +45,7 @@ import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
+import mindustry.world.meta.Env;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
@@ -56,9 +57,7 @@ public class FrostBlocks {
             andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
             graystoneFloor, graystoneSlatedFloor, tephra;
 
-    public static Prop algae, wornBoulderHuge;
-
-    public static OverlayFloor wornBoulderHugeBottom;
+    public static Prop algae, wornBoulderLarge, wornBoulderHuge;
 
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall;
@@ -247,21 +246,22 @@ public class FrostBlocks {
             hasShadow = false;
         }};
 
+        wornBoulderLarge = new Prop("worn-boulder-large"){{
+            variants = 0;
+            size = 1;
+            breakable = alwaysReplace = false;
+        }};
+
         wornBoulderHuge = new Prop("worn-boulder-huge"){{
             variants = 0;
             size = 1;
             breakable = alwaysReplace = false;
         }};
 
-        wornBoulderHugeBottom = new OverlayFloor("worn-boulder-huge-bottom"){{
-            variants = 0;
-        }};
-
         coreSiphon = new CoreSiphon("core-siphon"){{
             requirements(Category.production, ItemStack.with());
             liquidPadding = 6;
             this.size = 7;
-            envEnabled ^= 2;
             liquidCapacity = 1000;
             boost = consumeLiquid(Liquids.water, 0.05F);
             heatColor = new Color(Palf.heat).a(0.35f);
@@ -362,7 +362,7 @@ public class FrostBlocks {
                         speed = 3.5f;
                         lifetime = 200;
                         instantDisappear = true;
-                        for (int i = 0; i < 4; i++) {
+                        for (int i = 0; i < 6; i++) {
                             final float j = i;
                             spawnBullets.add(new BouncyBulletType(3.5f + j/7, 5, "shell"){{
                                     collidesBounce = true;
@@ -383,7 +383,7 @@ public class FrostBlocks {
                                     bounceShake = 0.7f;
                                     bounceEfficiency = 0.85f;
                                     bounceForce = 10;
-                                    maxBounces = 1;
+                                    maxBounces = 0;
                                     keepLift = false;
                                     keepHeight = false;
                                     frontColor = Pal.lightishOrange;

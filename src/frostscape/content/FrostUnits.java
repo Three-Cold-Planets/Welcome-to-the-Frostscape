@@ -88,15 +88,20 @@ public class FrostUnits {
             constructor = UnitEntity::create;
             flying = true;
             speed = 4;
+            health = 900;
+            armor = 6;
             accel = 0.023f;
             drag = 0.005f;
-            rotateSpeed = 3;
+            rotateSpeed = 3.5f;
             hitSize = 15;
+            range = 15;
+            maxRange = 55;
 
             engines.add(new ActivationEngine(0, -56/4, 5.5f, -90, 0.45f, 1, 0.6f, 2.25f));
             abilities.add(
                     new MoveLightningAbility(0, 0, 0, 0, 0.6f, 2.25f, Color.white, name + "-glow"),
-                    new MoveDamageLineAbility(65, 40/4, 0.45f, 20/4, 0.6f, 2.25f, 0, false, true, Fx.generatespark)
+                    new MoveDamageLineAbility(65, 40/4, 0.45f, 20/4, 0.6f, 2.25f, 0, false, true, Fx.generatespark),
+                    new MoveArmorAbility(0.6f, 2.25f, 2.3f, Layer.flyingUnit + 0.1f)
             );
 
             weapons.add(
@@ -106,26 +111,30 @@ public class FrostUnits {
                         rotate = true;
                         top = false;
                         alternate = false;
+                        shootSound = Sounds.minebeam;
                         layerOffset = -1;
                         x = 40 / 4;
                         y = 0;
                         recoil = 4.25f;
                         shootX = 0;
-                        shootY = 40 / 4;
-                        range = 50;
+                        shootY = 24 / 4;
                         shootCone = 15;
                         rotateSpeed = 1.5f;
-                        rotationLimit = 20;
+                        rotationLimit = 25;
                         bullet = new ContinuousFlameBulletType() {
                             {
                                 this.damage = 35;
-                                this.length = 55;
-                                this.knockback = -1.0F;
+                                this.length = 25;
+                                width = 3;
+                                this.knockback = 1.0F;
                                 this.pierceCap = 1;
                                 this.buildingDamageMultiplier = 0.3F;
+                                drawFlare = false;
                                 this.colors = new Color[]{Color.valueOf("eb7abe").a(0.55F), Color.valueOf("e189f5").a(0.7F), Color.valueOf("907ef7").a(0.8F), Color.valueOf("91a4ff"), Color.white};
                             }
                         };
+                        shootStatus = StatusEffects.slow;
+                        shootStatusDuration = 15;
                         parentizeEffects = false;
                         continuous = alwaysContinuous = true;
                     }}
