@@ -28,7 +28,6 @@ public class Math3D {
         return (y - Core.camera.position.y) * height/spacing;
     }
 
-
     public static class HeightHolder{
         public float height;
         public float lift;

@@ -9,12 +9,14 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.*;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Tmp;
 import frostscape.entities.bullet.BouncyBulletType;
-import frostscape.entities.bullet.CanisterBulletType;
-import frostscape.math.Math3D;
 import frostscape.util.DrawUtils;
+import frostscape.world.blocks.core.CoreBunker;
+import frostscape.world.blocks.drawers.ReflectorDrawer;
+import frostscape.world.blocks.environment.ParticleFloor;
+import frostscape.world.blocks.light.ReflectiveWall;
+import frostscape.world.blocks.light.SolarReflector;
 import frostscape.world.blocks.core.BuildBeamCore;
 import frostscape.world.blocks.core.FrostscapeCore;
 import frostscape.world.blocks.defense.MinRangeTurret;
@@ -23,19 +25,23 @@ import frostscape.world.blocks.drawers.DrawUpgradePart;
 import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
+import frostscape.world.light.LightBeams;
 import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
-import mindustry.gen.Bullet;
+import mindustry.gen.EntityMapping;
 import mindustry.gen.Sounds;
+import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
@@ -45,21 +51,88 @@ import static arc.math.Angles.randLenVectors;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
-    public static Floor frostStone, frostSnow,
-            andesiteFloor, volcanicAndesiteFloor, sulphanatedAndesite,
-            tephra;
+    public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
+            frostStone, frostSnow,
+            andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
+            graystoneFloor, graystoneSlatedFloor, tephra;
+
+    public static Prop algae, wornBoulderHuge;
+
+    public static OverlayFloor wornBoulderHugeBottom;
+
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
-    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite;
+    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall;
     public static StaticTree tephraWall;
     public static SteamVentProp frostVent;
 
     public static CoreSiphon coreSiphon;
     public static ItemTurret pyroclast;
-    public static FrostscapeCore coreBunker;
-
+    public static CoreBunker coreBunker;
     public static ThermalMine thermalLandmine;
 
+    public static SolarReflector solarReflector;
+
+    public static ReflectiveWall reflectiveWall;
+
     public static void load(){
+
+        sulphuricWater = new ParticleFloor("sulphuric-water"){{
+            isLiquid = true;
+            liquidDrop = Liquids.water;
+            variants = 4;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 120.0F;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9F;
+            supportsOverlay = true;
+            speedMultiplier = 0.8f;
+        }};
+
+        deepSulphuricWater = new ParticleFloor("deep-sulphuric-water"){{
+            isLiquid = true;
+            liquidDrop = Liquids.water;
+            variants = 4;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 120.0F;
+            drownTime = 200.0F;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9F;
+            supportsOverlay = true;
+            speedMultiplier = 0.6f;
+        }};
+
+        sulphuricAndesiteWater = new ParticleFloor("sulphuric-andesite-water"){{
+            isLiquid = true;
+            liquidDrop = Liquids.water;
+            variants = 3;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 120.0F;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9F;
+            supportsOverlay = true;
+            speedMultiplier = 0.92f;
+        }};
+
+        sulphuricGraystoneWater = new ParticleFloor("sulphuric-graystone-water"){{
+            isLiquid = true;
+            liquidDrop = Liquids.water;
+            variants = 3;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 120.0F;
+            cacheLayer = CacheLayer.water;
+            albedo = 0.9F;
+            supportsOverlay = true;
+            speedMultiplier = 0.92f;
+        }};
+
         frostStone = new Floor("frost-stone"){{
             variants = 4;
         }};
@@ -100,8 +173,21 @@ public class FrostBlocks {
             variants = 3;
         }};
 
+        volcanicPebbledAndesiteFloor = new Floor("volcanic-pebbled-andesite-floor"){{
+            variants = 4;
+            blendGroup = volcanicAndesiteFloor;
+        }};
+
         sulphanatedAndesite = new Floor("sulphanated-andesite-floor"){{
             variants = 3;
+        }};
+
+        graystoneFloor = new Floor("graystone-floor"){{
+            variants = 3;
+        }};
+        
+        graystoneSlatedFloor = new Floor("graystone-slated-floor"){{
+            variants = 8;
         }};
 
         tephra = new Floor("tephra"){{
@@ -135,8 +221,40 @@ public class FrostBlocks {
             itemDrop = FrostItems.magnetite;
         }};
 
+        grayWall = new StaticWall("graystone-wall"){{
+            variants = 4;
+        }};
+
+        sulphurGraystone = new StaticWall("sulphur-graystone"){{
+            variants = 3;
+            itemDrop = FrostItems.sulphur;
+        }};
+
+        wornWall = new StaticWall("worn-wall"){{
+            variants = 3;
+        }};
+
+        volcanicDaciteWall = new StaticWall("volcanic-dacite-wall"){{
+            variants = 2;
+        }};
+
         tephraWall = new StaticTree("tephra-wall"){{
             variants = 2;
+        }};
+
+        algae = new WobbleProp("algae"){{
+            variants = 3;
+            hasShadow = false;
+        }};
+
+        wornBoulderHuge = new Prop("worn-boulder-huge"){{
+            variants = 0;
+            size = 1;
+            breakable = alwaysReplace = false;
+        }};
+
+        wornBoulderHugeBottom = new OverlayFloor("worn-boulder-huge-bottom"){{
+            variants = 0;
         }};
 
         coreSiphon = new CoreSiphon("core-siphon"){{
@@ -237,8 +355,59 @@ public class FrostBlocks {
                 );
             }};
             outlineColor = Pal.darkOutline;
+
             ammo(
                     Items.pyratite,
+                    new BulletType(){{
+                        speed = 3.5f;
+                        lifetime = 200;
+                        instantDisappear = true;
+                        for (int i = 0; i < 4; i++) {
+                            final float j = i;
+                            spawnBullets.add(new BouncyBulletType(3.5f + j/7, 5, "shell"){{
+                                    collidesBounce = true;
+                                    pierceBuilding = false;
+                                    lifetime = 200;
+                                    drag = 0.006f;
+                                    minLife = 55f;
+                                    hitEffect = Fx.blastExplosion;
+                                    despawnEffect = Fx.blastExplosion;
+                                    width = 6;
+                                    height = 6;
+                                    shrinkX = 0.9f;
+                                    shrinkY = 0.9f;
+                                    status = FrostStatusEffects.napalm;
+                                    statusDuration = 12f * 60f;
+                                    gravity = 0.00216f;
+                                    startingLift = 0.066f + j/100;
+                                    bounceShake = 0.7f;
+                                    bounceEfficiency = 0.85f;
+                                    bounceForce = 10;
+                                    maxBounces = 1;
+                                    keepLift = false;
+                                    keepHeight = false;
+                                    frontColor = Pal.lightishOrange;
+                                    backColor = Pal.lightOrange;
+                                    hitShake = 3.2f;
+                                    bounceEffect = Fx.explosion;
+                                    incendAmount = 2;
+                                    incendChance = 1;
+                                    puddleLiquid = Liquids.oil;
+                                    puddleAmount = 25;
+                                    puddles = 1;
+                                    splashDamage = 15;
+                                    splashDamageRadius = 16;
+                                    knockback = 1;
+                                    trailEffect = Fxf.emberTrail;
+                                    trailChance = 0.65f;
+                                    fragBullets = 3;
+                                    fragBullet = FrostBullets.pyraGel.fragBullet;
+                                    hitSound = Sounds.explosion;
+                                }}
+                            );
+                        }
+                    }},
+                    Items.blastCompound,
                     new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
                         lifetime = 100;
                         drag = 0.016f;
@@ -349,14 +518,7 @@ public class FrostBlocks {
                             splashDamage = 15;
                             splashDamageRadius = 16;
                             knockback = 1;
-                            trailEffect = new Effect(40f, e -> {
-                                color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
-                                float height = (float) e.data;
-                                DrawUtils.speckOffset(e.x, e.y, height, e.fin() * 40, DrawUtils.smokeWeight, Tmp.v1);
-                                randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
-                                    Fill.circle(Tmp.v1.x + x, Tmp.v1.y + y, .2f + e.fout() * 1.2f);
-                                });
-                            });
+                            trailEffect = Fxf.emberTrail;
                             trailChance = 0.65f;
                             fragBullets = 3;
                             fragBullet = FrostBullets.pyraGel.fragBullet;
@@ -421,7 +583,25 @@ public class FrostBlocks {
             });
         }};
 
-        coreBunker = new BuildBeamCore("core-bunker"){{
+        coreBunker = new CoreBunker("core-bunker"){{
+
+            consumeLiquid(Liquids.water, 0.01f);
+            liquidPadding = 5;
+
+            float centerOffset = 55/4, floatMirrorSide = 17/4;
+
+            hitboxEdges = new float[]{
+                    -floatMirrorSide, centerOffset,
+                    floatMirrorSide, centerOffset,
+                    centerOffset, floatMirrorSide,
+                    centerOffset, -floatMirrorSide,
+                    floatMirrorSide, -centerOffset,
+                    -floatMirrorSide, -centerOffset,
+                    -centerOffset, -floatMirrorSide,
+                    -centerOffset, floatMirrorSide
+            };
+
+
             requirements(Category.effect, ItemStack.empty);
             size = 5;
             mountPoses = new Seq<>();
@@ -461,6 +641,7 @@ public class FrostBlocks {
             );
             defaultEntry = units.get(0);
         }};
+
         thermalLandmine = new ThermalMine("thermal-landmine"){{
             requirements(Category.effect, ItemStack.with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
             health = 55;
@@ -528,6 +709,26 @@ public class FrostBlocks {
                             FrostUpgrades.improvedPayload
                     )
             );
+        }};
+
+        solarReflector = new SolarReflector("solar-reflector"){{
+            requirements(Category.effect, ItemStack.with());
+            data = new LightBeams.ColorData(2.4f, 2f, 1.6f);
+            drawer = new DrawMulti(
+                    new DrawUpgradePart(
+                            name + "-base0",
+                            new String[]{
+                                    name + "-base0",
+                                    name + "-base1"
+                            },
+                            FrostUpgrades.improvedBase
+                    ),
+                    new ReflectorDrawer(name, Layer.blockBuilding,  Layers.light + 0.1f)
+            );
+        }};
+
+        reflectiveWall = new ReflectiveWall("reflective-wall"){{
+            requirements(Category.effect, ItemStack.with());
         }};
     }
 }

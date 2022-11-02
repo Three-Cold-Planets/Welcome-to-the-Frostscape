@@ -63,8 +63,6 @@ public class CrackedBlock extends Floor {
 
     //Think of it like a shader for effect delay
     public float lava(int x, int y){
-        return
-                Mathf.cos(x + y + Time.time/maxBlinkTime)
-                ;
+        return Mathf.cos(x + y + Time.time/maxBlinkTime);
     }
 }

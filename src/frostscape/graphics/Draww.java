@@ -6,6 +6,7 @@ import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.util.Tmp;
+import mindustry.Vars;
 
 public class Draww {
     public static Vec2 tv1 = new Vec2();
@@ -24,4 +25,23 @@ public class Draww {
         Draw.rect(region, x + tv1.x, y + tv1.y, region.width/4, remainder/4, drawRotation + angleToEnd);
     }
 
+    public static void drawShine(TextureRegion region, float x, float y, float rotation, float alpha){
+        if(!Vars.state.rules.lighting){
+            Draw.alpha(alpha);
+            Draw.rect(region, x, y, rotation);
+            return;
+        }
+        Draw.alpha((1 - Vars.state.rules.ambientLight.a) * alpha);
+        Draw.rect(region, x, y, rotation);
+        Draw.alpha(1);
+    }
+
+    public static void spinSprite(TextureRegion region, float x, float y, float r, float w, float h) {
+        float a = Draw.getColor().a;
+        r = Mathf.mod(r, 90.0F);
+        Draw.rect(region, x, y, w, h, r);
+        Draw.alpha(r / 90.0F * a);
+        Draw.rect(region, x, y, w, h, r - 90.0F);
+        Draw.alpha(a);
+    }
 }

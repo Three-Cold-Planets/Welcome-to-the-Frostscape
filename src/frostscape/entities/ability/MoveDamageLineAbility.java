@@ -28,6 +28,8 @@ public class MoveDamageLineAbility extends Ability {
     public float x = 0f;
     /** Whether the spawn side alternates */
     public boolean alternate = false;
+    /** Whether ground/air are affected units */
+    public boolean hitGround, hitAir;
     /** Bullet angle parameters */
     public float angleOffset = 0f;
     /** Effect spawned upon bullet creation **/
@@ -37,7 +39,7 @@ public class MoveDamageLineAbility extends Ability {
 
     MoveDamageLineAbility(){}
 
-    public MoveDamageLineAbility(float damage, int length, float chance, float y, float minSpeed, float maxSpeed,  float angleOffset, Effect effect){
+    public MoveDamageLineAbility(float damage, int length, float chance, float y, float minSpeed, float maxSpeed,  float angleOffset, boolean hitGround, boolean hitAir, Effect effect){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
@@ -45,6 +47,8 @@ public class MoveDamageLineAbility extends Ability {
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.angleOffset = angleOffset;
+        this.hitGround = hitGround;
+        this.hitAir = hitAir;
         this.effect = effect;
     }
 
@@ -57,6 +61,8 @@ public class MoveDamageLineAbility extends Ability {
             if(length > 0){
                 placeholder1.damage = damage;
                 placeholder1.length = length;
+                placeholder1.collidesGround = hitGround;
+                placeholder1.collidesAir = hitAir;
                 placeholder1.create(unit, x, y, unit.rotation + angleOffset);
                 effect.at(x, y, unit.rotation + angleOffset);
             }

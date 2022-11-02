@@ -12,6 +12,8 @@ import mindustry.gen.Building;
 import mindustry.gen.Statusc;
 
 public abstract class FrostscapeBuilding extends Building implements UpgradeableBuilding {
+
+    public UpgradeModule upgrades = new UpgradeModule();
     public float
             damageMultiplier = 1,
             healthMultiplier = 1,
@@ -44,8 +46,6 @@ public abstract class FrostscapeBuilding extends Building implements Upgradeable
         super.heal(amount/healthMultiplier);
     }
 
-    public UpgradeModule upgrades = new UpgradeModule();
-
     @Override
     public void writeBase(Writes write) {
         super.writeBase(write);
@@ -56,8 +56,8 @@ public abstract class FrostscapeBuilding extends Building implements Upgradeable
     public void readBase(Reads read) {
         super.readBase(read);
         upgrades.read(read);
-    }
 
+    }
     @Override
     public UpgradeModule upgrades() {
         return upgrades;

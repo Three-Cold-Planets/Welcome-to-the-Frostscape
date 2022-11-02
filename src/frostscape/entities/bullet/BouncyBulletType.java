@@ -8,16 +8,21 @@ import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.*;
+import frostscape.graphics.Draww;
 import frostscape.math.Math3D;
 import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.entities.*;
 import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.*;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import java.awt.geom.QuadCurve2D;
+import java.util.Iterator;
+
 import frostscape.math.Math3D.*;
 
 //how many of these am I going to make I don't damm know
@@ -39,6 +44,8 @@ public class BouncyBulletType extends BasicBulletType {
     public boolean useMinLife;
     public boolean useRotation;
 
+    public boolean spinsprite;
+
     public boolean keepLift, keepHeight;
     public float shadowAlpha;
     public float bounceEffectScale;
@@ -48,7 +55,6 @@ public class BouncyBulletType extends BasicBulletType {
     public TextureRegion shadowRegion;
 
     public float minLife;
-
     public float visualHeightRange;
     public BouncyBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
@@ -66,6 +72,7 @@ public class BouncyBulletType extends BasicBulletType {
         collidesBounce = false;
         useMinLife = true;
         useRotation = false;
+        spinsprite = false;
         keepLift = true;
         keepHeight = true;
         shadowAlpha = 1;
@@ -75,6 +82,8 @@ public class BouncyBulletType extends BasicBulletType {
         bounceEffect = Fx.unitLandSmall;
         trailEffect = Fx.artilleryTrail;
         collides = false;
+        hittable = false;
+        absorbable = false;
         pierceBuilding = true;
         minLife = 0;
     }
@@ -103,7 +112,26 @@ public class BouncyBulletType extends BasicBulletType {
 
     @Override
     public void init(Bullet b) {
-        super.init(b);
+        if (this.killShooter) {
+            Entityc var3 = b.owner();
+            if (var3 instanceof Healthc) {
+                Healthc h = (Healthc)var3;
+                h.kill();
+            }
+        }
+
+        if (this.instantDisappear) {
+            b.time = this.lifetime + 1.0F;
+        }
+
+        if (this.spawnBullets.size > 0) {
+            Iterator ittr = this.spawnBullets.iterator();
+
+            while(ittr.hasNext()) {
+                BulletType bullet = (BulletType)ittr.next();
+                handleData(b, bullet.create(b, b.x, b.y, b.rotation()));
+            }
+        }
         b.data = new HeightHolder(startingHeight, startingLift);
     }
 
@@ -147,6 +175,7 @@ public class BouncyBulletType extends BasicBulletType {
 
         float x = b.x + Math3D.xCamOffset2D(b.x, h);
         float y = b.y + Math3D.yCamOffset2D(b.y, h);
+        float rotation = b.rotation() + offset;
 
         Color mix = Tmp.c1.set(mixColorFrom).lerp(mixColorTo, b.fin());
 
@@ -154,45 +183,37 @@ public class BouncyBulletType extends BasicBulletType {
 
         Draw.color(Pal.shadow, Pal.shadow.a * shadowAlpha);
         Draw.z(Layer.darkness);
-        Draw.rect(shadowRegion, b.x + shadowTX * h, b.y + shadowTY * h,  width, height,b.rotation() - 90);
+        Draw.rect(shadowRegion, b.x + shadowTX * h, b.y + shadowTY * h,  width, height, rotation);
 
-        float[] layers = new float[]{visualHeightMax, visualHeightMin};
+        float[] layers = new float[]{visualHeightMin, visualHeightMax};
 
-        //What this does is make the bullet glow the closer it is to the ground.
+        //What this does is fade the layers in or out.
         for (int i = 0; i < 2; i++) {
             Draw.z(layers[i]);
-            float visibility = h/visualHeightRange;
-            if(i == 1) visibility = 1 - visibility;
+            float visibility = 1;
+            if(i == 1) visibility = h/visualHeightRange;
 
             if(backRegion.found()){
                 Draw.color(backColor);
                 Draw.alpha(visibility);
-                Draw.rect(backRegion, x, y, width, height, b.rotation() + offset);
+                Draw.rect(backRegion, x, y, width, height, rotation);
             }
 
             Draw.color(frontColor);
             Draw.alpha(visibility);
-            Draw.rect(frontRegion, x, y, width, height, b.rotation() + offset);
+            if(spinsprite) Draww.spinSprite(frontRegion, x, y, rotation, width, height);
+            else Draw.rect(frontRegion, x, y, width, height, rotation);
         }
         Draw.reset();
     }
 
     @Override
     public void createFrags(Bullet b, float x, float y) {
-        HeightHolder h = BouncyBulletType.getHolder(b);
         if(fragBullet != null){
             for(int i = 0; i < fragBullets; i++){
                 float len = Mathf.random(1f, 7f);
                 float a = b.rotation() + Mathf.range(fragRandomSpread / 2) + fragAngle + ((i - fragBullets/2) * fragSpread);
-                Bullet bullet = fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax));
-                if(fragBullet instanceof BouncyBulletType){
-                    //Bouncy!
-                    BouncyBulletType bouncy = ((BouncyBulletType) fragBullet);
-                    float height = bouncy.keepHeight ? h.height : bouncy.startingHeight;
-                    float lift = bouncy.keepLift ? h.lift : bouncy.startingLift;
-                    bullet.data = new HeightHolder(height, lift);
-                }
-                else bullet.data = new HeightHolder(h.height, h.lift);
+                handleData(b, fragBullet.create(b, x + Angles.trnsx(a, len), y + Angles.trnsy(a, len), a, Mathf.random(fragVelocityMin, fragVelocityMax), Mathf.random(fragLifeMin, fragLifeMax)));
             }
         }
     }
@@ -245,6 +266,17 @@ public class BouncyBulletType extends BasicBulletType {
         super.createSplashDamage(b, x, y);
     }
 
+    public void handleData(Bullet b, Bullet bullet){
+        HeightHolder h = BouncyBulletType.getHolder(b);
+        if(bullet.type instanceof BouncyBulletType){
+            //Bouncy!
+            BouncyBulletType bouncy = ((BouncyBulletType) fragBullet);
+            float height = bouncy.keepHeight ? h.height : bouncy.startingHeight;
+            float lift = bouncy.keepLift ? h.lift : bouncy.startingLift;
+            bullet.data = new HeightHolder(height, lift);
+        }
+        else b.data = new HeightHolder(h.height, h.lift);
+    }
     public void bounce(Bullet b, HeightHolder holder){
         bounceEffect.at(b.x, b.y, useRotation ? b.rotation() : bounceEffectScale, Vars.world.floorWorld(b.x, b.y).mapColor);
 

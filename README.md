@@ -1,6 +1,9 @@
 ## Overveiw
 Welcome to the Frostscape is an indev v7 campaign-based mod which focuses on unit control, stealth and various new systems. There are multiple ways to play, being assault, defense and stealth. The mod takes place on three planets, two of them being introductory. The mod is being developed by [@Sh1penfire](https://github.com/Sh1penfire) in [Mod Centre](https://discord.gg/XrFhAZys7T). It is currently in it's wip stage and a MVP (Minimum Viable Product) is being developed.
 
+## What is this place?
+Welcome to the amazing world of the light fork! This branch is mainly for testing light-related features for Welcome to the Frostscape, and will likely have some exclusive epxeremental content from time to time.
+
 ## Current Goal
 Currently the next milestone in development that im aiming to hit is finishing the MVP. I don't have an estamated time of completion for it, but join the [discord server](https://discord.gg/XrFhAZys7T), or check the [trello](https://trello.com/b/2g9oENth/hollow-frostscape) to keep up with development!
 
