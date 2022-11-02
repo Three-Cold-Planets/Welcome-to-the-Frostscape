@@ -78,7 +78,6 @@ public class BuildBeamCore extends FrostscapeCore{
             Draw.draw(Layer.blockBuilding, () -> {
                 Draw.color(Pal.accent, warmup);
 
-                drawTeam();
                 Shaders.blockbuild.region = entry.type.fullIcon;
                 Shaders.blockbuild.time = Time.time;
                 Shaders.blockbuild.progress = Mathf.clamp(progressf() + 0.05f);

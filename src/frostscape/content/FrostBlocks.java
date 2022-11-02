@@ -45,19 +45,23 @@ import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
-import mindustry.world.meta.Env;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
+    public static String
+        baseRock = NAME + "-base-rock-0",
+        baseReflector = NAME + "-base-reflector-0";
     public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
             frostStone, frostSnow,
             andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
             graystoneFloor, graystoneSlatedFloor, tephra;
 
-    public static Prop algae, wornBoulderLarge, wornBoulderHuge;
+    public static Prop algae, wornBoulderHuge;
+
+    public static OverlayFloor wornBoulderHugeBottom;
 
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall;
@@ -246,22 +250,21 @@ public class FrostBlocks {
             hasShadow = false;
         }};
 
-        wornBoulderLarge = new Prop("worn-boulder-large"){{
-            variants = 0;
-            size = 1;
-            breakable = alwaysReplace = false;
-        }};
-
         wornBoulderHuge = new Prop("worn-boulder-huge"){{
             variants = 0;
             size = 1;
             breakable = alwaysReplace = false;
         }};
 
+        wornBoulderHugeBottom = new OverlayFloor("worn-boulder-huge-bottom"){{
+            variants = 0;
+        }};
+
         coreSiphon = new CoreSiphon("core-siphon"){{
             requirements(Category.production, ItemStack.with());
             liquidPadding = 6;
             this.size = 7;
+            envEnabled ^= 2;
             liquidCapacity = 1000;
             boost = consumeLiquid(Liquids.water, 0.05F);
             heatColor = new Color(Palf.heat).a(0.35f);
@@ -362,7 +365,7 @@ public class FrostBlocks {
                         speed = 3.5f;
                         lifetime = 200;
                         instantDisappear = true;
-                        for (int i = 0; i < 6; i++) {
+                        for (int i = 0; i < 4; i++) {
                             final float j = i;
                             spawnBullets.add(new BouncyBulletType(3.5f + j/7, 5, "shell"){{
                                     collidesBounce = true;
@@ -383,7 +386,7 @@ public class FrostBlocks {
                                     bounceShake = 0.7f;
                                     bounceEfficiency = 0.85f;
                                     bounceForce = 10;
-                                    maxBounces = 0;
+                                    maxBounces = 1;
                                     keepLift = false;
                                     keepHeight = false;
                                     frontColor = Pal.lightishOrange;
@@ -409,6 +412,7 @@ public class FrostBlocks {
                     }},
                     Items.blastCompound,
                     new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
+                        frontColor = backColor = Color.white;
                         lifetime = 100;
                         drag = 0.016f;
                         minLife = 55f;
@@ -484,6 +488,7 @@ public class FrostBlocks {
                         });
                         trailChance = 0.65f;
                         trailRotation = true;
+                        spinsprite = true;
                         fragBullet = new BouncyBulletType(3.5f, 5, "shell"){{
                             collidesBounce = true;
                             pierceBuilding = false;
@@ -716,14 +721,24 @@ public class FrostBlocks {
             data = new LightBeams.ColorData(2.4f, 2f, 1.6f);
             drawer = new DrawMulti(
                     new DrawUpgradePart(
-                            name + "-base0",
+                            baseRock,
                             new String[]{
-                                    name + "-base0",
-                                    name + "-base1"
+                                    baseReflector
                             },
                             FrostUpgrades.improvedBase
                     ),
                     new ReflectorDrawer(name, Layer.blockBuilding,  Layers.light + 0.1f)
+            );
+
+            entries.add(
+                    new UpgradeEntry(FrostUpgrades.improvedBase){{
+                        healthMultiplier = new float[]{
+                                3.5f
+                        };
+                        costs = new ItemStack[][]{
+                                ItemStack.with(FrostItems.ferricPanels, 5)
+                        };
+                    }}
             );
         }};
 

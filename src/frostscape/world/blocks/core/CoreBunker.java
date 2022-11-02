@@ -158,6 +158,7 @@ public class CoreBunker extends BuildBeamCore{
                 Draww.drawShine(shineRegion, x, y, 0, 1);
                 drawTeamTop();
                 drawMounts();
+                drawTeam();
             }
         }
     }

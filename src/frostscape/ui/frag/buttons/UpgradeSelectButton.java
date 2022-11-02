@@ -21,6 +21,7 @@ import frostscape.ui.frag.BlockSelectFrag;
 import frostscape.world.UpgradesType;
 import frostscape.world.upgrades.UpgradeEntry;
 import frostscape.world.upgrades.UpgradeState;
+import mindustry.content.Fx;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
@@ -226,7 +227,7 @@ public class UpgradeSelectButton extends BlockSelectFrag.SelectButton {
                     UpgradeState state = build.upgrades().getState(entry.upgrade);
                     if(state.installing || state.level != currentLevel - 1) return;
                     build.upgrades().startUpgrade(entry);
-                    Log.info(entry);
+                    Fx.coreBuildBlock.at(build.self().x, build.self().y, build.self().block.size);
                     isValid = true;
                 });
             });

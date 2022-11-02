@@ -5,7 +5,9 @@ import arc.graphics.Blending;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.struct.Seq;
+import arc.util.Eachable;
 import frostscape.world.blocks.light.SolarReflector.SolarReflectorBuild;
+import mindustry.entities.units.BuildPlan;
 import mindustry.gen.Building;
 import mindustry.world.Block;
 import mindustry.world.draw.DrawBlock;
@@ -52,5 +54,10 @@ public class ReflectorDrawer extends DrawBlock {
         Draw.blend(Blending.additive);
         Draw.rect(this.shine, build.x, build.y, reflector.rotation);
         Draw.blend();
+    }
+
+    @Override
+    public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list) {
+        Draw.rect(reflector, plan.drawx(), plan.drawy(), (plan.rotation) * 90);
     }
 }

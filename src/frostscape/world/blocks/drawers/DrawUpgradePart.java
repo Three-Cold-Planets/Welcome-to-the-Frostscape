@@ -40,7 +40,6 @@ public class DrawUpgradePart extends UpgradeDrawer{
     }
 
     public TextureRegion getRegion(Building build){
-        Seq<Upgrade> upgrades = expectUpgradeable(build.block).upgrades();
         UpgradeableBuilding building = (UpgradeableBuilding) build;
         UpgradeState state = building.upgrades().states.find(s -> s.upgrade == upgrade);
         if(state == null || !state.installed) return null;
@@ -48,7 +47,7 @@ public class DrawUpgradePart extends UpgradeDrawer{
     }
 
     public void drawPlan(Block block, BuildPlan plan, Eachable<BuildPlan> list){
-
+        Draw.rect(loadedBase, plan.drawx(), plan.drawy(), (plan.rotation) * 90);
     }
 
     public void load(Block block){
@@ -59,7 +58,7 @@ public class DrawUpgradePart extends UpgradeDrawer{
     }
 
     public TextureRegion[] icons(Block block){
-        return new TextureRegion[]{block.region};
+        return new TextureRegion[]{loadedBase};
     }
 
     public static TextureRegion[] genRegionsList(int size, TextureRegion base, int[] indexes, TextureRegion[] values){
