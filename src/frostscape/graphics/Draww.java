@@ -35,4 +35,13 @@ public class Draww {
         Draw.rect(region, x, y, rotation);
         Draw.alpha(1);
     }
+
+    public static void spinSprite(TextureRegion region, float x, float y, float r, float w, float h) {
+        float a = Draw.getColor().a;
+        r = Mathf.mod(r, 90.0F);
+        Draw.rect(region, x, y, w, h, r);
+        Draw.alpha(r / 90.0F * a);
+        Draw.rect(region, x, y, w, h, r - 90.0F);
+        Draw.alpha(a);
+    }
 }
