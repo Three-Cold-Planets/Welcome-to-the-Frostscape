@@ -18,7 +18,7 @@ Theese goals will be required before the Minimum Viable Product is released.
 
 - [ ] Environmental heat systems
 
-- [ ] Light systems (Working on)
+- [X] Light systems (Working on)
 
 - [ ] Stealth systems
 
