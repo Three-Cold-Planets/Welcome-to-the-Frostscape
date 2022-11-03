@@ -69,13 +69,13 @@ public class Frostscape extends Mod{
                     loadSettings();
                     Family.all.each(Family::load);
                     VERSION_NAME = Vars.mods.getMod(NAME).meta.version;
-                    LAST_VERSION_NAME = Core.settings.getString(NAME + "-last-version", "0.0");
+                    LAST_VERSION_NAME = Core.settings.getString(NAME + "-last-version", "#NOT FOUND");
                     if(!LAST_VERSION_NAME.equals(VERSION_NAME)) Time.runTask(10f, () -> {
                         BaseDialog dialog = new BaseDialog("frog");
                         dialog.cont.image(Icon.warning).pad(20f).row();
                         dialog.cont.add("[red]WARNING").padTop(50).row();
-                        dialog.cont.add("This mod is still wip, proceed at your own risk").row();
-                        dialog.cont.add("[lightgray]Your last run version was [red]" + LAST_VERSION_NAME + "[],\n the mod has been updated to it's [cyan]" + VERSION_NAME).row();
+                        dialog.cont.add("Welcome to the Frostscape is still wip, proceed at your own risk").row();
+                        dialog.cont.add("[lightgray]Your last run version was [red]#" + LAST_VERSION_NAME + "[],\n the mod has been updated to it's [cyan]#" + VERSION_NAME).row();
                         //mod sprites are prefixed with the mod name (this mod is called 'example-java-mod' in its config)
                         dialog.cont.button("Understood, pushing on!", dialog::hide).size(300f, 50f);
                         dialog.show();
