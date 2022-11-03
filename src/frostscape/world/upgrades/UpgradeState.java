@@ -74,6 +74,8 @@ public class UpgradeState {
         write.str(upgrade.name);
         write.i(level);
         write.f(progress);
+        write.bool(installed);
+        write.bool(installing);
         ItemIO.writeStacks(write, cost);
         ItemIO.writeStacks(write, items);
     }
@@ -83,6 +85,8 @@ public class UpgradeState {
         upgrade = upgrades.find(u -> u.name.equals(name));
         level = read.i();
         progress = read.f();
+        installed = read.bool();
+        installing = read.bool();
         cost = ItemIO.readStacks(read);
         items = ItemIO.readStacks(read);
         return this;
