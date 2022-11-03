@@ -14,10 +14,10 @@ main: "frostscape.Frostscape"
 description: "An experimental modification created to test v7's new API. Will *not* be worked on consistently due to life."
 
 #the mod version
-version: 1.0
+version: a-1.0.1
 
 #the minimum game build required to run this mod
-minGameVersion: 137
+minGameVersion: 136
 
 #this is a java mod
 java: true
