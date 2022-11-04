@@ -10,8 +10,11 @@ import mindustry.editor.MapObjectivesDialog;
 
 import static frostscape.Frostscape.NAME;
 
+@Deprecated
 public class ContentInfoAdditions {
     public static void load(){
+        //TODO: Remove this class's implementation
+        if(true) return;
         Vars.ui.content.shown(() -> {
             Table info = (((Table) ((ScrollPane) (Vars.ui.content.cont.getChildren().get(0))).getWidget()).getCells().get(0).getTable());
             StringBuilder text = ((Label) ((Table) (info.getChildren().get(0))).getChildren().get(1)).getText();
