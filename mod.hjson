@@ -14,7 +14,7 @@ main: "frostscape.Frostscape"
 description: "An experimental modification created to test v7's new API. Will *not* be worked on consistently due to life."
 
 #the mod version
-version: alpha166
+version: v1.0.2-alpha
 
 #the minimum game build required to run this mod
 minGameVersion: 136
