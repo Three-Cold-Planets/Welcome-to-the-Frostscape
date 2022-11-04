@@ -412,6 +412,7 @@ public class FrostBlocks {
                     }},
                     Items.blastCompound,
                     new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
+                        frontColor = backColor = Color.white;
                         lifetime = 100;
                         drag = 0.016f;
                         minLife = 55f;

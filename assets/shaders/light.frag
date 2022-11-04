@@ -8,7 +8,6 @@ varying vec2 v_texCoords;
 //Linier Sampling Algo from https://www.rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
 
 vec4 colorAt(vec2 c){
-    vec2 coords = vec2(c.x * u_resolution.x + u_campos.x, c.y * u_resolution.y + u_campos.y);
     vec4 color = texture2D(u_texture, c);
     return color;
 }
@@ -28,10 +27,14 @@ void main() {
     vec4 color = colorAt(c);
 
     for (int i=1; i<3; i++) {
-        color += colorAt(c + vec2(0.0, offset[i])) * weight[i];
-        color += colorAt(c - vec2(0.0, offset[i])) * weight[i];
+        color += colorAt(c + vec2(offset[i]/u_resolution.x, 0.0)) * weight[i];
+        color += colorAt(c - vec2(offset[i]/u_resolution.x, 0.0)) * weight[i];
+        color += colorAt(c + vec2(0.0, offset[i]/u_resolution.y)) * weight[i];
+        color += colorAt(c - vec2(0.0, offset[i]/u_resolution.y)) * weight[i];
     }
 
     color = color * 2.0;
+
+    if(color.r + color.b + color.g < 0.5) gl_FragColor = vec4(0, 0, 0, 0);
     gl_FragColor = color;
 }

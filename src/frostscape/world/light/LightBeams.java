@@ -432,8 +432,10 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             });
             Draw.reset();
             Draw.alpha(1);
+            Draw.blend(Blending.additive);
             FrostShaders.effectBuffer.end();
             Draw.blit(FrostShaders.effectBuffer, FrostShaders.light);
+            Draw.blend();
         });
     }
 
