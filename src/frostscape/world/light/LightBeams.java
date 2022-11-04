@@ -1,5 +1,6 @@
 package frostscape.world.light;
 
+import arc.Core;
 import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -15,10 +16,12 @@ import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import frostscape.content.Palf;
+import frostscape.graphics.FrostShaders;
 import frostscape.math.Mathh;
 import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.graphics.Layer;
+import mindustry.graphics.Shaders;
 import mindustry.io.SaveFileReader;
 
 import java.io.DataInput;
@@ -376,56 +379,62 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
     public void draw(boolean debug){
         Draw.mixcol();
-        Draw.z(Layer.light + 5);
-        Draw.blend(Blending.additive);
-        lights.each(l -> {
-            out.clear();
-            l.getSources(out);
-            out.each(source -> {
-                if(!source.emitting || source.beam.size == 0) return;
+        Draw.blend();
+        FrostShaders.effectBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        Draw.draw(Layer.light + 5, () -> {
+            FrostShaders.effectBuffer.begin(Color.clear);
+            lights.each(l -> {
+                out.clear();
+                l.getSources(out);
+                out.each(source -> {
+                    if(!source.emitting || source.beam.size == 0) return;
 
-                Seq<CollisionData> beams = source.beam;
-                for (int i = 0; i < beams.size - 1; i++) {
-                    Draw.color();
-                    CollisionData before = beams.get(i), after = beams.get(i + 1);
-                    Color start = toColor(before.after), end = toColor(after.before);
-                    if(debug) Log.info(start.r + ", " + start.g + ", " + start.b);
+                    Seq<CollisionData> beams = source.beam;
+                    for (int i = 0; i < beams.size - 1; i++) {
+                        Draw.color();
+                        CollisionData before = beams.get(i), after = beams.get(i + 1);
+                        Color start = toColor(before.after), end = toColor(after.before);
+                        if(debug) Log.info(start.r + ", " + start.g + ", " + start.b);
 
-                    Tmp.v1.trns(before.rotAfter, source.beamWidth).rotate(90);
-                    float x1 = before.x + Tmp.v1.x, y1 = before.y + Tmp.v1.y, x2 = before.x - Tmp.v1.x, y2 = before.y - Tmp.v1.y;
-                    Tmp.v1.trns(before.rotAfter, source.beamWidth).rotate(90);
-                    float x3 = after.x - Tmp.v1.x, y3 = after.y - Tmp.v1.y, x4 = after.x + Tmp.v1.x, y4 = after.y + Tmp.v1.y;
-                    Fill.quad(x1, y1, start.toFloatBits(), x2, y2, start.toFloatBits(), x3, y3, end.toFloatBits(), x4, y4, end.toFloatBits());
+                        Tmp.v1.trns(before.rotAfter, source.beamWidth).rotate(90);
+                        float x1 = before.x + Tmp.v1.x, y1 = before.y + Tmp.v1.y, x2 = before.x - Tmp.v1.x, y2 = before.y - Tmp.v1.y;
+                        Tmp.v1.trns(before.rotAfter, source.beamWidth).rotate(90);
+                        float x3 = after.x - Tmp.v1.x, y3 = after.y - Tmp.v1.y, x4 = after.x + Tmp.v1.x, y4 = after.y + Tmp.v1.y;
+                        Fill.quad(x1, y1, start.toFloatBits(), x2, y2, start.toFloatBits(), x3, y3, end.toFloatBits(), x4, y4, end.toFloatBits());
 
-                    Draw.color(start);
-                    if(before.collision) Fill.circle(before.x, before.y, source.beamWidth);
-                }
-                CollisionData data = beams.get(beams.size - 1);
-                if(data.collision) {
-                    Draw.color(toColor(data.before));
-                    Fill.circle(data.x, data.y, source.beamWidth);
+                        Draw.color(start);
+                        if(before.collision) Fill.circle(before.x, before.y, source.beamWidth);
+                        //if(debug) Draw.blend(); Draw.color(); Lines.line(before.x, before.y, after.x, after.y);
+                    }
+                    CollisionData data = beams.get(beams.size - 1);
+                    if(data.collision) {
+                        Draw.color(toColor(data.before));
+                        Fill.circle(data.x, data.y, source.beamWidth);
+                    }
+                    //if(debug) Draw.color();Fill.circle(data.x, data.y, 1);
+                });
+                out.clear();
+                tmps.clear();
+                Draw.color();
+                if(!debug) return;
+                l.hitboxes(tmps);
+                for (int i = 0; i < tmps.size; i++) {
+                    WorldShape shape = tmps.get(i);
+                    int size = shape.edges().length;
+                    for (int j = 0; j < shape.edges().length; j += 2) {
+                        float x3 = shape.getX() + shape.edges()[(j) % size];
+                        float y3 = shape.getY() + shape.edges()[(j+1) % size];
+                        float x4 = shape.getX() + shape.edges()[(j+2) % size];
+                        float y4 = shape.getY() + shape.edges()[(j+3) % size];
+                        Lines.line(x3, y3, x4, y4);
+                    }
                 }
             });
-            out.clear();
-            tmps.clear();
-            Draw.color();
-            if(!debug) return;
-            Draw.blend();
-            l.hitboxes(tmps);
-            for (int i = 0; i < tmps.size; i++) {
-                WorldShape shape = tmps.get(i);
-                int size = shape.edges().length;
-                for (int j = 0; j < shape.edges().length; j += 2) {
-                    float x3 = shape.getX() + shape.edges()[(j) % size];
-                    float y3 = shape.getY() + shape.edges()[(j+1) % size];
-                    float x4 = shape.getX() + shape.edges()[(j+2) % size];
-                    float y4 = shape.getY() + shape.edges()[(j+3) % size];
-                    Lines.line(x3, y3, x4, y4);
-                }
-            }
-            Draw.blend(Blending.additive);
+            Draw.reset();
+            Draw.alpha(1);
+            FrostShaders.effectBuffer.end();
+            Draw.blit(FrostShaders.effectBuffer, FrostShaders.light);
         });
-        Draw.blend();
     }
 
     public ColorData applyFalloff(ColorData color, float distance){

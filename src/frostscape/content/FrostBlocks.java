@@ -45,13 +45,14 @@ import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
+import mindustry.world.meta.Env;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
-    public static String
+    public static final String
         baseRock = NAME + "-base-rock-0",
         baseReflector = NAME + "-base-reflector-0";
     public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
@@ -59,9 +60,7 @@ public class FrostBlocks {
             andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
             graystoneFloor, graystoneSlatedFloor, tephra;
 
-    public static Prop algae, wornBoulderHuge;
-
-    public static OverlayFloor wornBoulderHugeBottom;
+    public static Prop algae, wornBoulderLarge, wornBoulderHuge;
 
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall;
@@ -167,7 +166,7 @@ public class FrostBlocks {
             clipSize = 170;
             variants = 1;
         }};
-        
+
         andesiteFloor = new Floor("andesite-floor"){{
             variants = 3;
         }};
@@ -188,7 +187,7 @@ public class FrostBlocks {
         graystoneFloor = new Floor("graystone-floor"){{
             variants = 3;
         }};
-        
+
         graystoneSlatedFloor = new Floor("graystone-slated-floor"){{
             variants = 8;
         }};
@@ -250,21 +249,22 @@ public class FrostBlocks {
             hasShadow = false;
         }};
 
+        wornBoulderLarge = new Prop("worn-boulder-large"){{
+            variants = 0;
+            size = 1;
+            breakable = alwaysReplace = false;
+        }};
+
         wornBoulderHuge = new Prop("worn-boulder-huge"){{
             variants = 0;
             size = 1;
             breakable = alwaysReplace = false;
         }};
 
-        wornBoulderHugeBottom = new OverlayFloor("worn-boulder-huge-bottom"){{
-            variants = 0;
-        }};
-
         coreSiphon = new CoreSiphon("core-siphon"){{
             requirements(Category.production, ItemStack.with());
             liquidPadding = 6;
             this.size = 7;
-            envEnabled ^= 2;
             liquidCapacity = 1000;
             boost = consumeLiquid(Liquids.water, 0.05F);
             heatColor = new Color(Palf.heat).a(0.35f);
@@ -309,44 +309,44 @@ public class FrostBlocks {
                             outlineLayerOffset = -0.00002f;
                         }},
                         new RegionPart("-back"){{
-                             progress = PartProgress.warmup;
-                             mirror = true;
-                             moveRot = -15f;
-                             x = (30 - 6) / 4f;
-                             y = (-35f + 6) / 4f;
-                             moveX = 6/4;
-                             moveY = -6/4;
-                             under = true;
-                             heatColor = Color.clear;
+                            progress = PartProgress.warmup;
+                            mirror = true;
+                            moveRot = -15f;
+                            x = (30 - 6) / 4f;
+                            y = (-35f + 6) / 4f;
+                            moveX = 6/4;
+                            moveY = -6/4;
+                            under = true;
+                            heatColor = Color.clear;
                             children = Seq.with(
-                                     new RegionPart("-back"){
-                                     {
-                                         progress = PartProgress.warmup;
-                                         mirror = true;
-                                         moveRot = 360 -35f;
-                                         x = 0;
-                                         y = 0;
-                                         moveX = 6 / 4;
-                                         moveY = -6 / 4;
-                                         under = true;
-                                         heatColor = Color.clear;
-                                         children = Seq.with(
-                                                 new RegionPart("-fang"){
-                                                     {
-                                                         progress = PartProgress.warmup;
-                                                         mirror = true;
-                                                         moveRot = -15f;
-                                                         x = 0;
-                                                         y = 0;
-                                                         moveX = 4 / 4;
-                                                         moveY = -4 / 4;
-                                                         under = true;
-                                                         heatColor = Color.clear;
-                                                     }}
-                                         );
-                                     }}
-                             );
-                         }},
+                                    new RegionPart("-back"){
+                                        {
+                                            progress = PartProgress.warmup;
+                                            mirror = true;
+                                            moveRot = 360 -35f;
+                                            x = 0;
+                                            y = 0;
+                                            moveX = 6 / 4;
+                                            moveY = -6 / 4;
+                                            under = true;
+                                            heatColor = Color.clear;
+                                            children = Seq.with(
+                                                    new RegionPart("-fang"){
+                                                        {
+                                                            progress = PartProgress.warmup;
+                                                            mirror = true;
+                                                            moveRot = -15f;
+                                                            x = 0;
+                                                            y = 0;
+                                                            moveX = 4 / 4;
+                                                            moveY = -4 / 4;
+                                                            under = true;
+                                                            heatColor = Color.clear;
+                                                        }}
+                                            );
+                                        }}
+                            );
+                        }},
                         new RegionPart("-barrel"){{
                             progress = PartProgress.recoil.curve(Interp.pow2In);
                             moveY = -9;
@@ -365,54 +365,53 @@ public class FrostBlocks {
                         speed = 3.5f;
                         lifetime = 200;
                         instantDisappear = true;
-                        for (int i = 0; i < 4; i++) {
+                        for (int i = 0; i < 6; i++) {
                             final float j = i;
                             spawnBullets.add(new BouncyBulletType(3.5f + j/7, 5, "shell"){{
-                                    collidesBounce = true;
-                                    pierceBuilding = false;
-                                    lifetime = 200;
-                                    drag = 0.006f;
-                                    minLife = 55f;
-                                    hitEffect = Fx.blastExplosion;
-                                    despawnEffect = Fx.blastExplosion;
-                                    width = 6;
-                                    height = 6;
-                                    shrinkX = 0.9f;
-                                    shrinkY = 0.9f;
-                                    status = FrostStatusEffects.napalm;
-                                    statusDuration = 12f * 60f;
-                                    gravity = 0.00216f;
-                                    startingLift = 0.066f + j/100;
-                                    bounceShake = 0.7f;
-                                    bounceEfficiency = 0.85f;
-                                    bounceForce = 10;
-                                    maxBounces = 1;
-                                    keepLift = false;
-                                    keepHeight = false;
-                                    frontColor = Pal.lightishOrange;
-                                    backColor = Pal.lightOrange;
-                                    hitShake = 3.2f;
-                                    bounceEffect = Fx.explosion;
-                                    incendAmount = 2;
-                                    incendChance = 1;
-                                    puddleLiquid = Liquids.oil;
-                                    puddleAmount = 25;
-                                    puddles = 1;
-                                    splashDamage = 15;
-                                    splashDamageRadius = 16;
-                                    knockback = 1;
-                                    trailEffect = Fxf.emberTrail;
-                                    trailChance = 0.65f;
-                                    fragBullets = 3;
-                                    fragBullet = FrostBullets.pyraGel.fragBullet;
-                                    hitSound = Sounds.explosion;
-                                }}
+                                                 collidesBounce = true;
+                                                 pierceBuilding = false;
+                                                 lifetime = 200;
+                                                 drag = 0.006f;
+                                                 minLife = 55f;
+                                                 hitEffect = Fx.blastExplosion;
+                                                 despawnEffect = Fx.blastExplosion;
+                                                 width = 6;
+                                                 height = 6;
+                                                 shrinkX = 0.9f;
+                                                 shrinkY = 0.9f;
+                                                 status = FrostStatusEffects.napalm;
+                                                 statusDuration = 12f * 60f;
+                                                 gravity = 0.00216f;
+                                                 startingLift = 0.066f + j/100;
+                                                 bounceShake = 0.7f;
+                                                 bounceEfficiency = 0.85f;
+                                                 bounceForce = 10;
+                                                 maxBounces = 0;
+                                                 keepLift = false;
+                                                 keepHeight = false;
+                                                 frontColor = Pal.lightishOrange;
+                                                 backColor = Pal.lightOrange;
+                                                 hitShake = 3.2f;
+                                                 bounceEffect = Fx.explosion;
+                                                 incendAmount = 2;
+                                                 incendChance = 1;
+                                                 puddleLiquid = Liquids.oil;
+                                                 puddleAmount = 25;
+                                                 puddles = 1;
+                                                 splashDamage = 15;
+                                                 splashDamageRadius = 16;
+                                                 knockback = 1;
+                                                 trailEffect = Fxf.emberTrail;
+                                                 trailChance = 0.65f;
+                                                 fragBullets = 3;
+                                                 fragBullet = FrostBullets.pyraGel.fragBullet;
+                                                 hitSound = Sounds.explosion;
+                                             }}
                             );
                         }
                     }},
                     Items.blastCompound,
                     new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
-                        frontColor = backColor = Color.white;
                         lifetime = 100;
                         drag = 0.016f;
                         minLife = 55f;
@@ -488,7 +487,6 @@ public class FrostBlocks {
                         });
                         trailChance = 0.65f;
                         trailRotation = true;
-                        spinsprite = true;
                         fragBullet = new BouncyBulletType(3.5f, 5, "shell"){{
                             collidesBounce = true;
                             pierceBuilding = false;
@@ -656,41 +654,41 @@ public class FrostBlocks {
             entries.addAll(
                     new UpgradeEntry(FrostUpgrades.improvedBase){{
                         healthMultiplier = new float[]{
-                            1.1f,
-                            1.5f,
-                            3.5f
+                                1.1f,
+                                1.5f,
+                                3.5f
                         };
                         speedMultiplier = new float[]{
-                            1,
-                            0.85f,
-                            0.65f
+                                1,
+                                0.85f,
+                                0.65f
                         };
                         costs = new ItemStack[][]{
-                            ItemStack.with(Items.graphite, 5, Items.lead, 10),
-                            ItemStack.with(Items.metaglass, 7),
-                            ItemStack.with(Items.titanium, 10, Items.graphite, 15)
+                                ItemStack.with(Items.graphite, 5, Items.lead, 10),
+                                ItemStack.with(Items.metaglass, 7),
+                                ItemStack.with(Items.titanium, 10, Items.graphite, 15)
                         };
                     }},
                     new UpgradeEntry(FrostUpgrades.improvedPayload){{
                         damageMultiplier = new float[]{
-                            1.2f,
-                            1.5f,
-                            1.8f
+                                1.2f,
+                                1.5f,
+                                1.8f
                         };
                         reloadMultiplier = new float[]{
-                            1,
-                            1.3f,
-                            2
+                                1,
+                                1.3f,
+                                2
                         };
                         rangeMultiplier = new float[]{
-                            1.5f,
-                            2.1f,
-                            2.8f
+                                1.5f,
+                                2.1f,
+                                2.8f
                         };
                         costs = new ItemStack[][]{
-                            ItemStack.with(Items.coal, 5),
-                            ItemStack.with(Items.pyratite, 10),
-                            ItemStack.with(Items.coal, 10, Items.pyratite, 25)
+                                ItemStack.with(Items.coal, 5),
+                                ItemStack.with(Items.pyratite, 10),
+                                ItemStack.with(Items.coal, 10, Items.pyratite, 25)
                         };
                     }}
             );

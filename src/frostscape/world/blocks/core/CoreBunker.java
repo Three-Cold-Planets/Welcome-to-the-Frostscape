@@ -125,7 +125,6 @@ public class CoreBunker extends BuildBeamCore{
         @Override
         public LightBeams.CollisionData collision(float x, float y, float rotation, int shape, int side, LightBeams.ColorData color, LightBeams.CollisionData collision) {
             //Fully absorb the effects
-            Log.info(color.r);
             if(!Mathf.zero(color.r))steamgenWarmup = Mathf.clamp(steamgenWarmup + color.r * lightEfficiency);
             collision.after = new LightBeams.ColorData(0, 0, 0);
             return collision;
