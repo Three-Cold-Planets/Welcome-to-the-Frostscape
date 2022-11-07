@@ -123,6 +123,7 @@ public class FrostUnits {
                         rotationLimit = 25;
                         bullet = new ContinuousFlameBulletType() {
                             {
+                                recoil = 0.01f;
                                 this.damage = 35;
                                 this.length = 25;
                                 width = 3;

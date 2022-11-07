@@ -11,6 +11,7 @@ import frostscape.game.ScriptedSectorHandler;
 import frostscape.graphics.FrostShaders;
 import frostscape.mods.Compatibility;
 import frostscape.ui.FrostUI;
+import frostscape.ui.overlay.ScanningOverlay;
 import frostscape.ui.overlay.SelectOverlay;
 import frostscape.util.UIUtils;
 import frostscape.world.environment.FloorDataHandler;
@@ -48,6 +49,7 @@ public class Frostscape extends Mod{
     public static UpgradeHandler upgrades = new UpgradeHandler();
 
     public static SelectOverlay selection = new SelectOverlay();
+    public static ScanningOverlay scan = new ScanningOverlay();
 
     public static LightBeams lights = new LightBeams();
 
@@ -116,6 +118,8 @@ public class Frostscape extends Mod{
 
         Events.run(Trigger.draw, () -> {
             Draw.draw(Layer.overlayUI, selection::drawSelect);
+            Draw.draw(Layer.overlayUI, scan::draw);
+            Draw.draw(Layer.buildBeam, scan::drawScan);
             Draw.draw(Layer.light + 1, lights::draw);
         });
     }

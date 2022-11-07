@@ -58,7 +58,9 @@ public class FrostBlocks {
     public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
             frostStone, frostSnow,
             andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
-            graystoneFloor, graystoneSlatedFloor, tephra;
+            graystoneFloor, graystoneSlatedFloor,
+            volcanicDaciteFloor, roughVolcanicDaciteFloor,
+            tephra;
 
     public static Prop algae, wornBoulderLarge, wornBoulderHuge;
 
@@ -190,6 +192,14 @@ public class FrostBlocks {
 
         graystoneSlatedFloor = new Floor("graystone-slated-floor"){{
             variants = 8;
+        }};
+
+        volcanicDaciteFloor = new Floor("volcanic-dacite-floor"){{
+            variants = 4;
+        }};
+
+        roughVolcanicDaciteFloor = new Floor("rough-volcanic-dacite-floor"){{
+            variants = 4;
         }};
 
         tephra = new Floor("tephra"){{
