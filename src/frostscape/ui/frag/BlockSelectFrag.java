@@ -92,7 +92,7 @@ public class BlockSelectFrag {
         //For whatever higher-being-forsaken reason you remove the exit button I will... release the lions
         if(buttons.size == 0) {
             try {
-                throw new IllegalStateException("Buttons is empty, avoid clearing buttons outside unit tests.");
+                throw new IllegalStateException("Buttons are empty, avoid clearing buttons outside unit tests.\nRELEASE THE LIONS");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

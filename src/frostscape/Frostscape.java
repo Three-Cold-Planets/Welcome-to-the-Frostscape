@@ -111,7 +111,9 @@ public class Frostscape extends Mod{
         });
 
         Events.run(Trigger.update, () -> {
+            if(Vars.state.isMenu()) return;
             lights.updateBeams();
+            scan.update();
             if(!Vars.state.isPlaying()) return;
             selection.update();
         });

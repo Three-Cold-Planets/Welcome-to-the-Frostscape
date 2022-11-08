@@ -4,6 +4,7 @@ import arc.scene.ui.Dialog;
 import arc.util.Reflect;
 import frostscape.ui.dialog.FamilyDescriptionDialog;
 import frostscape.ui.dialog.settings.ControllerSettingDialog;
+import frostscape.ui.frag.BlockScanFrag;
 import frostscape.ui.frag.BlockSelectButtons;
 import frostscape.ui.frag.BlockSelectFrag;
 import mindustry.Vars;
@@ -19,6 +20,7 @@ public class FrostUI {
     public static FamilyDescriptionDialog family;
     public static ControllerSettingDialog SCHSettings;
     public static BlockSelectFrag select;
+    public static BlockScanFrag scan;
 
     public static void load(){
         family = new FamilyDescriptionDialog("@category.family");
@@ -26,6 +28,10 @@ public class FrostUI {
         select = new BlockSelectFrag();
         select.build(Vars.ui.hudGroup);
         BlockSelectButtons.setup();
+
+        scan = new BlockScanFrag();
+        scan.build(Vars.ui.hudGroup);
+
 
         modifyUI();
     }
