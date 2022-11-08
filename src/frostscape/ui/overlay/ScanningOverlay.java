@@ -10,6 +10,7 @@ import arc.input.KeyCode;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
@@ -17,6 +18,7 @@ import frostscape.content.FrostBlocks;
 import frostscape.content.Palf;
 import mindustry.Vars;
 import mindustry.audio.SoundLoop;
+import mindustry.content.Blocks;
 import mindustry.ctype.ContentType;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
@@ -26,56 +28,68 @@ import mindustry.gen.LegsUnit;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.environment.AirBlock;
+import mindustry.world.blocks.environment.SpawnBlock;
 
 //THERE WILL BE BLOOD-SHED
 public class ScanningOverlay {
+    public Seq<Class> excluded = new Seq<Class>;
     public SoundLoop scanSound = new SoundLoop(Sounds.respawning, 1);
 
-    public float radius, squareRadius, progress, warmup;
+    public float radius, warmup, progress, rotation;
     public boolean enabled = false, contained, previouslyContained, scanning;
     public Vec2 scanPos = new Vec2();
     public static Color[] colors = new Color[]{Pal.accentBack, Pal.accent};
     public Tile tile, actualTile, lastScanned;
 
+    public ScanningOverlay(){
+        excluded.add(SpawnBlock.class);
+    }
     public void update(){
+        rotation += Time.delta * (1 + warmup) * (1 + Interp.smooth.apply(progress) * 8);
         if(Core.input.keyTap(KeyCode.semicolon) && !Core.scene.hasField() && !Core.scene.hasDialog()) {
             if(!enabled) {
                 enabled = true;
-                Vars.ui.showInfoToast("Block scan active! Press [;] again to cancel", 1);
+                Vars.ui.showInfoToast("Environmental scanner active! Press [;] again to deactivate", 1);
             }
             else{
                 enabled = false;
-                Vars.ui.showInfoToast("Block scanning canceled", 1);
+                Vars.ui.showInfoToast("Environmental scanner deactivated", 1);
             }
         }
 
         if(!enabled){
             radius = Mathf.lerpDelta(radius, 0, 0.03f);
-            squareRadius = Mathf.lerpDelta(squareRadius, 0, 0.03f);
+            warmup = Mathf.lerpDelta(warmup, 0, 0.03f);
             progress = Mathf.lerpDelta(progress, 0, 0.03f);
             return;
         }
         scanning = Core.input.keyDown(KeyCode.mouseLeft) && scannable(actualTile);
         Vars.player.shooting = false;
-        Tmp.v1.set(Mathf.clamp(Core.input.mouseWorldX(), 0, Vars.world.unitWidth()), Mathf.clamp(Core.input.mouseWorldY(), 0, Vars.world.unitHeight()));
+        Tmp.v1.set(Mathf.clamp(Core.input.mouseWorldX(), 0, Vars.world.unitWidth() - Vars.tilesize), Mathf.clamp(Core.input.mouseWorldY(), 0, Vars.world.unitWidth() - Vars.tilesize));
         if(!scanning) scanPos.lerp(Tmp.v1, 0.05f);
         tile = Vars.world.tileWorld(Tmp.v1.x, Tmp.v1.y);
-        actualTile = scanning ? tile : Vars.world.tileWorld(scanPos.x, scanPos.y);
-        if(scanning) scanPos.lerp(actualTile.worldx(), actualTile.worldy(), 0.03f);
+        actualTile = Vars.world.tileWorld(scanPos.x, scanPos.y);
+        if(scanning) {
+            if(actualTile.build != null) scanPos.lerp(actualTile.build.x, actualTile.build.y, 0.03f);
+            scanPos.lerp(actualTile.worldx(), actualTile.worldy(), 0.03f);
+        }
 
         //Store previous state, so we know when the spot is contained again
         previouslyContained = contained;
         contained = Tmp.r1.set(tile.worldx() - Vars.tilesize * 2, tile.worldy() - Vars.tilesize * 2, Vars.tilesize * 4, Vars.tilesize * 4).contains(scanPos);
-        radius = Mathf.lerpDelta(radius, scanning ? 1 : contained ? 0.5f : 0.2f, 0.03f);
-        squareRadius = Mathf.lerpDelta(squareRadius, scanning ? 1 : 0, 0.03f);
+        warmup = Mathf.lerpDelta(warmup, scanning ? 1 : 0, 0.02f);
+        radius = Mathf.lerpDelta(radius, scanning ? 1 - 0.33f * (1 + Mathf.maxZero(progress - 0.3f) * 3) : contained ? 0.5f : 0.2f, 0.03f);
 
         if(scanning) {
-            progress += 0.0056 * Time.delta;
+            progress += 0.0056 * Time.delta * warmup;
         }
         else {
             progress = Mathf.lerpDelta(progress, 0, 0.03f);
-            if(Mathf.zero(progress)) progress = 0;
+            if(progress < 0.001f) progress = 0;
+            if(warmup < 0.001f) warmup = 0;
         }
         scanSound.update(actualTile.worldx(), actualTile.worldy(), scanning);
 
@@ -92,59 +106,78 @@ public class ScanningOverlay {
 
         float y1 = Mathf.sin(Time.time, 15, 5);
         float y2 = Mathf.sin(Time.time, 25, 5);
-        Lines.line(scanPos.x - 6, scanPos.y + y1, scanPos.x - 6 + Math.min(squareRadius * 14, 12), scanPos.y + y1);
-        Lines.line(scanPos.x - 9, scanPos.y + y2, scanPos.x - 9 + Math.min(squareRadius * 20, 18), scanPos.y + y2);
+        Lines.line(scanPos.x - 6, scanPos.y + y1, scanPos.x - 6 + Math.min(warmup * 14, 12), scanPos.y + y1);
+        Lines.line(scanPos.x - 9, scanPos.y + y2, scanPos.x - 9 + Math.min(warmup * 20, 18), scanPos.y + y2);
 
         Lines.stroke(1);
-        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 30, 21), 0.75f, Time.time * 2);
+        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 45, 21), 0.75f, rotation * 2);
         Lines.stroke(1.5f);
-        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 30, 24), 0.6f, Time.time * 1.2f + 35);
+        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 45, 24), 0.6f, rotation * 1.2f + 35);
         Lines.stroke(3f);
-        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 30, 27), 0.3f, Time.time);
-        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 30, 27), 0.3f, Time.time + 120);
-        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 30, 27), 0.3f, Time.time + 240);
+        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 45, 27), 0.3f, rotation);
+        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 45, 27), 0.3f, rotation + 120);
+        Lines.arc(scanPos.x, scanPos.y, Math.min(radius * 45, 27), 0.3f, rotation + 240);
 
         if(!scanning) {
+            if(!scannable(tile)) {
+                if(tile.build != null){
+                    Draw.color(Pal.shadow);
+                    Fill.rect(tile.build.x, tile.build.y, tile.build.block.size * Vars.tilesize, tile.build.block.size * Vars.tilesize);
+                    Draw.color(Pal.remove);
+                    Draw.rect(Icon.cancel.getRegion(), tile.build.x + tile.build.block.size * Vars.tilesize/2, tile.build.y + tile.build.block.size * Vars.tilesize/2);
+                    return;
+                }
+
+                Draw.color(Pal.remove);
+                Draw.rect(Icon.cancel.getRegion(), tile.worldx() + 4, tile.worldy() + 4);
+                return;
+            }
             Draw.color(Pal.shadow);
             Fill.rect(tile.worldx(), tile.worldy(), Vars.tilesize, Vars.tilesize);
-        }
-
-        if(!scannable(tile)) {
-            Draw.color(Pal.remove);
-            Draw.rect(Icon.cancel.getRegion(), tile.worldx() + 4, tile.worldy() + 4);
-            return;
         }
         float rotationPer = Mathf.clamp(Interp.Pow.slowFast.apply(Mathf.maxZero((progress - 0.5f) * 2)), 0, 1);
         float radius = Math.min(progress * 8, 4);
         Draw.color(Tmp.c1.set(Pal.darkestMetal).a(1));
-        Fill.circle(tile.worldx() + 4, tile.worldy() + 4, radius);
+        Fill.circle(actualTile.worldx() + 4, actualTile.worldy() + 4, radius);
         //Filling the circle with progress
         Lines.stroke(3.5f, Pal.accent);
-        Lines.arc(tile.worldx() + 4, tile.worldy() + 4, Math.min(progress * 8, 2.5f), rotationPer);
+        Lines.arc(actualTile.worldx() + 4, actualTile.worldy() + 4, Math.min(progress * 8, 2.5f), rotationPer);
         //Fill the outsides
         Lines.stroke(Mathf.clamp(progress * 2) * 1.5f, Pal.accentBack);
-        Lines.arc(tile.worldx() + 4, tile.worldy() + 4, radius, 5, rotationPer * 360);
+        Lines.arc(actualTile.worldx() + 4, actualTile.worldy() + 4, radius, 5, rotationPer * 360);
         //Outline progress circle
         Lines.stroke(1, Tmp.c1.set(Pal.darkMetal).a(1));
-        Lines.arc(tile.worldx() + 4, tile.worldy() + 4, Math.min(progress * 8, 5), 1);
+        Lines.arc(actualTile.worldx() + 4, actualTile.worldy() + 4, Math.min(progress * 8, 5), 1);
     }
 
     public void drawScan(){
-        if(!scanning || (!enabled && radius < 0.000001f)) return;
-        Draw.color(Pal.accent);
+        if(!scanning || (!enabled && radius < 0.001f)) return;
 
         Tmp.v1.set(actualTile.worldx(), actualTile.worldy());
 
-        //Draw the target lines
-        float rotation = Time.time/2;
-        Tmp.v2.trns(rotation, 8);
-        Fill.square(Tmp.v1.x, Tmp.v1.y, Math.min(squareRadius * 10, 4));
-        Draw.color();
-        Draw.alpha(Mathf.sin(10, 1));
-        Draw.rect(actualTile.block().uiIcon, actualTile.worldx(), actualTile.worldy(), 0);
+        if(actualTile.build != null){
+            Draw.alpha(Mathf.sin(15, 1));
+            Draw.color(Pal.accent);
+            Fill.square(actualTile.build.x, actualTile.build.y, warmup * actualTile.build.block.size * Vars.tilesize/2);
+        }
+        else {
+            Draw.color(Pal.accent);
+            Fill.square(Tmp.v1.x, Tmp.v1.y, Math.min(warmup * 10, 4));
+            //Handle invalid blocks
+            if(actualTile.block() instanceof AirBlock || actualTile.block() == Blocks.cliff){
+                if(!(actualTile.overlay() instanceof AirBlock)) {
+                    Draw.rect(actualTile.overlay().uiIcon, actualTile.worldx(), actualTile.worldy(), 0);
+                }
+            }
+            else Draw.rect(actualTile.block().uiIcon, actualTile.worldx(), actualTile.worldy(), 0);
+        }
     }
 
+    public boolean valid(Building build){
+        return build instanceof Scannable b && b.canBeScanned();
+    }
     public boolean scannable(Tile tile){
+        if(tile.build != null && !valid(tile.build)) return false;
         return tile != lastScanned;
     }
 
@@ -165,6 +198,7 @@ public class ScanningOverlay {
                 break;
             }
         }
+        if(tile.build instanceof Scannable b) b.scaned();
         Vars.ui.hudfrag.showUnlock(scanned);
     }
 }

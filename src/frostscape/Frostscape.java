@@ -5,7 +5,9 @@ import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import arc.scene.ui.Image;
 import arc.scene.ui.layout.Cell;
+import arc.struct.ObjectFloatMap;
 import arc.struct.Seq;
+import arc.struct.Sort;
 import arc.util.*;
 import frostscape.game.ScriptedSectorHandler;
 import frostscape.graphics.FrostShaders;
@@ -13,6 +15,7 @@ import frostscape.mods.Compatibility;
 import frostscape.ui.FrostUI;
 import frostscape.ui.overlay.ScanningOverlay;
 import frostscape.ui.overlay.SelectOverlay;
+import frostscape.util.Sorts;
 import frostscape.util.UIUtils;
 import frostscape.world.environment.FloorDataHandler;
 import frostscape.world.light.LightBeams;
@@ -40,6 +43,7 @@ public class Frostscape extends Mod{
     public static NativeJavaPackage p = null;
 
     public static final String NAME = "hollow-frostscape";
+    public static Mods.LoadedMod MOD;
     public static final float VERSION = 136.1f;
     public static String VERSION_NAME = "", LAST_VERSION_NAME = "";
     public static ScriptedSectorHandler sectors = new ScriptedSectorHandler();
@@ -57,13 +61,15 @@ public class Frostscape extends Mod{
 
         Events.on(FileTreeInitEvent.class, e -> {
             Core.app.post(FrostShaders::load);
+            MOD = Vars.mods.getMod(NAME);
         });
 
         Events.on(EventType.ClientLoadEvent.class,
                 e -> {
                     loadSettings();
                     Family.all.each(Family::load);
-                    VERSION_NAME = Vars.mods.getMod(NAME).meta.version;
+
+                    VERSION_NAME = MOD.meta.version;
                     LAST_VERSION_NAME = Core.settings.getString(NAME + "-last-version", "0.0");
                     if(!LAST_VERSION_NAME.equals(VERSION_NAME)) Time.runTask(10f, () -> {
                         BaseDialog dialog = new BaseDialog("phrog");
@@ -102,8 +108,12 @@ public class Frostscape extends Mod{
                 }
         );
 
-        Events.on(EventType.ContentInitEvent.class, e -> {
+        Events.run(EventType.ContentInitEvent.class, () -> {
+            loadSplash();
+        });
 
+        Events.run(EventType.WinEvent.class, () -> {
+            loadSplash();
         });
 
         Events.run(EventType.SaveWriteEvent.class, () -> {
@@ -156,25 +166,25 @@ public class Frostscape extends Mod{
     }
 
     public void loadContent(){
-        float current = Time.millis();
+        long current = Time.millis();
         FrostContentLoader.load();
-        final float time = Time.millis() - current;
+        final float time = Time.timeSinceMillis(current);
 
         Events.run(ClientLoadEvent.class, () -> {
 
             //Log content loading time in ClientLoadEvent
             Log.info(String.format("Loaded Frostscape content in: %s", time));
 
-            float current1 = Time.millis();
+            long current1 = Time.millis();
             FrostUI.load();
             UIUtils.loadAdditions();
 
-            Log.info(String.format("Loaded Frostscape ui in: %s", (Time.millis() - current1)));
+            Log.info(String.format("Loaded Frostscape ui in: %s", (Time.timeSinceMillis(current1))));
 
             current1 = Time.millis();
             //Run after all content has loaded
             Compatibility.handle();
-            Log.info(String.format("Loaded Frostscape compat in: %s", (Time.millis() - current1)));
+            Log.info(String.format("Loaded Frostscape compat in: %s", (Time.timeSinceMillis(current1))));
         });
     }
 
@@ -183,5 +193,67 @@ public class Frostscape extends Mod{
             t.sliderPref(Core.bundle.get("frostscape-parallax"), 100, 1, 100, 1, s -> s + "%");
             t.sliderPref(Core.bundle.get("frostscape-wind-visual-force"), 100, 0, 800, 1, s -> s + "%");
         });
+    }
+
+    void loadSplash(){
+
+        MOD.meta.subtitle = null;
+
+        ObjectFloatMap<String> categories = getCategories(NAME + ".splash.chances");
+
+        categories.each(e -> {
+            if(!(MOD.meta.subtitle == null)) return;
+
+            boolean showing = Mathf.chance(e.value);
+            if(showing){
+                String[] subtitles = getEntries(NAME + ".splash." + e.key);
+                MOD.meta.subtitle = subtitles[Mathf.random((int)Mathf.maxZero(subtitles.length - 1))];
+            }
+        });
+
+        if(!(MOD.meta.subtitle == null)) return;
+
+        String[] subtitles = getEntries(NAME + ".splash.default");
+        MOD.meta.subtitle = subtitles[Mathf.random((int)Mathf.maxZero(subtitles.length - 1))];
+    }
+
+    String[] getEntries(String key){
+        String packed = Core.bundle.get(key);
+        int end = 0;
+        String[] list = new String[]{};
+        for (int i = 0; i < packed.length(); i++) {
+            if(packed.charAt(i) == '|' && packed.charAt(i - 1) != '\\') {
+                String entry = packed.substring(end, i);
+                list = Structs.add(list, entry);
+                end = i + 1;
+            }
+        }
+        String subtitle = packed.substring(end);
+        Structs.add(list, subtitle);
+        return list;
+    }
+
+    ObjectFloatMap<String> getCategories(String key){
+        String packed = Core.bundle.get(key);
+        int end = 0;
+        ObjectFloatMap<String> categories = new ObjectFloatMap<>();
+        String lastName = "";
+        boolean name = true;
+        for (int i = 0; i < packed.length(); i++) {
+            if(packed.charAt(i) == '|' && packed.charAt(i - 1) != '\\') {
+                String entry = packed.substring(end, i);
+                if(name) {
+                    lastName = entry;
+                }
+                else categories.put(lastName, Strings.parseFloat(entry));
+
+                end = i + 1;
+
+                name = !name;
+            }
+        }
+        String ending = packed.substring(end);
+        categories.put(lastName, Strings.parseFloat(ending));
+        return categories;
     }
 }
