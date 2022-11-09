@@ -3,12 +3,14 @@ package frostscape.ui.dialog;
 import arc.Core;
 import arc.scene.style.Drawable;
 import arc.scene.ui.layout.Table;
+import frostscape.ui.dialog.database.ScannedBlocksTable;
 import mindustry.content.Blocks;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.ui.dialogs.DatabaseDialog;
 
 import static frostscape.Frostscape.NAME;
 
@@ -17,9 +19,38 @@ public class DatabaseEntriesDialog extends BaseDialog {
     public Table contents = new Table();
     public Table buttonList = new Table();
     public float padding = 150;
+
+    public ScannedBlocksTable scanned;
     public DatabaseEntriesDialog(String name){
         super(name);
+        this.buttons.defaults().size(210.0F, 64.0F);
+        this.addCloseListener();
 
+        this.onResize(this::rebuild);
+
+        contents.clear();
+        buttons.clear();
+
+        scanned = new ScannedBlocksTable();
+        scanned.rebuild();
+
+        addButton("@about.button", Icon.info, this::defaultSetup);
+
+        addButton("@category.family", Core.atlas.drawable(NAME + "-hunter"), () -> {
+            contents.clear();
+        });
+
+        addButton("@category.scanning", Icon.zoom, () -> {
+            contents.clear();
+            contents.add(scanned).fill();
+        });
+
+        rebuild();
+    }
+
+    public void rebuild(){
+        buttons.clear();
+        cont.clear();
         buttons.left();
         addCloseButton();
 
@@ -30,23 +61,11 @@ public class DatabaseEntriesDialog extends BaseDialog {
         buttons.pane(buttonList).width(Core.graphics.getWidth() - 240).style(Styles.horizontalPane).left();
         buttonList.fill().left();
         defaultSetup();
-
-        addButton("@about.button", Icon.info, this::defaultSetup);
-
-        addButton("@category.family", Core.atlas.drawable(NAME + "-hunter"), () -> {
-            contents.clear();
-        });
-
-        addButton("@category.scanning", Core.atlas.drawable(Blocks.radar.name), () -> {
-            contents.clear();
-        });
     }
 
     @Override
     public void addCloseButton() {
-        this.buttons.defaults().size(210.0F, 64.0F);
         this.buttons.button("@back", Icon.left, this::hide).size(210.0F, 64.0F);
-        this.addCloseListener();
     }
 
     public void addButton(String name, Drawable icon, Runnable func){

@@ -22,10 +22,7 @@ import mindustry.content.Blocks;
 import mindustry.ctype.ContentType;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
-import mindustry.gen.Building;
-import mindustry.gen.Icon;
-import mindustry.gen.LegsUnit;
-import mindustry.gen.Sounds;
+import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.world.Block;
@@ -56,10 +53,12 @@ public class ScanningOverlay {
             if(!enabled) {
                 enabled = true;
                 Vars.ui.showInfoToast("Environmental scanner active! Press [;] again to deactivate", 1);
+                Sounds.buttonClick.play();
             }
             else{
                 enabled = false;
                 Vars.ui.showInfoToast("Environmental scanner deactivated", 1);
+                Sounds.back.play();
             }
         }
 
