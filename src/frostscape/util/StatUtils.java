@@ -1,5 +1,6 @@
 package frostscape.util;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.scene.event.ClickListener;
@@ -15,6 +16,7 @@ import mindustry.content.UnitTypes;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
+import mindustry.world.Block;
 import mindustry.world.meta.Stats;
 
 public class StatUtils {
@@ -47,10 +49,17 @@ public class StatUtils {
                     t.clicked(() -> {
                         FrostUI.family.build(family);
                     });
-                    Log.info(family.localizedName);
                 }).size(320, 80);
                 table.row();
             });
         });
+    }
+
+    public static void addScanningStats(Block b){
+        if(b.minfo.mod != null) {
+            b.stats.add(FrostStats.envCategory, Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", b.minfo.mod.meta.displayName));
+            return;
+        }
+        b.stats.add(FrostStats.envCategory, Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", "category.scanning.vanilla"));
     }
 }

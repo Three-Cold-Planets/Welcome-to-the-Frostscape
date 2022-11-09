@@ -149,6 +149,7 @@ public class Frostscape extends Mod{
                 "frostscape.game",
                 "frostscape.graphics",
                 "frostscape.math",
+                "frostscape.mods",
                 "frostscape.ui",
                 "frostscape.util",
                 "frostscape.world",

@@ -5,6 +5,7 @@ import mindustry.world.meta.StatCat;
 
 public class FrostStatCats {
     public static StatCat
-        family = new StatCat("family")
+        family = new StatCat("family"),
+        scanning = new StatCat("scanning")
     ;
 }

@@ -31,11 +31,13 @@ import mindustry.graphics.Pal;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.environment.AirBlock;
+import mindustry.world.blocks.environment.Cliff;
 import mindustry.world.blocks.environment.SpawnBlock;
 
 //THERE WILL BE BLOOD-SHED
 public class ScanningOverlay {
-    public Seq<Class> excluded = new Seq<Class>;
+    //Completely excluded from scanning. Doesn't apply to floors.
+    public Seq<Class> excluded = new Seq<Class>();
     public SoundLoop scanSound = new SoundLoop(Sounds.respawning, 1);
 
     public float radius, warmup, progress, rotation;
@@ -45,8 +47,9 @@ public class ScanningOverlay {
     public Tile tile, actualTile, lastScanned;
 
     public ScanningOverlay(){
-        excluded.add(SpawnBlock.class);
+        excluded.addAll(AirBlock.class, Cliff.class);
     }
+
     public void update(){
         rotation += Time.delta * (1 + warmup) * (1 + Interp.smooth.apply(progress) * 8);
         if(Core.input.keyTap(KeyCode.semicolon) && !Core.scene.hasField() && !Core.scene.hasDialog()) {
@@ -69,10 +72,17 @@ public class ScanningOverlay {
         scanning = Core.input.keyDown(KeyCode.mouseLeft) && scannable(actualTile);
         Vars.player.shooting = false;
         Tmp.v1.set(Mathf.clamp(Core.input.mouseWorldX(), 0, Vars.world.unitWidth() - Vars.tilesize), Mathf.clamp(Core.input.mouseWorldY(), 0, Vars.world.unitWidth() - Vars.tilesize));
-        if(!scanning) scanPos.lerp(Tmp.v1, 0.05f);
-        tile = Vars.world.tileWorld(Tmp.v1.x, Tmp.v1.y);
+
+        if(!scanning) {
+            scanPos.lerp(Tmp.v1, 0.05f);
+            //Don't move the current tile once scanning
+            tile = Vars.world.tileWorld(Tmp.v1.x, Tmp.v1.y);
+        }
         actualTile = Vars.world.tileWorld(scanPos.x, scanPos.y);
-        if(scanning) {
+
+        if(scanning){
+            //Snap targeting rectical and scanned tile to cursor
+            actualTile = tile;
             if(actualTile.build != null) scanPos.lerp(actualTile.build.x, actualTile.build.y, 0.03f);
             scanPos.lerp(actualTile.worldx(), actualTile.worldy(), 0.03f);
         }
@@ -94,7 +104,7 @@ public class ScanningOverlay {
         scanSound.update(actualTile.worldx(), actualTile.worldy(), scanning);
 
         if(progress >= 1){
-            finishScanning(actualTile, 2);
+            finishScanning(actualTile, getLayer(actualTile));
         }
     }
 
@@ -177,8 +187,24 @@ public class ScanningOverlay {
         return build instanceof Scannable b && b.canBeScanned();
     }
     public boolean scannable(Tile tile){
-        if(tile.build != null && !valid(tile.build)) return false;
-        return tile != lastScanned;
+        return tile != lastScanned && getLayer(tile) != -1;
+    }
+
+    /**
+     * Returns an int corosponding to layer of the tile. Returns 3 for buildings, 2 for walls, 1 for overlays and 0 for floors. If invalid, returns a -1.
+     * @param tile
+     * @return
+     */
+    public int getLayer(Tile tile){
+        if(tile == null) return -1;
+        if(tile.build != null){
+            if(valid(tile.build)) return 3;
+            else return -1;
+        }
+        if(tile.overlay().wallOre) return 1;
+        if(!excluded.contains(tile.block().getClass())) return 2;
+        if(!excluded.contains(tile.overlay().getClass())) return 1;
+        return 0;
     }
 
     public void finishScanning(Tile tile, int part){
@@ -199,6 +225,6 @@ public class ScanningOverlay {
             }
         }
         if(tile.build instanceof Scannable b) b.scaned();
-        Vars.ui.hudfrag.showUnlock(scanned);
+        if(Vars.state.isCampaign()) Vars.ui.hudfrag.showUnlock(scanned);
     }
 }

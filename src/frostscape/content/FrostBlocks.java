@@ -26,6 +26,7 @@ import frostscape.world.blocks.drill.CoreSiphon;
 import frostscape.world.blocks.environment.CrackedBlock;
 import frostscape.world.blocks.environment.SteamVentProp;
 import frostscape.world.light.LightBeams;
+import frostscape.world.meta.stat.FrostStats;
 import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
@@ -742,14 +743,14 @@ public class FrostBlocks {
             );
 
             entries.add(
-                    new UpgradeEntry(FrostUpgrades.improvedBase){{
-                        healthMultiplier = new float[]{
-                                3.5f
-                        };
-                        costs = new ItemStack[][]{
-                                ItemStack.with(FrostItems.ferricPanels, 5)
-                        };
-                    }}
+                new UpgradeEntry(FrostUpgrades.improvedBase){{
+                    healthMultiplier = new float[]{
+                            3.5f
+                    };
+                    costs = new ItemStack[][]{
+                            ItemStack.with(FrostItems.ferricPanels, 5)
+                    };
+                }}
             );
         }};
 

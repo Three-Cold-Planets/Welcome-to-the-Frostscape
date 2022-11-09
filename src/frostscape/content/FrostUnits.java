@@ -125,7 +125,7 @@ public class FrostUnits {
                             {
                                 recoil = 0.01f;
                                 this.damage = 35;
-                                this.length = 25;
+                                this.length = 55;
                                 width = 3;
                                 this.knockback = 1.0F;
                                 this.pierceCap = 1;

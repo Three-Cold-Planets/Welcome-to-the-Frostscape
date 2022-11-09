@@ -2,6 +2,7 @@ package frostscape.ui;
 
 import arc.scene.ui.Dialog;
 import arc.util.Reflect;
+import frostscape.ui.dialog.DatabaseEntriesDialog;
 import frostscape.ui.dialog.FamilyDescriptionDialog;
 import frostscape.ui.dialog.settings.ControllerSettingDialog;
 import frostscape.ui.frag.BlockScanFrag;
@@ -9,7 +10,6 @@ import frostscape.ui.frag.BlockSelectButtons;
 import frostscape.ui.frag.BlockSelectFrag;
 import mindustry.Vars;
 import mindustry.game.Rules;
-import mindustry.gen.Groups;
 import mindustry.gen.Icon;
 
 import static mindustry.Vars.experimental;
@@ -22,9 +22,12 @@ public class FrostUI {
     public static BlockSelectFrag select;
     public static BlockScanFrag scan;
 
+    public static DatabaseEntriesDialog entries;
+
     public static void load(){
         family = new FamilyDescriptionDialog("@category.family");
         SCHSettings = new ControllerSettingDialog("@dialog.SCHsettings");
+        entries = new DatabaseEntriesDialog("@dialog.database-entries");
         select = new BlockSelectFrag();
         select.build(Vars.ui.hudGroup);
         BlockSelectButtons.setup();
@@ -37,6 +40,7 @@ public class FrostUI {
     }
 
     public static void modifyUI(){
+        Vars.ui.database.buttons.button("@extras", Icon.bookOpen, entries::show).size(210f, 64f);
 
         Dialog menu = Reflect.get(Vars.ui.editor.getClass(), Vars.ui.editor, "menu");
 
