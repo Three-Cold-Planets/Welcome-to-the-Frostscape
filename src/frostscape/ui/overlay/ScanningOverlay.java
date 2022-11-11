@@ -80,7 +80,7 @@ public class ScanningOverlay {
         actualTile = Vars.world.tileWorld(scanPos.x, scanPos.y);
 
         if(scanning){
-            //Snap targeting rectical and scanned tile to cursor
+            //Snap targeting rectical and scan tile to cursor
             actualTile = tile;
             if(actualTile.build != null) scanPos.lerp(actualTile.build.x, actualTile.build.y, 0.03f);
             scanPos.lerp(actualTile.worldx(), actualTile.worldy(), 0.03f);
@@ -224,6 +224,8 @@ public class ScanningOverlay {
             }
         }
         if(tile.build instanceof Scannable b) b.scaned();
-        if(Vars.state.isCampaign()) Vars.ui.hudfrag.showUnlock(scanned);
+        if(Vars.state.isCampaign()) {
+            scanned.unlock();
+        }
     }
 }

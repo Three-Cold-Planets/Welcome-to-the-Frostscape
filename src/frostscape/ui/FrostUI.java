@@ -8,6 +8,7 @@ import frostscape.ui.dialog.settings.ControllerSettingDialog;
 import frostscape.ui.frag.BlockScanFrag;
 import frostscape.ui.frag.BlockSelectButtons;
 import frostscape.ui.frag.BlockSelectFrag;
+import frostscape.ui.frag.NoteInfoDialog;
 import mindustry.Vars;
 import mindustry.game.Rules;
 import mindustry.gen.Icon;
@@ -19,15 +20,17 @@ import static mindustry.Vars.steam;
 public class FrostUI {
     public static FamilyDescriptionDialog family;
     public static ControllerSettingDialog SCHSettings;
+
+    public static DatabaseEntriesDialog database;
+    public static NoteInfoDialog notes;
     public static BlockSelectFrag select;
     public static BlockScanFrag scan;
-
-    public static DatabaseEntriesDialog entries;
 
     public static void load(){
         family = new FamilyDescriptionDialog("@category.family");
         SCHSettings = new ControllerSettingDialog("@dialog.SCHsettings");
-        entries = new DatabaseEntriesDialog("@dialog.database-entries");
+        database = new DatabaseEntriesDialog("@dialog.database-entries");
+        notes = new NoteInfoDialog("@dialog.notes");
         select = new BlockSelectFrag();
         select.build(Vars.ui.hudGroup);
         BlockSelectButtons.setup();
@@ -40,7 +43,7 @@ public class FrostUI {
     }
 
     public static void modifyUI(){
-        Vars.ui.database.buttons.button("@extras", Icon.bookOpen, entries::show).size(210f, 64f);
+        Vars.ui.database.buttons.button("@extras", Icon.bookOpen, database::show).size(210f, 64f);
 
         Dialog menu = Reflect.get(Vars.ui.editor.getClass(), Vars.ui.editor, "menu");
 

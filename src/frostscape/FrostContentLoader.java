@@ -11,6 +11,7 @@ import static frostscape.game.ScriptedSectorHandler.controllers;
 
 public class FrostContentLoader {
     public static void load(){
+        FrostNotes.load();
         FrostResearch.load();
         Families.load();
         FrostStatusEffects.load();

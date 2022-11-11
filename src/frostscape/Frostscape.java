@@ -20,6 +20,7 @@ import frostscape.util.UIUtils;
 import frostscape.world.environment.FloorDataHandler;
 import frostscape.world.light.LightBeams;
 import frostscape.world.meta.Family;
+import frostscape.world.meta.LoreNote;
 import frostscape.world.research.ResearchHandler;
 import frostscape.world.upgrades.UpgradeHandler;
 import mindustry.Vars;
@@ -67,6 +68,7 @@ public class Frostscape extends Mod{
         Events.on(EventType.ClientLoadEvent.class,
                 e -> {
                     loadSettings();
+                    LoreNote.all.each(LoreNote::load);
                     Family.all.each(Family::load);
 
                     VERSION_NAME = MOD.meta.version;

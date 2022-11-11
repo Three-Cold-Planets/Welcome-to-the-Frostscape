@@ -4,13 +4,11 @@ import arc.Core;
 import arc.scene.style.Drawable;
 import arc.scene.ui.layout.Table;
 import frostscape.ui.dialog.database.ScannedBlocksTable;
-import mindustry.content.Blocks;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
-import mindustry.ui.dialogs.DatabaseDialog;
 
 import static frostscape.Frostscape.NAME;
 
@@ -20,7 +18,7 @@ public class DatabaseEntriesDialog extends BaseDialog {
     public Table buttonList = new Table();
     public float padding = 150;
 
-    public ScannedBlocksTable scanned;
+    public ScannedBlocksTable scan;
     public DatabaseEntriesDialog(String name){
         super(name);
         this.buttons.defaults().size(210.0F, 64.0F);
@@ -31,8 +29,8 @@ public class DatabaseEntriesDialog extends BaseDialog {
         contents.clear();
         buttons.clear();
 
-        scanned = new ScannedBlocksTable();
-        scanned.rebuild();
+        scan = new ScannedBlocksTable();
+        scan.rebuild();
 
         addButton("@about.button", Icon.info, this::defaultSetup);
 
@@ -42,7 +40,7 @@ public class DatabaseEntriesDialog extends BaseDialog {
 
         addButton("@category.scanning", Icon.zoom, () -> {
             contents.clear();
-            contents.add(scanned).fill();
+            contents.add(scan).fill();
         });
 
         rebuild();

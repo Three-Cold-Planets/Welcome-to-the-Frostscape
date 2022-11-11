@@ -749,7 +749,7 @@ public class FrostBlocks {
                     };
                     costs = new ItemStack[][]{
                             ItemStack.with(FrostItems.ferricPanels, 5)
-                    };
+                    };ß
                 }}
             );
         }};

@@ -56,10 +56,12 @@ public class StatUtils {
     }
 
     public static void addScanningStats(Block b){
+        b.stats.add(FrostStats.envCategory, getCategory(b));
+    }
+    public static String getCategory(Block b){
         if(b.minfo.mod != null) {
-            b.stats.add(FrostStats.envCategory, Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", b.minfo.mod.meta.displayName));
-            return;
+            return Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", b.minfo.mod.meta.displayName);
         }
-        b.stats.add(FrostStats.envCategory, Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", "category.scanning.vanilla"));
+        return Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", "category.scanning.vanilla");
     }
 }
