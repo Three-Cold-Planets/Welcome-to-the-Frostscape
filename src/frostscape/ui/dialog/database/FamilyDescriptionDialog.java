@@ -1,4 +1,4 @@
-package frostscape.ui.dialog;
+package frostscape.ui.dialog.database;
 
 import arc.Core;
 import arc.graphics.Color;

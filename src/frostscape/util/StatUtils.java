@@ -62,6 +62,6 @@ public class StatUtils {
         if(b.minfo.mod != null) {
             return Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", b.minfo.mod.meta.displayName);
         }
-        return Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", "category.scanning.vanilla");
+        return Core.bundle.get(b.getContentType().name() + "." + b.name + ".env-category", Core.bundle.get("category.scanning.vanilla"));
     }
 }
