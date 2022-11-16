@@ -44,6 +44,14 @@ Unique research system
 
 Sh1p gets a life (Never being completed)
 
+## Dependancies/Compatabilities
+
+As of current, Frostscape doesn't have any dependancies/compatabilities, but it does however have a few planned ones
+Block Selection/Block Scanning will be implemented in a separate mod, and will have Frostscape-specific features stripped. When enablling either mod with Frostscape, they will be disabled.
+
+If any mod maker wants to make their own environmental tiles compatable with Frostscape's block scanning mechanic, send them [this](https://github.com/Sh1penfire/Welcome-to-the-Frostscape/blob/master/guides/Environmental%20Scanning%20Entries.md) page
+
+
 ## Credits
 Thanks to
 
