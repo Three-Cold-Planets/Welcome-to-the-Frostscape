@@ -55,4 +55,6 @@ Thanks to
 
 -Determiedmech1#6702, Ssem#4539, PsychicFireSong#5026 on discord for being active on mod suggestions in Mod Centre (Join the server [here](https://discord.gg/XrFhAZys7T))
 
+-[Goobrr](https://github.com/Goobrr) for the [Grimoire](https://github.com/Goobrr/Grimoire) API
+
 -You for using the mod! (Maybe)
