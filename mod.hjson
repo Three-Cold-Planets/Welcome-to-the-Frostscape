@@ -11,8 +11,7 @@ author: "Sh1penfire"
 main: "frostscape.Frostscape"
 
 #the mod description as seen in the mod dialog
-description: "An experimental modification created to test v7's new API. Will *not* be worked on consistently due to life.\n\nA voice lingers in the darkness, dancing around your ears. Will you join it?"
-
+description: "An experimental modification created to test v7's new API. Will *not* be worked on consistently due to life.\n\n[dark[]gray]A voice lingers in the darkness, dancing around your ears. Will you join it?"
 #the mod version
 version: v1.0.2-alpha
 
