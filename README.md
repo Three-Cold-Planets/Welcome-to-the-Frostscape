@@ -4,53 +4,12 @@ Welcome to the Frostscape is an indev v7 campaign-based mod which focuses on uni
 ## Current Goal
 Currently the next milestone in development that im aiming to hit is finishing the MVP. I don't have an estamated time of completion for it, but join the [discord server](https://discord.gg/XrFhAZys7T), or check the [trello](https://trello.com/b/2g9oENth/hollow-frostscape) to keep up with development!
 
-## Todo
-
-### Required in MVP
-Theese goals will be required before the Minimum Viable Product is released.
-
-- [X] Upgrades system
-
-- [X] Block selection/actions ui
-
-- [ ] Environmental heat systems
-
-- [X] Light systems
-
-- [ ] Stealth systems
-
-### Alpha release
-Theese goals will be required before the Alpha release launches
-
-- [ ] Tutorial
-
-- [ ] Barebones content
-
-- [ ] Sector Controllers system(for the editor)
-
-- [ ] Further development of heat systems
-
-
-### Future goals..?
-Theese goals are VAPID, but expandable goals for future progression and development of the mod
-
-Main Planet implementation
-
-Moon campaigns
-
-Roguelike planetgen
-
-Unique research system
-
-Sh1p gets a life (Never being completed)
-
 ## Dependancies/Compatabilities
 
 As of current, Frostscape doesn't have any dependancies/compatabilities, but it does however have a few planned ones
 Block Selection/Block Scanning will be implemented in a separate mod, and will have Frostscape-specific features stripped. When enablling either mod with Frostscape, they will be disabled.
 
 If any mod maker wants to make their own environmental tiles compatable with Frostscape's block scanning mechanic, send them [this](https://github.com/Sh1penfire/Welcome-to-the-Frostscape/blob/master/guides/Environmental%20Scanning%20Entries.md) page
-
 
 ## Credits
 Thanks to
