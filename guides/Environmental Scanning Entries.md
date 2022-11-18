@@ -6,4 +6,4 @@ Start by launching the game, and getting intoa  campaign map (Note that while sc
 
 For PC players, press ; to toggle the scanner. It should look something like this.
 
-[[/guides/screenshots/Scan circle screenshot.ext|A yellow circle following the player's cursor]]
+[[https://github.com/Sh1penfire/Welcome-to-the-Frostscape/blob/main/guides/screenshots/Scan circle screenshot.png|A yellow circle following the player's cursor]]
