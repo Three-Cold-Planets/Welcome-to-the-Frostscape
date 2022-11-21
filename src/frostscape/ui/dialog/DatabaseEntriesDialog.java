@@ -1,6 +1,7 @@
-package frostscape.ui.dialog.database;
+package frostscape.ui.dialog;
 
 import arc.Core;
+import arc.math.Mathf;
 import arc.scene.style.Drawable;
 import arc.scene.ui.layout.Table;
 import frostscape.ui.dialog.database.ScannedBlocksTable;
@@ -73,6 +74,10 @@ public class DatabaseEntriesDialog extends BaseDialog {
     public void defaultSetup(){
         contents.clear();
         contents.pane(pane -> {
+            if(true || Mathf.chance(0.05f)){
+                pane.add("@dialog.database-entries.info" + (1 + Mathf.random(2)));
+                return;
+            }
             pane.add("@dialog.database-entries.info0");
         });
     }

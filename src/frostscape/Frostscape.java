@@ -1,6 +1,7 @@
 package frostscape;
 
 import arc.*;
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import arc.scene.ui.Image;
@@ -9,6 +10,7 @@ import arc.struct.ObjectFloatMap;
 import arc.struct.Seq;
 import arc.struct.Sort;
 import arc.util.*;
+import frostscape.content.Palf;
 import frostscape.game.ScriptedSectorHandler;
 import frostscape.graphics.FrostShaders;
 import frostscape.mods.Compatibility;
@@ -59,6 +61,9 @@ public class Frostscape extends Mod{
     public static LightBeams lights = new LightBeams();
 
     public Frostscape(){
+
+        Color.cyan.set(Palf.pulseChargeEnd);
+        Color.sky.set(Palf.pulseChargeStart);
 
         Events.on(FileTreeInitEvent.class, e -> {
             Core.app.post(FrostShaders::load);

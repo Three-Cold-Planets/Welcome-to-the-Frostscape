@@ -31,6 +31,7 @@ import frostscape.world.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.MissileBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
@@ -40,6 +41,7 @@ import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.*;
+import mindustry.type.unit.MissileUnitType;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ContinuousLiquidTurret;
 import mindustry.world.blocks.defense.turrets.ContinuousTurret;
@@ -55,6 +57,7 @@ import static arc.math.Angles.randLenVectors;
 import static frostscape.Frostscape.NAME;
 
 public class FrostBlocks {
+    //Base names
     public static final String
         baseRock = NAME + "-base-rock-0",
         baseReflector = NAME + "-base-reflector-0";
@@ -308,7 +311,7 @@ public class FrostBlocks {
             shootY = -4;
             shootWarmupSpeed = 0.08f;
             minWarmup = 0.9f;
-            drawer = new DrawTurret("reinforced-"){{
+            drawer = new DrawTurret("elevated-"){{
                 Color heatc = Pal.turretHeat;
                 heatColor = heatc;
                 liquidDraw = Liquids.oil;
@@ -326,7 +329,7 @@ public class FrostBlocks {
                             mirror = true;
                             moveRot = -15f;
                             x = (30 - 6) / 4f;
-                            y = (-35f + 6) / 4f;
+                            y = (-34.5f + 6) / 4f;
                             moveX = 6/4;
                             moveY = -6/4;
                             under = true;
@@ -457,29 +460,31 @@ public class FrostBlocks {
                                     })
                             };
                         }};
-                        hitEffect = new MultiEffect(){{
-                            effects = new Effect[]{
-                                    new Effect(135, e -> {
-                                        e.scaled(75, e1 -> {
-                                            Draw.color(Pal.lightPyraFlame);
+                        hitEffect = new Effect(85, e -> {
+                            e.scaled(15, e1 -> {
 
-                                            Lines.stroke(e1.fout() * 0.65f);
-                                            Lines.circle(e1.x, e1.y, e1.finpow() * 35);
+                                Lines.stroke(e1.fout() * 0.65f);
+                                color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
+                                Lines.circle(e1.x, e1.y, e1.finpow() * 35);
 
-                                            Lines.stroke(e1.fout() * 3);
-                                            Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 54, (x, y) -> {
-                                                Lines.line(e.x + x * 0.3f, e.y + y * 0.3f, e.x + x, e.y + y);
-                                            });
-                                        });
+                                Lines.stroke(e1.fout() * 3);
+                                Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 54, (x, y) -> {
+                                    Lines.line(e.x + x * 0.3f, e.y + y * 0.3f, e.x + x, e.y + y);
+                                });
+                            });
 
-                                        Draw.color(Pal.darkPyraFlame);
-                                        Draw.alpha(e.fout());
-                                        Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 5), e.fin() * 54 + 6, (x, y) -> {
-                                            Fill.circle(e.x + x, e.y + y, 5 * e.fout(Interp.pow4));
-                                        });
-                                    })
-                            };
-                        }};
+                            color(Pal.stoneGray);
+                            randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
+                                Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.5f, 45);
+                            });
+
+                            color(Color.gray);
+                            Draw.alpha(e.fout());
+                            Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 5), e.fin() * 54 + 6, (x, y) -> {
+                                Fill.circle(e.x + x, e.y + y, 5 * e.fout(Interp.pow4));
+                            });
+
+                        });
 
                         trailEffect = new Effect(55, e -> {
                             float h = (float) e.data;
@@ -623,7 +628,7 @@ public class FrostBlocks {
             size = 5;
             mountPoses = new Seq<>();
             for (int i = 1; i < Geometry.d8.length; i += 2) {
-                mountPoses.add(new Vec2(Geometry.d8[i].x * 29/2, Geometry.d8[i].y * 29/2));
+                mountPoses.add(new Vec2(Geometry.d8[i].x * 26/2, Geometry.d8[i].y * 26/2));
             }
             units.addAll(
                     new UnitEntry(null, new ResearchedLockedCond(FrostResearch.improvedWelding), 180, UnitTypes.pulsar),

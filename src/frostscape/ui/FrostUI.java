@@ -2,8 +2,8 @@ package frostscape.ui;
 
 import arc.scene.ui.Dialog;
 import arc.util.Reflect;
-import frostscape.ui.dialog.database.DatabaseEntriesDialog;
-import frostscape.ui.dialog.database.FamilyDescriptionDialog;
+import frostscape.ui.dialog.DatabaseEntriesDialog;
+import frostscape.ui.dialog.FamilyDescriptionDialog;
 import frostscape.ui.dialog.settings.ControllerSettingDialog;
 import frostscape.ui.frag.BlockScanFrag;
 import frostscape.ui.frag.BlockSelectButtons;

@@ -1,4 +1,4 @@
-package frostscape.ui.dialog.database;
+package frostscape.ui.dialog;
 
 import arc.Core;
 import arc.graphics.Color;
@@ -19,6 +19,7 @@ import mindustry.ctype.*;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
+import mindustry.mod.Mods;
 import mindustry.type.Weather;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
@@ -46,6 +47,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
         cont.clear();
         maxWidth = Core.scene.getWidth();
         current = family;
+        
 
         cont.table(table -> {
             table.table(t -> {
