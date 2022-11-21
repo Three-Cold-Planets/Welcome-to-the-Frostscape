@@ -41,6 +41,7 @@ public class BouncyBulletType extends BasicBulletType {
     public float bounceIncendSpread, bounceIncendChance;
 
     public boolean collidesBounce;
+    public float fragLiftMin, fragLiftMax;
     public boolean useMinLife;
     public boolean useRotation;
 
@@ -70,6 +71,7 @@ public class BouncyBulletType extends BasicBulletType {
         bounceIncendSpread = 5;
         bounceIncendChance = 0;
         collidesBounce = false;
+        fragLiftMin = fragLiftMax = 1;
         useMinLife = true;
         useRotation = false;
         spinsprite = false;
@@ -272,7 +274,7 @@ public class BouncyBulletType extends BasicBulletType {
             //Bouncy!
             BouncyBulletType bouncy = ((BouncyBulletType) fragBullet);
             float height = bouncy.keepHeight ? h.height : bouncy.startingHeight;
-            float lift = bouncy.keepLift ? h.lift : bouncy.startingLift;
+            float lift = Mathf.random(fragVelocityMin, fragVelocityMax) * (bouncy.keepLift ? h.lift : bouncy.startingLift);
             bullet.data = new HeightHolder(height, lift);
         }
         else b.data = new HeightHolder(h.height, h.lift);

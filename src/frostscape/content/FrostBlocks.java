@@ -337,7 +337,7 @@ public class FrostBlocks {
                             children = Seq.with(
                                     new RegionPart("-back"){
                                         {
-                                            progress = PartProgress.warmup;
+                                            progress = PartProgress.recoil;
                                             mirror = true;
                                             moveRot = 360 -35f;
                                             x = 0;
@@ -429,9 +429,8 @@ public class FrostBlocks {
                     Items.blastCompound,
                     new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
                         frontColor = backColor = Color.white;
-                        lifetime = 100;
+                        lifetime = 17.5f;
                         drag = 0.016f;
-                        minLife = 55f;
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.blastExplosion;
                         width = 8;
@@ -506,7 +505,7 @@ public class FrostBlocks {
                         });
                         trailChance = 0.65f;
                         trailRotation = true;
-                        fragBullet = new BouncyBulletType(3.5f, 5, "shell"){{
+                        fragBullet = new BouncyBulletType(4.5f, 5, "shell"){{
                             collidesBounce = true;
                             pierceBuilding = false;
                             lifetime = 120;
@@ -520,14 +519,12 @@ public class FrostBlocks {
                             shrinkY = 0.9f;
                             status = FrostStatusEffects.napalm;
                             statusDuration = 12f * 60f;
-                            gravity = 0.00432f;
-                            startingLift = 0.066f;
+                            gravity = 0.00082f;
                             bounceShake = 0.7f;
                             bounceEfficiency = 0.65f;
                             bounceForce = 10;
                             maxBounces = 3;
-                            keepLift = false;
-                            keepHeight = false;
+                            keepLift = true;
                             frontColor = Pal.lightishOrange;
                             backColor = Pal.lightOrange;
                             hitShake = 3.2f;
@@ -547,18 +544,13 @@ public class FrostBlocks {
                             hitSound = Sounds.explosion;
                         }};
                         fragBullets = 5;
-                        fragSpread = 20;
+                        fragSpread = 5;
                         fragRandomSpread = 5;
-                        fragLifeMin = 0.8f;
-                        fragLifeMax = 0.9f;
-                        fragVelocityMin = 1;
-                        fragVelocityMax = 1;
-                        incendAmount = 5;
-                        incendChance = 1;
-                        bounceIncend = 2;
-                        bounceIncendChance = 1;
-                        puddleLiquid = Liquids.oil;
-                        puddleAmount = 6;
+                        fragLifeMin = 0.6f;
+                        fragLifeMax = 1f;
+                        fragVelocityMin = 0.5f;
+                        fragVelocityMax = 1f;
+                        fragLiftMin = 0.8f;
                         splashDamage = 55;
                         splashDamageRadius = 16;
                         scaleLife = false;
