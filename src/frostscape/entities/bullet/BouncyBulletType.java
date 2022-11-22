@@ -274,7 +274,7 @@ public class BouncyBulletType extends BasicBulletType {
             //Bouncy!
             BouncyBulletType bouncy = ((BouncyBulletType) fragBullet);
             float height = bouncy.keepHeight ? h.height : bouncy.startingHeight;
-            float lift = Mathf.random(fragVelocityMin, fragVelocityMax) * (bouncy.keepLift ? h.lift : bouncy.startingLift);
+            float lift = Mathf.random(fragLiftMin, fragLiftMax) * (bouncy.keepLift ? h.lift : bouncy.startingLift);
             bullet.data = new HeightHolder(height, lift);
         }
         else b.data = new HeightHolder(h.height, h.lift);

@@ -308,7 +308,7 @@ public class FrostBlocks {
             recoil = 6;
             rotateSpeed = 2.5f;
             cooldownTime = 75;
-            shootY = -4;
+            shootY = -8;
             shootWarmupSpeed = 0.08f;
             minWarmup = 0.9f;
             drawer = new DrawTurret("elevated-"){{
@@ -439,8 +439,8 @@ public class FrostBlocks {
                         shrinkY = 1f;
                         status = StatusEffects.burning;
                         statusDuration = 12f * 60f;
-                        gravity = 0.00036f;
-                        startingLift = 0.0144f;
+                        gravity = 0.00072f;
+                        startingLift = 0.0288f;
                         bounceShake = 0.7f;
                         bounceEfficiency = 0.65f;
                         bounceForce = 10;
@@ -519,7 +519,7 @@ public class FrostBlocks {
                             shrinkY = 0.9f;
                             status = FrostStatusEffects.napalm;
                             statusDuration = 12f * 60f;
-                            gravity = 0.00082f;
+                            gravity = 0.00164f;
                             bounceShake = 0.7f;
                             bounceEfficiency = 0.65f;
                             bounceForce = 10;
@@ -548,9 +548,10 @@ public class FrostBlocks {
                         fragRandomSpread = 5;
                         fragLifeMin = 0.6f;
                         fragLifeMax = 1f;
-                        fragVelocityMin = 0.5f;
+                        fragVelocityMin = 0.6f;
                         fragVelocityMax = 1f;
-                        fragLiftMin = 0.8f;
+                        fragLiftMin = 0.3f;
+                        fragLiftMax = 2f;
                         splashDamage = 55;
                         splashDamageRadius = 16;
                         scaleLife = false;

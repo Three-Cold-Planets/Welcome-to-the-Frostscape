@@ -1,6 +1,8 @@
 package frostscape.content;
 
 import frostscape.world.meta.LoreNote;
+import mindustry.gen.Player;
+import mindustry.net.Net;
 
 import static frostscape.Frostscape.NAME;
 
