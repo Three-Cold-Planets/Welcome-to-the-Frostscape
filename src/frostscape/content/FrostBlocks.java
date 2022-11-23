@@ -35,6 +35,7 @@ import mindustry.entities.bullet.MissileBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.gen.Building;
 import mindustry.gen.EntityMapping;
 import mindustry.gen.Sounds;
 import mindustry.graphics.CacheLayer;
@@ -68,7 +69,7 @@ public class FrostBlocks {
             volcanicDaciteFloor, roughVolcanicDaciteFloor,
             tephra;
 
-    public static Prop algae, wornBoulderLarge, wornBoulderHuge;
+    public static Prop algae, frostCluster, wornBoulderLarge, wornBoulderHuge;
 
     public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
     public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall;
@@ -263,6 +264,14 @@ public class FrostBlocks {
         algae = new WobbleProp("algae"){{
             variants = 3;
             hasShadow = false;
+        }};
+
+        frostCluster = new Prop("frost-cluster"){{
+            variants = 3;
+            size = 1;
+            breakable = alwaysReplace = false;
+            solid = true;
+            BulletType p = null;
         }};
 
         wornBoulderLarge = new Prop("worn-boulder-large"){{
