@@ -210,7 +210,7 @@ public class FrostBlocks {
         }};
 
         tephra = new Floor("tephra"){{
-            variants = 4;
+            variants = 3;
         }};
 
         crackedAndesiteFloor = new CrackedBlock("cracked-andesite-floor"){{
@@ -411,7 +411,7 @@ public class FrostBlocks {
                                                  bounceShake = 0.7f;
                                                  bounceEfficiency = 0.85f;
                                                  bounceForce = 10;
-                                                 maxBounces = 0;
+                                                 bounceCap = 0;
                                                  keepLift = false;
                                                  keepHeight = false;
                                                  frontColor = Pal.lightishOrange;
@@ -448,12 +448,12 @@ public class FrostBlocks {
                         shrinkY = 1f;
                         status = StatusEffects.burning;
                         statusDuration = 12f * 60f;
-                        gravity = 0.00072f;
-                        startingLift = 0.0288f;
+                        gravity = 0.00144f;
+                        startingLift = 0.0576f;
                         bounceShake = 0.7f;
                         bounceEfficiency = 0.65f;
                         bounceForce = 10;
-                        maxBounces = 0;
+                        bounceCap = 0;
                         hitShake = 6.2f;
                         hittable = true;
                         hitSound = Sounds.bang;
@@ -528,11 +528,11 @@ public class FrostBlocks {
                             shrinkY = 0.9f;
                             status = FrostStatusEffects.napalm;
                             statusDuration = 12f * 60f;
-                            gravity = 0.00164f;
+                            gravity = 0.00328f;
                             bounceShake = 0.7f;
                             bounceEfficiency = 0.65f;
                             bounceForce = 10;
-                            maxBounces = 3;
+                            bounceCap = 3;
                             keepLift = true;
                             frontColor = Pal.lightishOrange;
                             backColor = Pal.lightOrange;
@@ -551,6 +551,7 @@ public class FrostBlocks {
                             fragBullets = 3;
                             fragBullet = FrostBullets.pyraGel.fragBullet;
                             hitSound = Sounds.explosion;
+                            homing = velHomeDefault;
                         }};
                         fragBullets = 5;
                         fragSpread = 5;

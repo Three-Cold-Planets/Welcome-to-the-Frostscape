@@ -8,6 +8,7 @@ import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.*;
+import frostscape.entities.BaseBulletType;
 import frostscape.graphics.Draww;
 import frostscape.math.Math3D;
 import mindustry.Vars;
@@ -26,7 +27,7 @@ import java.util.Iterator;
 import frostscape.math.Math3D.*;
 
 //how many of these am I going to make I don't damm know
-public class BouncyBulletType extends BasicBulletType {
+public class BouncyBulletType extends BaseBulletType {
     public static final float shadowTX = -12f, shadowTY = -13f;
     public float gravity;
     public float bounceEfficiency;
@@ -34,7 +35,7 @@ public class BouncyBulletType extends BasicBulletType {
     //conversion of the lost energy to forward momentum
     public float bounceForce;
     //Set to -1 to disable
-    public int maxBounces;
+    public int bounceCap;
     public float visualHeightMax, visualHeightMin;
 
     public int bounceIncend;
@@ -66,7 +67,7 @@ public class BouncyBulletType extends BasicBulletType {
         startingHeight = 0;
         startingLift = 0.05f;
         bounceForce = 1;
-        maxBounces = -1;
+        bounceCap = -1;
         bounceIncend = 0;
         bounceIncendSpread = 5;
         bounceIncendChance = 0;
@@ -295,7 +296,7 @@ public class BouncyBulletType extends BasicBulletType {
         if(collidesBounce){
             bounceCollision(b);
         }
-        if(b.fdata > maxBounces && maxBounces != -1) {
+        if(b.fdata > bounceCap && bounceCap != -1) {
             b.hit();
             b.remove();
         }

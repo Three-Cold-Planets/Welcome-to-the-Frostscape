@@ -258,13 +258,13 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         //Main loop for testing collisions
 
         //If light beams continued forever I'd be dammed
-        int maxBounces = 6;
+        int bounceCap = 6;
 
         Vec2 pointOut = new Vec2();
         //Remember last collision point
         CollisionData last = start;
 
-        for (int i = 0; i < maxBounces; i++) {
+        for (int i = 0; i < bounceCap; i++) {
 
             if(Mathf.zero(Math.abs(last.after.r) + Math.abs(last.after.g) + Math.abs(last.after.b))) break;
             float bx1 = last.x, by1 = last.y;

@@ -44,7 +44,7 @@ public class CanisterBulletType extends BouncyBulletType{
         if(holder.height < 0) {
             Log.info("HIT!");
             Log.info(b.fdata);
-            if(b.fdata + 1 > maxBounces && maxBounces != -1) {
+            if(b.fdata + 1 > bounceCap && bounceCap != -1) {
                 Log.info("Applying things");
                 b.fdata = 0;
                 b.data = null;
