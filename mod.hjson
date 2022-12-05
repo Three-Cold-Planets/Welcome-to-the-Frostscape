@@ -16,7 +16,7 @@ description: "An experimental modification created to test v7's new API themed a
 version: v1.0.2-alpha
 
 #the minimum game build required to run this mod
-minGameVersion: 136
+minGameVersion: 137
 
 #this is a java mod
 java: true
