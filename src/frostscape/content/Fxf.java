@@ -44,6 +44,13 @@ public class Fxf {
 
     emberTrail = new Effect(40f, e -> {
         color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
+        randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {
+            Fill.circle(e.x + x, e.y + y, .2f + e.fout() * 1.2f);
+        });
+    }),
+
+    emberTrailHeight = new Effect(40f, e -> {
+        color(Liquids.slag.color, Color.white, e.fout() / 5f + Mathf.randomSeedRange(e.id, 0.12f));
         float height = (float) e.data;
         DrawUtils.speckOffset(e.x, e.y, height, e.fin() * 40, DrawUtils.smokeWeight, Tmp.v1);
         randLenVectors(e.id, 2, 1f + e.fin() * 3f, (x, y) -> {

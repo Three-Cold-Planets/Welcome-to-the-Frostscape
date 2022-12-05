@@ -27,6 +27,15 @@ public class Mathh {
         }
     }
 
+    //Returns the point at which two lines intersect, assuming the two lines intersect
+    public static Vec2 intersectionUnsafe(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4){
+
+        float det = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4))/det;
+
+        return new Vec2(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+    }
+
     //I'd love to explain how this works but just check desmos
     public static float rotReflectionX(float rotation){
         return Math.abs(360 + 180 - rotation);

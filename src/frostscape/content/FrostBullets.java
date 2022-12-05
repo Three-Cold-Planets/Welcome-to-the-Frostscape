@@ -60,18 +60,21 @@ public class FrostBullets {
             splashDamage = 55;
             splashDamageRadius = 16;
 
-            fragBullet = new BasicBulletType(2.6f, 18){{
-                width = 10f;
-                height = 12f;
+            fragBullet = new BasicBulletType(1.6f, 18){{
+                width = 6f;
+                height = 8f;
                 frontColor = Pal.lightishOrange;
                 backColor = Pal.lightOrange;
                 status = FrostStatusEffects.napalm;
                 hitEffect = new MultiEffect(Fx.hitBulletSmall, Fx.fireHit);
+                trailEffect = Fxf.emberTrail;
+                trailChance = 0.5f;
 
                 ammoMultiplier = 5;
 
                 splashDamage = 12f;
                 splashDamageRadius = 22f;
+
 
                 incendAmount = 1;
                 incendChance = 1;
@@ -80,7 +83,10 @@ public class FrostBullets {
                 fragBullet = new LiquidBulletType(Liquids.oil){{
                     speed = 0.25f;
                     puddleAmount = 3;
+                    status = FrostStatusEffects.napalm;
+                    statusDuration = 240;
                 }};
+                drag = 0.03f;
             }};
             scaleLife = true;
             //Todo: fix calcMinLife
@@ -106,7 +112,7 @@ public class FrostBullets {
             bounceShake = 0.7f;
             bounceEfficiency = 0.65f;
             bounceForce = 10;
-            bounceCap = 4;
+            maxBounces = 4;
             hitShake = 3.2f;
             hittable = true;
             bounceEffect = new MultiEffect(){{

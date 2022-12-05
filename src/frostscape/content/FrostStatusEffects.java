@@ -4,8 +4,10 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.util.Time;
+import frostscape.type.status.FrostStatusEffect;
 import mindustry.content.*;
 import mindustry.gen.Unit;
+import mindustry.gen.UnitEntity;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 
@@ -18,7 +20,7 @@ public class FrostStatusEffects {
             spriteTests[i] = new StatusEffect("test-" + i){{}};
         }
 
-        napalm = new StatusEffect("sticky-fire"){{
+        napalm = new StatusEffect("sticky-fire") {{
             damage = 0.18f;
             transitionDamage = 80;
             speedMultiplier = 0.9f;
@@ -29,15 +31,23 @@ public class FrostStatusEffects {
                 affinity(StatusEffects.burning, (unit, result, time) -> unit.damagePierce(Math.min(transitionDamage, StatusEffects.burning.damage * time)));
                 affinity(StatusEffects.tarred, (unit, result, time) -> result.set(napalm, Math.min(transitionDamage/damage, result.time + time)));
             });
-        }};
+            }
 
-        causticCoating = new StatusEffect("caustic-coating"){{
+            @Override
+            public void update(Unit unit, float time) {
+                super.update(unit, time);
+                unit.unapply(StatusEffects.burning);
+            }
+        };
+
+        causticCoating = new FrostStatusEffect("caustic-coating"){{
             color = Palf.sulphur;
             effect = Fxf.sulphurDrops;
             damage = 0.43f;
             damageMultiplier = 0.35f;
             speedMultiplier = 0.85f;
-            dragMultiplier =  0.85f;
+            dragMultiplier = 0.85f;
+            shieldDamageMultiplier = 3;
         }};
 
         attackBoost = new StatusEffect("attack-boost"){{
