@@ -112,7 +112,7 @@ public class FrostBullets {
             bounceShake = 0.7f;
             bounceEfficiency = 0.65f;
             bounceForce = 10;
-            maxBounces = 4;
+            bounceCap = 4;
             hitShake = 3.2f;
             hittable = true;
             bounceEffect = new MultiEffect(){{
