@@ -1,29 +1,30 @@
 package frostscape.type;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.*;
 import frostscape.content.Palf;
-import frostscape.time.Stopwatch;
 import frostscape.util.StatUtils;
 import frostscape.world.meta.Family;
-import frostscape.world.meta.stat.FrostStats;
-import mindustry.Vars;
+import mindustry.content.Fx;
 import mindustry.gen.Unit;
-import mindustry.gen.UnitEntity;
 import mindustry.type.UnitType;
-import mindustry.type.UnitType.UnitEngine;
-import mindustry.world.meta.Stat;
-import rhino.*;
+import mindustry.type.Weapon;
 
-import java.lang.reflect.Field;
+import static frostscape.math.Mathh.rotReflectionY;
 
 public class HollusUnitType extends UnitType{
     public Seq<Family> families;
+
+    public Runnable init;
+
+    public Runnable load;
 
     public HollusUnitType(String name) {
         super(name);
@@ -33,12 +34,14 @@ public class HollusUnitType extends UnitType{
     @Override
     public void load() {
         super.load();
+        if(load != null) load.run();
     }
 
     @Override
     public void init() {
         super.init();
         families.each(family -> family.members.add(this));
+        if(init != null) init.run();
     }
 
     @Override
@@ -51,6 +54,10 @@ public class HollusUnitType extends UnitType{
         }
     }
 
+    public interface LoadableEngine{
+        Seq<LoadableEngine> engines = new Seq<LoadableEngine>();
+        void load();
+    }
     public static class ActivationEngine extends UnitEngine {
         public float from, to, threshold, target;
 
@@ -71,7 +78,29 @@ public class HollusUnitType extends UnitType{
 
             radius *= activation;
 
-            super.draw(unit);
+            UnitType type = unit.type;
+            float scale = type.useEngineElevation ? unit.elevation : 1f;
+
+            if(scale <= 0.0001f) return;
+
+            float rot = unit.rotation - 90;
+            Color color = type.engineColor == null ? unit.team.color : type.engineColor;
+
+            Tmp.v1.set(x, y).rotate(rot);
+            float ex = Tmp.v1.x, ey = Tmp.v1.y;
+
+            Draw.color(color);
+            Fill.circle(
+                    unit.x + ex,
+                    unit.y + ey,
+                    (radius + Mathf.absin(Time.time, 2f, radius / 4f)) * scale
+            );
+            Draw.color(type.engineColorInner);
+            Fill.circle(
+                    unit.x + ex - Angles.trnsx(rot + rotation, 1f),
+                    unit.y + ey - Angles.trnsy(rot + rotation, 1f),
+                    (radius + Mathf.absin(Time.time, 2f, radius / 4f)) / 2f  * scale
+            );
 
             radius = iradius;
         }

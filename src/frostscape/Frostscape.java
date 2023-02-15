@@ -8,16 +8,15 @@ import arc.scene.ui.Image;
 import arc.scene.ui.layout.Cell;
 import arc.struct.ObjectFloatMap;
 import arc.struct.Seq;
-import arc.struct.Sort;
 import arc.util.*;
 import frostscape.content.Palf;
 import frostscape.game.ScriptedSectorHandler;
 import frostscape.graphics.FrostShaders;
 import frostscape.mods.Compatibility;
+import frostscape.type.HollusUnitType.LoadableEngine;
 import frostscape.ui.FrostUI;
 import frostscape.ui.overlay.ScanningOverlay;
 import frostscape.ui.overlay.SelectOverlay;
-import frostscape.util.Sorts;
 import frostscape.util.UIUtils;
 import frostscape.world.environment.FloorDataHandler;
 import frostscape.world.light.LightBeams;
@@ -26,7 +25,6 @@ import frostscape.world.meta.LoreNote;
 import frostscape.world.research.ResearchHandler;
 import frostscape.world.upgrades.UpgradeHandler;
 import mindustry.Vars;
-import mindustry.game.EventType;
 import mindustry.game.EventType.*;
 import mindustry.gen.Icon;
 import mindustry.gen.Sounds;
@@ -70,11 +68,12 @@ public class Frostscape extends Mod{
             MOD = Vars.mods.getMod(NAME);
         });
 
-        Events.on(EventType.ClientLoadEvent.class,
+        Events.on(ClientLoadEvent.class,
                 e -> {
                     loadSettings();
                     LoreNote.all.each(LoreNote::load);
                     Family.all.each(Family::load);
+                    LoadableEngine.engines.each(LoadableEngine::load);
 
                     VERSION_NAME = MOD.meta.version;
                     LAST_VERSION_NAME = Core.settings.getString(NAME + "-last-version", "0.0");
@@ -115,17 +114,11 @@ public class Frostscape extends Mod{
                 }
         );
 
-        Events.run(EventType.ContentInitEvent.class, () -> {
-            loadSplash();
-        });
+        Events.run(ContentInitEvent.class, this::loadSplash);
 
-        Events.run(EventType.WinEvent.class, () -> {
-            loadSplash();
-        });
+        Events.run(WinEvent.class, this::loadSplash);
 
-        Events.run(EventType.SaveWriteEvent.class, () -> {
-            lights.lights.clear();
-        });
+        Events.run(SaveWriteEvent.class, lights.lights::clear);
 
         Events.run(Trigger.update, () -> {
             if(Vars.state.isMenu()) return;
@@ -237,8 +230,7 @@ public class Frostscape extends Mod{
             }
         }
         String subtitle = packed.substring(end);
-        Structs.add(list, subtitle);
-        return list;
+        return Structs.add(list, subtitle);
     }
 
     ObjectFloatMap<String> getCategories(String key){

@@ -1,9 +1,11 @@
 package frostscape.graphics;
 
 import arc.Core;
+import arc.graphics.Texture;
 import arc.graphics.g2d.Draw;
 import arc.graphics.gl.FrameBuffer;
 import arc.graphics.gl.Shader;
+import arc.math.Mat;
 import arc.scene.ui.layout.Scl;
 import arc.util.Log;
 import arc.util.Time;

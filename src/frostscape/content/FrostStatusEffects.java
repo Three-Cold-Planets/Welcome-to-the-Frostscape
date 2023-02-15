@@ -56,7 +56,7 @@ public class FrostStatusEffects {
 
         engineBoost = new StatusEffect("engine-boost"){{
             speedMultiplier = 2.45f;
-            dragMultiplier = 0.5f;
+            dragMultiplier = 0.75f;
         }};
 
         lowGrav = new StatusEffect("low-grav"){

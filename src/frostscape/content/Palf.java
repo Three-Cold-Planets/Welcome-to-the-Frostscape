@@ -8,9 +8,12 @@ public class Palf {
     pulseChargeStart = new Color(Color.sky).lerp(Pal.lightTrail, 0.35f),
     pulseChargeEnd = new Color(Color.sky).lerp(Pal.lightTrail, 0.25f).lerp(Color.valueOf("#a4ddf2"), 0.05f),
 
+    aluminium = Color.valueOf("#a0a3b4"),
+
+    ice = Color.valueOf("#9ccaed"),
     sulphur = Color.valueOf("#beab77"),
 
-    quiteDarkOutline = Color.valueOf("#403e49"),
+    quiteDarkOutline = Color.valueOf("#413b45"),
     hunter = Color.valueOf("#dde6f0"),
     heat = new Color(1.0F, 0.22F, 0.22F, 0.8F),
 

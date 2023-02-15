@@ -1,16 +1,21 @@
 package frostscape.entities;
 
+import arc.func.Prov;
 import arc.math.Angles;
+import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.math.geom.Vec2;
 import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.Tmp;
+import mindustry.Vars;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.game.Team;
 import mindustry.gen.*;
+import mindustry.graphics.Trail;
+import mindustry.io.JsonIO;
 import mindustry.logic.Ranged;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.defense.turrets.Turret.TurretBuild;
@@ -22,10 +27,26 @@ public class BaseBulletType extends BasicBulletType {
     public float trueSpeed,
     rotationOffset;
 
+    public Prov<Trail> trailProv;
+
     @Override
     public void init() {
         super.init();
         if(!useTrueSpeed) trueSpeed = speed;
+        if(trailProv == null) trailProv = () -> new Trail(trailLength);
+    }
+
+    @Override
+    public void updateTrail(Bullet b) {
+        if (!Vars.headless && this.trailLength > 0) {
+            if (b.trail == null) {
+                b.trail = trailProv.get();
+            }
+
+            b.trail.length = this.trailLength;
+            b.trail.update(b.x, b.y, this.trailInterp.apply(b.fin()) * (1.0F + (this.trailSinMag > 0.0F ? Mathf.absin(Time.time, this.trailSinScl, this.trailSinMag) : 0.0F)));
+        }
+
     }
 
     @Override
@@ -126,8 +147,8 @@ public class BaseBulletType extends BasicBulletType {
             Tmp.v3.set(((Posc) b.owner()).x(), ((Posc) b.owner()).y());
             if(limitRange) Tmp.v1.sub(Tmp.v3).clamp(0, ((Ranged) b.owner).range()).add(Tmp.v3);
             b.vel.add(Tmp.v2.trns(b.angleTo(Tmp.v1), b.type.homingPower * Time.delta)).clamp(0, trueBulletSpeed);
-            if(b.dst(Tmp.v3.x, Tmp.v3.y) >= ((Ranged) b.owner).range() + trueBulletSpeed + 3) b.time += b.lifetime/100 * Time.delta;
-
+            if(limitRange && b.dst(Tmp.v3.x, Tmp.v3.y) >= ((Ranged) b.owner).range() + trueBulletSpeed + 3) b.time += b.lifetime/100 * Time.delta;
+            
             //essentualy goes to owner aim pos, without stopping homing
         }
     }
