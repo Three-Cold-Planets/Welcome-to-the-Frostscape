@@ -14,7 +14,9 @@ import arc.util.Time;
 import arc.util.Timer;
 import arc.util.Tmp;
 import mindustry.Vars;
+import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
+import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.gen.Unit;
 import mindustry.gen.UnitEntity;
@@ -28,10 +30,12 @@ import mindustry.world.blocks.units.UnitFactory;
 public class ThermalMine extends UpgradeableMine{
     protected static boolean unitFound;
     public float radius = 24, lightMulti = 0.95f;
-    public float heat = 0;
+
+    public Effect heatEffect;
+    public float effectInterval = -1;
     public Color explosionCenter = Pal.lightPyraFlame, explosionEdge = Pal.darkPyraFlame;
     public float activationTime = 150;
-    public float warmupSpeed = 0.2f, warmDownSpeed = 0.15f, expansionSpeed;
+    public float warmupSpeed = 0.2f, warmDownSpeed = 0.15f;
 
     public StatusEffect status = StatusEffects.melting;
     public float statusDuration = 100;
@@ -41,6 +45,13 @@ public class ThermalMine extends UpgradeableMine{
         super(name);
         cooldown = 15;
         tileDamage = 2;
+        heatEffect = Fx.fire;
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        if(effectInterval == -1) effectInterval = heatEffect.lifetime;
     }
 
     @Override
@@ -61,7 +72,7 @@ public class ThermalMine extends UpgradeableMine{
     }
 
     public class ThermalMineBuild extends UpgradeableMineBuild{
-        public float warmup = 0, heatRadius = 0, active;
+        public float warmup = 0, heatRadius = 0, effectTimer, active;
 
         @Override
         public void draw() {
@@ -93,6 +104,12 @@ public class ThermalMine extends UpgradeableMine{
             if(warmup < 0.001F) heatRadius = 0;
 
             if(activated) {
+
+                if(effectTimer++ >= effectInterval) {
+                    effectTimer %= effectInterval;
+                    heatEffect.at(x, y);
+                }
+
                 unitFound = false;
                 boolean time = timer(timerDamage, cooldown/reloadMultiplier);
                 Units.nearby(x - heatRadius, y - heatRadius, heatRadius * 2, heatRadius * 2, u -> {

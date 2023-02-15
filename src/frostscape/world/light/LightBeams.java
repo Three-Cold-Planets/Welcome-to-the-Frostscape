@@ -20,6 +20,7 @@ import frostscape.graphics.FrostShaders;
 import frostscape.math.Mathh;
 import mindustry.Vars;
 import mindustry.content.Fx;
+import mindustry.entities.bullet.LaserBulletType;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Shaders;
 import mindustry.io.SaveFileReader;
@@ -39,6 +40,8 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     public Seq<Lightc> lights = new Seq<>(), removeable = new Seq<>();
     public Seq<LightSource> out = new Seq<>();
     public Seq<WorldShape> tmps = new Seq<WorldShape>(), shapes = new Seq<WorldShape>();
+
+    public ObjectMap<WorldShape, Lightc> shapeMap = new ObjectMap<>();
     public static float[] tmpf = new float[6];
 
     public static int[] intOut = new int[2];
@@ -221,6 +224,20 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         //Todo: Finish main loop
         if(!Vars.state.isPlaying() && !shouldUpdate) return;
         shouldUpdate = false;
+
+        //Map the shapes to their Lightc owners
+        shapeMap.clear();
+
+        lights.each(lightc -> {
+            if(!lightc.collides()) return;
+            lightc.hitboxes(tmps);
+            for (int j = 0; j < tmps.size; j++) {
+                shapes.add(tmps.get(j));
+                shapeMap.put(tmps.get(j), lightc);
+            }
+            tmps.clear();
+        });
+
         lights.each(l -> {
             if(!l.exists()) removeable.add(l);
             out.clear();
@@ -237,6 +254,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             l.afterLight();
         });
 
+        //WELCOME TO THE UNEXIST
         removeable.each(r -> lights.remove(r));
         removeable.clear();
     }
@@ -270,28 +288,12 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             float bx1 = last.x, by1 = last.y;
             float rotation = last.rotAfter;
             ColorData tempData = new ColorData(last.after);
-            shapes.clear();
 
             //Find the furthest point to form the end of the line segment.
             Vec2 furthestFade = (furthestFalloffPoint(last.after, Tmp.v1.set(bx1, by1), rotation)), end = furthestFade;
 
             //Asign variables to the ending cords of the beam
             float bx2 = furthestFade.x, by2 = furthestFade.y;
-
-            //Map the shapes to their Lightc owners
-            ObjectMap<WorldShape, Lightc> shapeMap = new ObjectMap<>();
-            
-            lights.each(lightc -> {
-                if(!lightc.collides()) return;
-                lightc.hitboxes(tmps);
-                for (int j = 0; j < tmps.size; j++) {
-                    shapes.add(tmps.get(j));
-                    shapeMap.put(tmps.get(j), lightc);
-                }
-                tmps.clear();
-            });
-
-            shapes.sort(hitbox -> Mathf.dst2(bx1, by1, hitbox.getX(), hitbox.getY()));
 
             //Check for if the beam intersects anything. If it does, set a new target position and handle falloff.
             boolean hitTarget = linecastClosest(bx1, by1, bx2, by2, shapes, intOut, pointOut);
@@ -357,7 +359,6 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                 r2.set(x3, y3, x4 - x3, y4 - y3).normalize();
 
                 if(!r1.overlaps(r2)) continue;
-
                 Vec2 point = Mathh.intersection(x1, y1, x2, y2, x3, y3, x4, y4);
 
                 //If the point found is null, or the point is further away from a previously found point, continue.
@@ -394,7 +395,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
                         Draw.color();
                         CollisionData before = beams.get(i), after = beams.get(i + 1);
                         Color start = toColor(before.after), end = toColor(after.before);
-                        if(debug) Log.info(start.r + ", " + start.g + ", " + start.b);
+                        //if(debug) Log.info(start.r + ", " + start.g + ", " + start.b);
 
                         Tmp.v1.trns(before.rotAfter, source.beamWidth).rotate(90);
                         float x1 = before.x + Tmp.v1.x, y1 = before.y + Tmp.v1.y, x2 = before.x - Tmp.v1.x, y2 = before.y - Tmp.v1.y;
