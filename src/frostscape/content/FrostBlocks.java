@@ -612,6 +612,7 @@ public class FrostBlocks {
 
             consumeLiquid(Liquids.water, 0.01f);
             liquidPadding = 5;
+            itemCapacity = 1;
 
             float centerOffset = 55/4, floatMirrorSide = 17/4;
 
