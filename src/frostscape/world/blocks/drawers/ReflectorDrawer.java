@@ -46,9 +46,8 @@ public class ReflectorDrawer extends DrawBlock {
         Draw.z(layer);
         Draw.rect(this.reflector, build.x, build.y, reflector.rotation);
         if (this.outline.found()) {
-            Draw.z(49.99F);
+            Draw.z(50);
             Draw.rect(this.outline, build.x, build.y, reflector.rotation);
-            Draw.z(50.0F);
         }
         Draw.z(topLayer);
         Draw.blend(Blending.additive);
