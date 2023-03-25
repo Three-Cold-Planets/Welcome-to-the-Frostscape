@@ -63,6 +63,7 @@ public class FrostBlocks {
         baseRock = NAME + "-base-rock-0",
         baseReflector = NAME + "-base-reflector-0";
     public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
+            sulphuricIce,
             frostStone, frostSnow,
             andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
             graystoneFloor, graystoneSlatedFloor,
@@ -142,6 +143,17 @@ public class FrostBlocks {
             albedo = 0.9F;
             supportsOverlay = true;
             speedMultiplier = 0.92f;
+        }};
+
+        sulphuricIce = new ParticleFloor("sulphuric-ice"){{
+            variants = 4;
+            effect = Fxf.sulphuricSmoke;
+            chance = 0.00012f;
+            status = FrostStatusEffects.causticCoating;
+            statusDuration = 75.0F;
+            albedo = 0.9F;
+            supportsOverlay = true;
+            speedMultiplier = 1.12f;
         }};
 
         frostStone = new Floor("frost-stone"){{
@@ -612,6 +624,7 @@ public class FrostBlocks {
 
             consumeLiquid(Liquids.water, 0.01f);
             liquidPadding = 5;
+            itemCapacity = 1;
 
             float centerOffset = 55/4, floatMirrorSide = 17/4;
 

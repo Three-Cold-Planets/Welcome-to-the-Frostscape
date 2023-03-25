@@ -13,7 +13,7 @@ main: "frostscape.Frostscape"
 #the mod description as seen in the mod dialog
 description: "An experimental modification created to test v7's new API themed around Frostscapes and Volcanoes. Aims to one day create a satasfying rogue-lite experiance in your tower-defense real time stratagy factory game. Will *not* be worked on consistently due to life, thank you if you chose to use this.\n\n[dark[]gray]A voice lingers in the darkness, dancing around your ears. Will you join it?"
 #the mod version
-version: v1.0.2-alpha
+version: v1.1-alpha
 
 #the minimum game build required to run this mod
 minGameVersion: 137
