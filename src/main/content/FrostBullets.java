@@ -1,11 +1,19 @@
 package main.content;
 
-import arc.graphics.g2d.*;
-import arc.math.*;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
+import arc.math.Angles;
+import arc.math.Interp;
+import arc.math.Mathf;
 import main.entities.bullet.BouncyBulletType;
-import mindustry.content.*;
+import mindustry.content.Fx;
+import mindustry.content.Liquids;
+import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
-import mindustry.entities.bullet.*;
+import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.LiquidBulletType;
+import mindustry.entities.bullet.RailBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.graphics.Pal;
 

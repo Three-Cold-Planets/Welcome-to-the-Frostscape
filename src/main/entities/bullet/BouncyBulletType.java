@@ -36,10 +36,12 @@ import java.util.Iterator;
 //how many of these am I going to make I don't damm know
 public class BouncyBulletType extends BaseBulletType {
     public static final float shadowTX = -12f, shadowTY = -13f;
+
     public float gravity;
+    //Percent of bounce velocity lost on impact
     public float bounceEfficiency;
     public float startingHeight, startingLift;
-    //conversion of the lost energy to forward momentum
+    //Percent of the lost bounce velocity added to forward movement
     public float bounceForce;
     //Set to -1 to disable
     public int bounceCap;
@@ -54,7 +56,7 @@ public class BouncyBulletType extends BaseBulletType {
     public boolean useRotation;
 
     public boolean spinsprite;
-
+    //Whether to keep the lift and height parameters from the parent bullet. Does nothing if parent does not have a HeightHolder
     public boolean keepLift, keepHeight;
     public float shadowAlpha;
     public float bounceEffectScale;
@@ -206,13 +208,7 @@ public class BouncyBulletType extends BaseBulletType {
 
     @Override
     public void hit(Bullet b, float x, float y) {
-        Log.info("Height \\/");
-        Log.info(getHeight(b));
-        Log.info("Lift \\/");
-        Log.info(getHolder(b).lift);
-        Log.info("Lift in effect \\/");
         this.hitEffect.at(x, y, b.rotation(), this.hitColor, getHolder(b));
-        Log.info("ID: " + id);
         this.hitSound.at(x, y, this.hitSoundPitch, this.hitSoundVolume);
         Effect.shake(this.hitShake, this.hitShake, b);
         if (this.fragOnHit) {

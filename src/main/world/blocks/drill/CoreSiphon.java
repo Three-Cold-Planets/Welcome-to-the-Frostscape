@@ -31,15 +31,12 @@ import mindustry.gen.Sounds;
 import mindustry.graphics.Drawf;
 import mindustry.type.Liquid;
 import mindustry.world.Tile;
-import mindustry.world.blocks.environment.Floor.UpdateRenderState;
 import mindustry.world.blocks.liquid.LiquidBlock;
 import mindustry.world.blocks.production.Pump;
 import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.world.meta.BlockGroup;
 
 import java.util.Iterator;
-
-import static main.world.environment.FloorDataHandler.updateFloors;
 
 public class CoreSiphon extends BaseBlock {
 
@@ -164,7 +161,7 @@ public class CoreSiphon extends BaseBlock {
         boolean cracked = super.canPlaceOn(tile, team, rotation);
         if (isMultiblock()) {
             countOre(tile);
-            if(returnCount > 1) return true;
+            if(returnCount > 0) return true;
             Iterator ittr = tile.getLinkedTilesAs(this, tempTiles).iterator();
 
             while(ittr.hasNext()) {
@@ -264,8 +261,6 @@ public class CoreSiphon extends BaseBlock {
 
                         if(drill.progress >= 1){
                             Tile targTile = Vars.world.tileWorld(drill.targetPos.x + x, drill.targetPos.y + y);
-                            UpdateRenderState state = updateFloors.find(r -> r.tile == targTile);
-                            if(state != null) updateFloors.remove(state);
                             CrackedBlock cracked = (CrackedBlock) targTile.floor();
                             targTile.setFloor(cracked.cracked);
                             drill.progress = 0;

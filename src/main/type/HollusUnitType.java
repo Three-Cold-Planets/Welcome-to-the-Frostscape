@@ -11,11 +11,12 @@ import arc.util.Tmp;
 import main.graphics.ModPal;
 import main.util.StatUtils;
 import main.world.meta.Family;
+import mindustry.content.StatusEffects;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 
 public class HollusUnitType extends UnitType{
-    public Seq<Family> families;
+    public Seq<Family> families = new Seq<>();
 
     public Runnable init;
 
@@ -23,6 +24,7 @@ public class HollusUnitType extends UnitType{
 
     public HollusUnitType(String name) {
         super(name);
+        immunities.add(StatusEffects.freezing);
         outlineColor = ModPal.quiteDarkOutline;
     }
 

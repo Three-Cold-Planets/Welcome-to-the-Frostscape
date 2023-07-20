@@ -1,43 +1,24 @@
 package main.world.environment;
 
-import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import main.world.blocks.environment.DataBlock;
 import main.world.blocks.environment.EnvironmentData;
-import mindustry.Vars;
-import mindustry.game.EventType.ClientLoadEvent;
-import mindustry.graphics.BlockRenderer;
 import mindustry.io.SaveFileReader.CustomChunk;
 import mindustry.world.Tile;
-import mindustry.world.blocks.environment.Floor.UpdateRenderState;
 
-import java.io.*;
-import java.lang.reflect.Field;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
 public class FloorDataHandler implements CustomChunk {
 
     public FloorDataHandler(){
-        Events.run(ClientLoadEvent.class, () -> {
-            Field floors = null;
-            try {
-                floors = BlockRenderer.class.getDeclaredField("updateFloors");
-            } catch (NoSuchFieldException e) {
-                Log.err(e);
-            }
-            floors.setAccessible(true);
-            try {
-                updateFloors = (Seq<UpdateRenderState>) floors.get(Vars.renderer.blocks);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        });
+
     }
 
-    public static Seq<UpdateRenderState> updateFloors;
     public static Seq<DataBlock> blocks = new Seq<>();
 
     public ObjectMap<Tile, DataHolders> data = new ObjectMap<>();

@@ -15,6 +15,7 @@ public class FrostContentLoader {
         Families.load();
         FrostStatusEffects.load();
         FrostItems.load();
+        FrostLiquids.load();
         FrostBullets.load();
         FrostUpgrades.load();
         FrostUnits.load();

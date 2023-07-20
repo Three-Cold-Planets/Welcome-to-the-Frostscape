@@ -1,27 +1,38 @@
 package main.content;
 
 import arc.graphics.Color;
-import arc.graphics.g2d.*;
-import arc.math.*;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
+import arc.math.Angles;
+import arc.math.Interp;
+import arc.math.Mathf;
 import arc.struct.Seq;
 import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
 import main.entities.bullet.FrostBulletType;
+import main.entities.bullet.RicochetBulletType;
 import main.type.HollusUnitType;
 import main.type.weapon.SwingWeapon;
 import main.type.weapon.VelocityWeapon;
-import mindustry.content.*;
+import mindustry.content.Fx;
+import mindustry.content.Liquids;
+import mindustry.content.StatusEffects;
+import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.MoveLightningAbility;
-import mindustry.entities.bullet.*;
+import mindustry.entities.bullet.ContinuousFlameBulletType;
+import mindustry.entities.bullet.RailBulletType;
 import mindustry.entities.part.RegionPart;
-import mindustry.gen.*;
-import mindustry.graphics.*;
+import mindustry.gen.Sounds;
+import mindustry.gen.UnitEntity;
+import mindustry.gen.UnitWaterMove;
+import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 import mindustry.type.Weapon;
 
 import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
-import static arc.graphics.g2d.Lines.stroke;
 import static arc.math.Angles.randLenVectors;
 import static main.Frostscape.NAME;
 
@@ -36,7 +47,7 @@ public class FrostUnits {
         sunspot = new HollusUnitType("sunspot"){{
             maxRange = 150;
             range = 10;
-            families = Seq.with(Families.hunter);
+            families.add(Families.hunter);
             hitSize = 70/8;
             constructor = UnitEntity::create;
             flying = true;
@@ -148,7 +159,7 @@ public class FrostUnits {
         stalagmite = new HollusUnitType("stalagmite"){{
             health = 750;
             armor = 6;
-            families = Seq.with(Families.hunter);
+            families.add(Families.hunter);
             constructor = UnitWaterMove::create;
             accel = 0.055f;
             drag = 0.165f;
@@ -304,5 +315,21 @@ public class FrostUnits {
                     }}
             );
         }};
+
+        RicochetBulletType bouncy = new RicochetBulletType(2, 10, "missile-large"){{
+            width = 8;
+            height = 16;
+            shrinkX = 0;
+            shrinkY = 0;
+            lifetime = 120;
+            bounceEffect = Fx.none;
+            hitEffect = Fx.none;
+            trailColor = Pal.accent;
+            trailWidth = 4.5f;
+            trailLength = 60;
+            bounceCap = 1;
+        }};
+
+        UnitTypes.alpha.weapons.each(w -> w.bullet = bouncy);
     }
 }

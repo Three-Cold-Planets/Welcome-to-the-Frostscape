@@ -15,6 +15,8 @@ public class ModPal {
     ice = Color.valueOf("#9ccaed"),
     sulphur = Color.valueOf("#beab77"),
 
+    salt = Color.valueOf("e8e4e3"),
+
     quiteDarkOutline = Color.valueOf("#413b45"),
     hunter = Color.valueOf("#dde6f0"),
     heat = new Color(1.0F, 0.22F, 0.22F, 0.8F),

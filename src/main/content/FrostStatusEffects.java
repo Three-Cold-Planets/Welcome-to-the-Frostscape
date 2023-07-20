@@ -21,7 +21,7 @@ public class FrostStatusEffects {
             spriteTests[i] = new StatusEffect("test-" + i){{}};
         }
 
-        napalm = new StatusEffect("sticky-fire") {{
+        napalm = new StatusEffect("napalm") {{
             damage = 0.18f;
             transitionDamage = 80;
             speedMultiplier = 0.9f;

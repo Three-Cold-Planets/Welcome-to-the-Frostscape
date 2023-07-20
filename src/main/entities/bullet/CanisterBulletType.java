@@ -14,7 +14,7 @@ import mindustry.gen.Bullet;
 import mindustry.graphics.Layer;
 
 //Time delayed bomb after hitting ground when it uses up all bounces.
-public class CanisterBulletType extends BouncyBulletType{
+public class CanisterBulletType extends BouncyBulletType {
     public int charSize = Vars.tilesize;
     public float detonationTime = 35, landingSpeed;
     public boolean stick = true;

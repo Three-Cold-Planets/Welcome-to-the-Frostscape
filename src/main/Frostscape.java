@@ -155,7 +155,7 @@ public class Frostscape extends Mod{
     @Override
     public void init() {
 
-        //Import classes manually into Console.
+        //Import classes manually into Console.S
         //Todo: Automatically import classes into the js console
         Vars.mods.getScripts().runConsole(
                 "function buildWorldP(){return Vars.world.buildWorld(Vars.player.x, Vars.player.y)}");

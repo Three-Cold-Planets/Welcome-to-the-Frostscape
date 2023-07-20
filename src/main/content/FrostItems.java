@@ -8,6 +8,8 @@ import mindustry.type.Item;
 public class FrostItems {
     //Ferric/Aluminium tech for all biomes
     public static Item magnetite, bauxite, ferricPanels, aluminium, thermite,
+    //Salts and clays
+    hailite,
     //Meltables items
     ice,
     //Volcanic tech
@@ -37,6 +39,10 @@ public class FrostItems {
 
         thermite = new Item("thermite"){{
             color = Items.pyratite.color.cpy().shiftSaturation(0.1f);
+        }};
+
+        hailite = new Item("hailite"){{
+            color = ModPal.salt;
         }};
 
         ice = new Item("ice"){{

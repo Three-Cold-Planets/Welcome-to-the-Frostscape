@@ -201,7 +201,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         //Find the new closest point
         Vec2 newClosest = closestFalloffPoint(closestCol, closest, rotation, newCol);
 
-        //One of the colours has already faded, so if the point isn't the same as the ending that means there is only one remaining
+        //One of the colors has already faded, so if the point isn't the same as the ending that means there is only one remaining
         if(newClosest.equals(furthest)) return;
         beam.add(new CollisionData(newClosest.x, newClosest.y, rotation, applyFalloff(newCol, newClosest.dst(furthest))));
 
@@ -462,7 +462,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         //Find max distances before fading
         float r = color.r/falloff.r, g = color.g/falloff.g, b = color.b/falloff.b;
 
-        //Translate it by the rotation of the beam, and max length of the colours before they fall off completely, then add the original beam's position.
+        //Translate it by the rotation of the beam, and max length of the colors before they fall off completely, then add the original beam's position.
         return new Vec2().trns(rotation, Math.max(Math.max(r, b), g)).add(position);
     }
 
@@ -493,7 +493,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         //Apply falloff and write it to out
         applyFalloff(out.set(color.r, color.g, color.b), distance);
 
-        //Translate it by the rotation of the beam, and max length of the colours before they fall off completely, then add the original beam's position.
+        //Translate it by the rotation of the beam, and max length of the colors before they fall off completely, then add the original beam's position.
         return new Vec2().trns(rotation, distance).add(position);
     }
 
