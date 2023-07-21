@@ -24,6 +24,7 @@ import mindustry.entities.abilities.MoveLightningAbility;
 import mindustry.entities.bullet.ContinuousFlameBulletType;
 import mindustry.entities.bullet.RailBulletType;
 import mindustry.entities.part.RegionPart;
+import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
 import mindustry.gen.UnitEntity;
 import mindustry.gen.UnitWaterMove;
@@ -316,20 +317,32 @@ public class FrostUnits {
             );
         }};
 
-        RicochetBulletType bouncy = new RicochetBulletType(2, 10, "missile-large"){{
-            width = 8;
-            height = 16;
+        RicochetBulletType bouncy = new RicochetBulletType(4, 10, "missile-large"){{
+            drag = 0.015f;
+            bounciness = 1.5f;
+            width = 4;
+            height = 8;
             shrinkX = 0;
             shrinkY = 0;
-            lifetime = 120;
+            lifetime = 65;
             bounceEffect = Fx.none;
-            hitEffect = Fx.none;
             trailColor = Pal.accent;
-            trailWidth = 4.5f;
-            trailLength = 60;
-            bounceCap = 1;
+            trailWidth = 2f;
+            trailLength = 8;
+            bounceCap = 2;
+            homingRange = 32;
+            homingPower = 0.54f;
+            homingDelay = 15;
+            hitEffect = Fx.hitBulletSmall;
         }};
 
-        UnitTypes.alpha.weapons.each(w -> w.bullet = bouncy);
+        UnitTypes.alpha.weapons.each(w -> {
+            w.reload = 45;
+            w.bullet = bouncy;
+            w.shoot = new ShootSpread(){{
+                shots = 3;
+                shotDelay = 5;
+            }};
+        });
     }
 }

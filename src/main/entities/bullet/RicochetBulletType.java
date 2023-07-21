@@ -24,8 +24,8 @@ public class RicochetBulletType extends BasicBulletType {
     //Whether the bullet can bounce multiple times on the same entity
     public boolean bounceSame = true;
 
-    //how many ticks inbetween collisions being cleared. Set around 15/20 or lower to make bullet reliable in low fps.
-    public int bounceInternal = 15;
+    //how many ticks inbetween collisions being cleared. Set around 15/20 or lower to make bullet reliable in low fps. -1 to disable
+    public int bounceInternal = -1;
 
     public boolean useRange = true;
 
@@ -44,7 +44,7 @@ public class RicochetBulletType extends BasicBulletType {
 
     @Override
     public void update(Bullet b){
-        if(bounceSame || b.timer.get(1, bounceInternal)){{
+        if(bounceInternal != -1 && b.timer.get(1, bounceInternal)){{
             b.collided.clear();
         }}
         super.update(b);
@@ -53,9 +53,10 @@ public class RicochetBulletType extends BasicBulletType {
     @Override
     public void hitEntity(Bullet b, Hitboxc entity, float health) {
         b.fdata++;
-        if((entity instanceof Unit)) {
+        if ((bounceCap == -1 || b.fdata <= bounceCap) && bounceUnits) {
+            b.collided.pop();
+            if((entity instanceof Unit)) {
             Unit unit = (Unit) entity;
-            if ((bounceCap == -1 || b.fdata <= bounceCap) && bounceUnits) {
                 //Bring bullet back to point of intersection
                 float rotation = b.vel.angle();
                 b.vel.setAngle(360 + rotation - (rotation - b.angleTo(entity)) * 2);
@@ -74,7 +75,6 @@ public class RicochetBulletType extends BasicBulletType {
 
     @Override
     public void hitTile(Bullet b, Building build, float x, float y, float initialHealth, boolean direct) {
-        Log.info("Hit tile!");
         b.fdata++;
         if(build != null){
             float difX = b.x - build.x,
@@ -114,20 +114,10 @@ public class RicochetBulletType extends BasicBulletType {
                 }
                 Tmp.v1.add(build.x, build.y);
                 Tmp.v2.add(build.x, build.y);
-                Log.info("Dif: " + difY);
-
-                Log.info(flipX + "," + flipY);
-                Log.info(b.x + ", " + b.y);
                 Tmp.v5.set(b.x, b.y);
-                Fx.smoke.at(Tmp.v1.cpy());
-                Fx.smoke.at(Tmp.v2.cpy());
-                Fx.smoke.at(b);
-                Fx.smoke.at(Tmp.v4.trns(b.vel.angle() + 180, size * 2).add(b.x, b.y));
                 Intersector.intersectLines(Tmp.v1, Tmp.v2, Tmp.v3.set(b), Tmp.v4.trns(b.vel.angle() + 180, size * 2).add(b.x, b.y), Tmp.v5);
                 b.x = Tmp.v5.x;
                 b.y = Tmp.v5.y;
-                Log.info(b.x + ", " + b.y);
-                Log.info("bounced!\n---");
 
                 if (flipX) {
                     b.vel.x *= -1 * bounciness;
