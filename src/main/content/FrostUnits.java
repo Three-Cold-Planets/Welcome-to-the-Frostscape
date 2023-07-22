@@ -23,6 +23,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.abilities.MoveLightningAbility;
 import mindustry.entities.bullet.ContinuousFlameBulletType;
 import mindustry.entities.bullet.ExplosionBulletType;
+import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.entities.part.RegionPart;
 import mindustry.gen.Building;
 import mindustry.gen.Sounds;
@@ -221,7 +222,6 @@ public class FrostUnits {
                             keepVelocity = false;
                             lifetime = 20;
                             knockback = 4;
-                            pierceArmor = true;
                             pierce = true;
                             pierceBuilding = true;
                             pierceArmor = true;
@@ -229,7 +229,7 @@ public class FrostUnits {
                             statusDuration = 180;
                             hitEffect = Fx.none;
                             despawnEffect = Fx.none;
-
+                            fragOnHit = true;
                             trailRotation = true;
                             bounceEffect = trailEffect = new Effect(45, e -> {
                                 color(Liquids.water.color);
@@ -244,6 +244,16 @@ public class FrostUnits {
                                 });
                             });
                             trailChance = 1;
+                            fragSpread = 3;
+                            fragBullets = 3;
+                            fragBullet = intervalBullet = new LiquidBulletType(Liquids.water){{
+                                speed = 3;
+                                lifetime = 25;
+                                orbSize = 2;
+                                drag = 0.05f;
+                            }};
+                            intervalBullets = 2;
+                            intervalDelay = 5;
                         }};
 
                         parts.addAll(new RegionPart("-container"){{
