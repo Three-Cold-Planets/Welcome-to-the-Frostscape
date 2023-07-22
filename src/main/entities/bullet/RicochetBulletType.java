@@ -1,7 +1,6 @@
 package main.entities.bullet;
 
 import arc.math.geom.Intersector;
-import arc.util.Log;
 import arc.util.Tmp;
 import mindustry.Vars;
 import mindustry.content.Fx;
@@ -54,7 +53,7 @@ public class RicochetBulletType extends BasicBulletType {
     public void hitEntity(Bullet b, Hitboxc entity, float health) {
         b.fdata++;
         if ((bounceCap == -1 || b.fdata <= bounceCap) && bounceUnits) {
-            b.collided.pop();
+            if(b.collided.size >= 1) b.collided.pop();
             if((entity instanceof Unit)) {
             Unit unit = (Unit) entity;
                 //Bring bullet back to point of intersection
@@ -127,7 +126,7 @@ public class RicochetBulletType extends BasicBulletType {
                 }
                 b.x += b.vel.x;
                 b.y += b.vel.y;
-                bounceEffect.at(x, y, b.angleTo(build));
+                bounceEffect.at(Tmp.v5.x, Tmp.v5.y, b.vel.angle());
             }
         }
         super.hitTile(b, build, x, y, initialHealth, direct);

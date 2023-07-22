@@ -2,6 +2,7 @@ package main.world.blocks.light;
 
 import arc.math.geom.Rect;
 import arc.struct.Seq;
+import arc.util.io.Writes;
 import main.math.MathUtils;
 import main.world.BaseBlock;
 import main.world.BaseBuilding;
@@ -23,6 +24,7 @@ public class ReflectiveWall extends BaseBlock {
     public class ReflectiveWallBuild extends BaseBuilding implements Lightc {
 
         public WorldRect hitbox = new WorldRect();
+
         @Override
         public void created() {
             LightBeams.get().handle(this);
@@ -74,6 +76,11 @@ public class ReflectiveWall extends BaseBlock {
             collision.rotAfter = newRot;
 
             return collision;
+        }
+
+        @Override
+        public void write(Writes write) {
+            super.write(write);
         }
     }
 }

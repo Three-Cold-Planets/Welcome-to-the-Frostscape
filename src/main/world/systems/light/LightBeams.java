@@ -225,6 +225,8 @@ public class LightBeams implements SaveFileReader.CustomChunk {
     }
 
     public void updateBeams(){
+        removeable.clear();
+        shapes.clear();
         //Todo: Finish main loop
         if(!Vars.state.isPlaying() && !shouldUpdate) return;
         shouldUpdate = false;
@@ -259,8 +261,9 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         });
 
         //WELCOME TO THE UNEXIST
-        removeable.each(r -> lights.remove(r));
-        removeable.clear();
+        removeable.each(r -> {
+            lights.remove(r);
+        });
     }
 
     //Left separate in the case that a light source needs to update itself

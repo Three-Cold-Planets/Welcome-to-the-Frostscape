@@ -4,7 +4,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
-import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.struct.Seq;
@@ -15,6 +14,7 @@ import main.entities.bullet.RicochetBulletType;
 import main.type.HollusUnitType;
 import main.type.weapon.SwingWeapon;
 import main.type.weapon.VelocityWeapon;
+import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
@@ -22,9 +22,9 @@ import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.MoveLightningAbility;
 import mindustry.entities.bullet.ContinuousFlameBulletType;
-import mindustry.entities.bullet.RailBulletType;
+import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.entities.part.RegionPart;
-import mindustry.entities.pattern.ShootSpread;
+import mindustry.gen.Building;
 import mindustry.gen.Sounds;
 import mindustry.gen.UnitEntity;
 import mindustry.gen.UnitWaterMove;
@@ -82,7 +82,7 @@ public class FrostUnits {
                         range = 150;
                         recoil = 0.5f;
                         shootEffect = new Effect(12, e -> {
-                            Draw.color(Color.white);
+                            color(Color.white);
                             randLenVectors(e.id, (int) (Mathf.randomSeed(e.id) * 8 + 2), e.fin(Interp.pow4) * 145, e.rotation, 15, (x1, y1) -> {
                                 Lines.lineAngle(e.x, e.y, Mathf.angle(x1, y1), e.fout(Interp.pow4) * 8);
                             });
@@ -202,41 +202,48 @@ public class FrostUnits {
                         shootStatus = StatusEffects.slow;
                         shootStatusDuration = 82;
 
-                        bullet = new RailBulletType(){{
+                        bullet = new RicochetBulletType(5, 35, "circle"){{
                             chargeEffect = new Effect(40, e -> {
                                 color(Liquids.water.gasColor);
                                 alpha(Mathf.clamp(e.foutpow() * 2f));
 
-                                Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e.finpow() * 45, e.rotation, 40, (x, y) -> {
+                                randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e.finpow() * 45, e.rotation, 40, (x, y) -> {
                                     Fill.circle(e.x + x, e.y + y, e.finpow() * 1.5f);
                                 });
                             });
 
-                            damage = 35;
+                            frontColor = Liquids.water.color;
+                            shrinkX = shrinkY = 0;
+                            width = height = 4;
+                            trailLength = 8;
+                            trailWidth = 2;
+                            trailColor = Liquids.water.color;
+                            keepVelocity = false;
+                            lifetime = 20;
                             knockback = 4;
-                            pierce = false;
-                            pierceBuilding = false;
+                            pierceArmor = true;
+                            pierce = true;
+                            pierceBuilding = true;
                             pierceArmor = true;
                             status = StatusEffects.wet;
                             statusDuration = 180;
-                            pierceEffect = new Effect(55, e -> {
-                                color(Liquids.water.color);
-                                alpha(Mathf.clamp(e.foutpow() * 2f));
+                            hitEffect = Fx.none;
+                            despawnEffect = Fx.none;
 
-                                Angles.randLenVectors(e.id, 15, e.finpow() * 25, e.rotation, 60, (x, y) -> {
+                            trailRotation = true;
+                            bounceEffect = trailEffect = new Effect(45, e -> {
+                                color(Liquids.water.color);
+                                alpha(Mathf.clamp(e.fslope() * e.fslope() * 2f));
+                                Color color = Draw.getColor();
+
+                                randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 6), e.finpow() * 45, e.rotation, 5 + 25 * e.fin(), (x, y) -> {
+                                    Building b = Vars.world.buildWorld(e.x + x, e.y + y);
+                                    if(b != null) alpha(color.a * (b.dst2(e.x + x, e.y + y)/b.hitSize()/b.hitSize()/2 + 0.5f));
                                     Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
+                                    Draw.color(color);
                                 });
                             });
-
-                            pointEffect = new Effect(20, e -> {
-                                color(Liquids.water.color);
-                                alpha(Mathf.clamp(e.fout() * 2f));
-
-                                Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e.finpow() * 45, e.rotation, 5, (x, y) -> {
-                                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
-                                });
-                            });
-                            pointEffectSpace = 10;
+                            trailChance = 1;
                         }};
 
                         parts.addAll(new RegionPart("-container"){{
@@ -317,32 +324,37 @@ public class FrostUnits {
             );
         }};
 
-        RicochetBulletType bouncy = new RicochetBulletType(4, 10, "missile-large"){{
+        RicochetBulletType bouncy = new RicochetBulletType(5, 10, "missile-large"){{
             drag = 0.015f;
-            bounciness = 1.5f;
+            bounciness = 1f;
             width = 4;
             height = 8;
             shrinkX = 0;
             shrinkY = 0;
-            lifetime = 65;
-            bounceEffect = Fx.none;
+            lifetime = 75;
+            knockback = 1.5f;
+            fragBullet = new ExplosionBulletType(10, 15){{
+                killShooter = false;
+            }};
+            fragBullets = 2;
+            hitEffect = Fx.none;
+            bounceEffect = Fx.hitBulletSmall;
             trailColor = Pal.accent;
-            trailWidth = 2f;
-            trailLength = 8;
-            bounceCap = 2;
+            trailWidth = 1f;
+            trailLength = 4;
+            bounceSame = true;
+            bounceCap = 1;
+            pierceCap = 2;
+            removeAfterPierce = false;
             homingRange = 32;
-            homingPower = 0.54f;
-            homingDelay = 15;
-            hitEffect = Fx.hitBulletSmall;
+            homingPower = 0.17f;
+            homingDelay = 5;
         }};
 
         UnitTypes.alpha.weapons.each(w -> {
-            w.reload = 45;
+            w.reload = 15;
             w.bullet = bouncy;
-            w.shoot = new ShootSpread(){{
-                shots = 3;
-                shotDelay = 5;
-            }};
+            w.inaccuracy = 5;
         });
     }
 }
