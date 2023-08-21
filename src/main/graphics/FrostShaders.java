@@ -25,7 +25,7 @@ public class FrostShaders {
         bufferScreen = new FrameBuffer(Core.graphics.getWidth(), Core.graphics.getHeight());
         try {
             pauseMenu = new NamedShader("pauseMenu");
-            light = new NamedShader("light");
+            light = new LightShader("light", 5);
         }
         catch (IllegalArgumentException error){
             loaded = false;
@@ -59,6 +59,23 @@ public class FrostShaders {
                     Core.graphics.getHeight()
             );
             setUniformf("u_drawCol", Draw.getColor().r,  Draw.getColor().g,  Draw.getColor().b,  Draw.getColor().a);
+        }
+    }
+
+    public static class LightShader extends NamedShader{
+
+        public int radius;
+
+        public LightShader(String name, int radius) {
+            super(name);
+            this.radius = radius;
+        }
+
+        @Override
+        public void apply() {
+            super.apply();
+
+            setUniformi("u_radius", radius);
         }
     }
 }

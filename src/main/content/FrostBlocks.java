@@ -11,9 +11,9 @@ import arc.math.geom.Geometry;
 import arc.math.geom.Point2;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Tmp;
 import main.entities.bullet.BouncyBulletType;
+import main.entities.part.AccelPartProgress;
 import main.graphics.Layers;
 import main.graphics.ModPal;
 import main.math.Math3D;
@@ -31,7 +31,6 @@ import main.world.blocks.light.ReflectiveWall;
 import main.world.blocks.light.SolarReflector;
 import main.world.systems.light.LightBeams;
 import main.world.systems.upgrades.UpgradeEntry;
-import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
@@ -143,7 +142,7 @@ public class FrostBlocks {
                         );
                     }},
                     new RegionPart("-barrel"){{
-                        progress = PartProgress.recoil.curve(Interp.pow2In);
+                        progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.recoil.inv());
                         moveY = -9;
                         heatColor = Color.valueOf("f03b0e");
                         mirror = false;
@@ -231,11 +230,7 @@ public class FrostBlocks {
 
                     hitEffect = new Effect(850, e -> {
                         float h = Math.max(((Math3D.HeightHolder) e.data).height, 0);
-                        Log.info(((Math3D.HeightHolder) e.data).height);
-                        Log.info(((Math3D.HeightHolder) e.data).lift);
-                        Log.info(h);
                         e.scaled(150, e1 -> {
-                            if(Vars.state.isPlaying())Log.info(h);
                             DrawUtils.parallaxOffset(e.x, e.y, h, Tmp.v1);
                             float ox = Tmp.v1.x, oy = Tmp.v1.y;
                             Draw.z(visualHeightMax);

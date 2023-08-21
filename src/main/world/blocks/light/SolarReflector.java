@@ -10,12 +10,16 @@ import main.world.UpgradesType;
 import main.world.systems.light.LightBeams;
 import main.world.systems.light.LightBeams.LightSource;
 import main.world.systems.light.Lightc;
+import mindustry.content.UnitTypes;
+import mindustry.gen.BlockUnitc;
+import mindustry.gen.Unit;
+import mindustry.world.blocks.ControlBlock;
 import mindustry.world.draw.DrawBlock;
 
 public class SolarReflector extends BaseBlock {
 
     public LightBeams.ColorData data = new LightBeams.ColorData(1, 1, 1);
-    public float rotationSpeed = 0.001f;
+    public float rotationSpeed = 1f;
 
     public DrawBlock drawer;
 
@@ -42,7 +46,7 @@ public class SolarReflector extends BaseBlock {
         this.drawer.getRegionsToOutline(this, out);
     }
 
-    public static class ReflectorSource extends LightSource{
+    public static class ReflectorSource extends LightSource {
         float x, y;
         public ReflectorSource(LightBeams.ColorData color, float rotation, float x, float y) {
             super(color, rotation);
@@ -62,7 +66,9 @@ public class SolarReflector extends BaseBlock {
         }
     }
 
-    public class SolarReflectorBuild extends BaseBuilding implements Lightc {
+    public class SolarReflectorBuild extends BaseBuilding implements Lightc, ControlBlock {
+
+        public BlockUnitc unit = (BlockUnitc) UnitTypes.block.create(team);
 
         //Instantiated on building creation
         public Seq<ReflectorSource> sources = new Seq<>();
@@ -76,10 +82,10 @@ public class SolarReflector extends BaseBlock {
         @Override
         public void update() {
             super.update();
-            rotation += Time.delta;
+            if(isControlled() && unit.isShooting()) targetRot = angleTo(unit.aimX(), unit.aimY());
             sources.each(source -> source.rotation = rotation);
 
-            Angles.moveToward(rotation, targetRot, rotationSpeed);
+            rotation = Angles.moveToward(rotation, targetRot, rotationSpeed * Time.delta);
         }
 
         @Override
@@ -111,6 +117,24 @@ public class SolarReflector extends BaseBlock {
         @Override
         public void afterLight() {
             Lightc.super.afterLight();
+        }
+
+        @Override
+        public Unit unit(){
+            //make sure stats are correct
+            unit.tile(this);
+            unit.team(team);
+            return (Unit)unit;
+        }
+
+        @Override
+        public boolean isControlled() {
+            return ControlBlock.super.isControlled();
+        }
+
+        @Override
+        public boolean canControl() {
+            return ControlBlock.super.canControl();
         }
     }
 }

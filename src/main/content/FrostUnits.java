@@ -1,5 +1,6 @@
 package main.content;
 
+import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -7,10 +8,14 @@ import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.struct.Seq;
+import arc.util.Time;
+import arc.util.Tmp;
+import main.ai.types.FixedFlyingAI;
 import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
 import main.entities.bullet.FrostBulletType;
 import main.entities.bullet.RicochetBulletType;
+import main.graphics.ModPal;
 import main.type.HollusUnitType;
 import main.type.weapon.SwingWeapon;
 import main.type.weapon.VelocityWeapon;
@@ -20,21 +25,17 @@ import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
-import mindustry.entities.abilities.MoveLightningAbility;
-import mindustry.entities.bullet.ContinuousFlameBulletType;
-import mindustry.entities.bullet.ExplosionBulletType;
-import mindustry.entities.bullet.LiquidBulletType;
+import mindustry.entities.bullet.*;
 import mindustry.entities.part.RegionPart;
-import mindustry.gen.Building;
-import mindustry.gen.Sounds;
-import mindustry.gen.UnitEntity;
-import mindustry.gen.UnitWaterMove;
+import mindustry.gen.*;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.Weapon;
 
 import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
+import static arc.graphics.g2d.Lines.stroke;
 import static arc.math.Angles.randLenVectors;
 import static main.Frostscape.NAME;
 
@@ -57,19 +58,21 @@ public class FrostUnits {
             rotateSpeed = 3;
             accel = 0.038f;
             drag = 0.028f;
+            engineSize = 0.0F;
             faceTarget = true;
             circleTarget = true;
             omniMovement = false;
             engines.clear();
+            aiController = () -> new FixedFlyingAI();
             setEnginesMirror(
-                        new ActivationEngine(24/4, -32/4, 3.5f, 15 - 90, 0.45f, 1, 1, 3.5f)
+                        new ActivationEngine(24/4, -30/4, 3.5f, 15 - 90, 0.45f, 1, 1, 3.5f)
             );
             abilities.add(
-                    new MoveLightningAbility(0, 0, 0, 0, 2, 4.5f, Color.white, name + "-glow"),
-                    new MoveDamageLineAbility(9, 40/4, 0.85f, 6/4, 1, 4.5f, 0, false, true, Fx.sparkShoot),
-                    new MoveArmorAbility(1.2f, 5, 0.6f, Layer.flyingUnit + 0.1f)
+                    new MoveDamageLineAbility(9, 40/4, 0.85f, 6/4, 1, 4.5f, 0, true, true, Fx.colorSpark, Fx.hitLancer),
+                    new MoveArmorAbility(1.2f, 5, 0.6f, true, name + "-glow",Layer.flyingUnit + 0.1f)
             );
 
+            deathExplosionEffect = new Effect(45, e -> {});
             weapons.add(
                 new Weapon("none"){{
                     x = 24/4;
@@ -97,6 +100,102 @@ public class FrostUnits {
                     shootCone = 180;
                     shootStatus = FrostStatusEffects.engineBoost;
                     shootStatusDuration = 35;
+                }},
+                new Weapon() {{
+                    shootOnDeath = true;
+                    shootCone = 180;
+                    reload = 60;
+                    ejectEffect = Fx.none;
+                    shootSound = Sounds.none;
+                    x = shootY = 0.0f;
+                    mirror = false;
+                    noAttack = true;
+                    controllable = false;
+                    bullet = new BulletType(){{
+                        killShooter = true;
+                        instantDisappear = true;
+                        fragBullets = 1;
+                        float rad = 15;
+                        fragBullet = new BasicBulletType(3, 0, NAME + "-sunspot-tip") {
+
+                            @Override
+                            public void update(Bullet b) {
+                                super.update(b);
+                                b.rotation(b.rotation() + b.fout() * b.fout() * Time.delta * 5);
+                            }
+                            @Override
+                            public void draw(Bullet b) {
+                                super.draw(b);
+
+                                Draw.z(Layer.effect);
+
+                                stroke((0.7f + Mathf.absin(10, 0.7f)) * b.fin() * 1.6f, ModPal.hunter);
+
+                                float progress = b.fin(Interp.smooth);
+
+                                for (int i = 0; i < 6; i++) {
+                                    float rot = i * 360f / 6 - 360 * progress;
+                                    Lines.arc(b.x, b.y, rad * progress + 3f, 0.08f + b.fin() * 0.06f, rot);
+                                }
+
+                                float fastProgress = Mathf.clamp(progress * 3 - 2);
+
+                                Fill.light(b.x, b.y, 20, rad, Tmp.c1.set(ModPal.hunter).a(fastProgress), Tmp.c2.set(Color.clear));
+                            }
+
+                            public void createFrags(Bullet b, float x, float y) {
+                                if (this.fragBullet != null && (this.fragOnAbsorb || !b.absorbed)) {
+                                    for(int i = 0; i < this.fragBullets; ++i) {
+                                        float a = b.rotation();
+                                        this.fragBullet.create(b, x, y, a, Mathf.random(this.fragVelocityMin, this.fragVelocityMax), Mathf.random(this.fragLifeMin, this.fragLifeMax));
+                                    }
+                                }
+                            }
+
+                            {
+                                layer = Layer.groundUnit + 0.1f;
+                                drag = 0.045f;
+                                collidesTiles = false;
+                                collides = false;
+                                hitSound = Sounds.spark;
+                                rangeOverride = 0.0F;
+                                shootEffect = Fx.none;
+                                lifetime = 95;
+                                shrinkX = shrinkY = 0;
+                                splashDamageRadius = 55.0F;
+                                splashDamage = 90.0F;
+                                spin = 0.85f;
+                                hittable = false;
+                                collidesAir = true;
+                                fragBullets = 1;
+                                fragBullet = new EmpBulletType() {
+                                    {
+                                    damage = 35;
+                                    instantDisappear = true;
+                                    despawnHit = true;
+                                    radius = rad;
+                                    hitEffect = new Effect(50f, 100f, e -> {
+                                        e.scaled(7f, b -> {
+                                            color(ModPal.hunter, b.fout());
+                                            Fill.circle(e.x, e.y, radius);
+                                        });
+
+                                        color(ModPal.hunter);
+                                        stroke(e.fout() * 3f);
+                                        Lines.circle(e.x, e.y, radius);
+
+                                        Fill.circle(e.x, e.y, 12f * e.fout());
+                                        color();
+                                        Fill.circle(e.x, e.y, 6f * e.fout());
+                                        Draw.blend(Blending.additive);
+                                        Drawf.light(e.x, e.y, radius * 1.6f, ModPal.hunter, e.fout());
+                                        Draw.blend();
+                                    });
+                                    hitColor = ModPal.hunter;
+                                }};
+                            }
+                        };
+                    }};
                 }}
             );
         }};
@@ -115,11 +214,12 @@ public class FrostUnits {
             range = 15;
             maxRange = 55;
 
+            trailLength = 15;
+            trailScl = 3;
             engines.add(new ActivationEngine(0, -56/4, 5.5f, -90, 0.45f, 1, 0.6f, 2.25f));
             abilities.add(
-                    new MoveLightningAbility(0, 0, 0, 0, 0.6f, 2.25f, Color.white, name + "-glow"),
-                    new MoveDamageLineAbility(65, 40/4, 0.45f, 20/4, 0.6f, 2.25f, 0, false, true, Fx.generatespark),
-                    new MoveArmorAbility(0.6f, 2.25f, 2.3f, Layer.flyingUnit + 0.1f)
+                    new MoveDamageLineAbility(65, 40/4, 0.45f, 20/4, 0.6f, 2.25f, 0, false, true, Fx.generatespark, Fx.sparkShoot),
+                    new MoveArmorAbility(0.6f, 2.25f, 2.3f, false, name + "-glow", Layer.flyingUnit + 0.1f)
             );
 
             weapons.add(

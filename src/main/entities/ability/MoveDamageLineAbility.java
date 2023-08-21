@@ -1,9 +1,11 @@
 package main.entities.ability;
-import arc.math.*;
-import arc.util.*;
-import mindustry.entities.*;
+
+import arc.math.Angles;
+import arc.math.Mathf;
+import arc.util.Time;
+import mindustry.entities.Effect;
 import mindustry.entities.abilities.Ability;
-import mindustry.gen.*;
+import mindustry.gen.Unit;
 
 import static main.content.FrostBullets.placeholder1;
 
@@ -27,13 +29,15 @@ public class MoveDamageLineAbility extends Ability {
     /** Bullet angle parameters */
     public float angleOffset = 0f;
     /** Effect spawned upon bullet creation **/
-    public Effect effect;
+    public Effect effect,
+    /** Effect for hitting things. Self explanitory **/
+    hitEffect;
 
     protected float side = 1f;
 
     MoveDamageLineAbility(){}
 
-    public MoveDamageLineAbility(float damage, int length, float chance, float y, float minSpeed, float maxSpeed,  float angleOffset, boolean hitGround, boolean hitAir, Effect effect){
+    public MoveDamageLineAbility(float damage, int length, float chance, float y, float minSpeed, float maxSpeed,  float angleOffset, boolean hitGround, boolean hitAir, Effect effect, Effect hitEffect){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
@@ -44,6 +48,7 @@ public class MoveDamageLineAbility extends Ability {
         this.hitGround = hitGround;
         this.hitAir = hitAir;
         this.effect = effect;
+        this.hitEffect = hitEffect;
     }
 
     @Override
@@ -57,6 +62,7 @@ public class MoveDamageLineAbility extends Ability {
                 placeholder1.length = length;
                 placeholder1.collidesGround = hitGround;
                 placeholder1.collidesAir = hitAir;
+                placeholder1.hitEffect = hitEffect;
                 placeholder1.create(unit, x, y, unit.rotation + angleOffset);
                 effect.at(x, y, unit.rotation + angleOffset);
             }

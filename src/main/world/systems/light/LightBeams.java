@@ -1,7 +1,6 @@
 package main.world.systems.light;
 
 import arc.Core;
-import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -391,6 +390,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         FrostShaders.effectBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         Draw.draw(Layer.light + 5, () -> {
             FrostShaders.effectBuffer.begin(Color.clear);
+            //Draw.blend(Blending.additive);
             lights.each(l -> {
                 out.clear();
                 l.getSources(out);
@@ -402,7 +402,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
 
                         CollisionData before = beams.get(i), after = beams.get(i + 1);
                         Core.camera.bounds(Tmp.r1);
-                        if(!Tmp.r2.setCentered(before.x, before.y, before.x - after.x, before.y - after.y).overlaps(Tmp.r1)) continue;
+                        if(!Tmp.r2.setCentered(before.x, before.y, after.x - before.x, after.y - before.y).overlaps(Tmp.r1)) continue;
 
                         Color start = toColor(before.after), end = toColor(after.before);
                         //if(debug) Log.info(start.r + ", " + start.g + ", " + start.b);
@@ -444,7 +444,6 @@ public class LightBeams implements SaveFileReader.CustomChunk {
             });
             Draw.reset();
             Draw.alpha(1);
-            Draw.blend(Blending.additive);
             FrostShaders.effectBuffer.end();
             Draw.blit(FrostShaders.effectBuffer, FrostShaders.light);
             Draw.blend();
