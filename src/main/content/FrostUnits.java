@@ -8,7 +8,6 @@ import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.struct.Seq;
-import arc.util.Time;
 import arc.util.Tmp;
 import main.ai.types.FixedFlyingAI;
 import main.entities.ability.MoveArmorAbility;
@@ -17,7 +16,7 @@ import main.entities.bullet.FrostBulletType;
 import main.entities.bullet.RicochetBulletType;
 import main.graphics.ModPal;
 import main.type.HollusUnitType;
-import main.type.weapon.SwingWeapon;
+import main.type.weapon.ThrustSwingWeapon;
 import main.type.weapon.VelocityWeapon;
 import mindustry.Vars;
 import mindustry.content.Fx;
@@ -38,6 +37,7 @@ import static arc.graphics.g2d.Draw.color;
 import static arc.graphics.g2d.Lines.stroke;
 import static arc.math.Angles.randLenVectors;
 import static main.Frostscape.NAME;
+import static mindustry.content.Fx.circleColorSpark;
 
 public class FrostUnits {
     public static HollusUnitType
@@ -111,22 +111,17 @@ public class FrostUnits {
                     mirror = false;
                     noAttack = true;
                     controllable = false;
+                    rotate = false;
+                    inaccuracy = 180;
                     bullet = new BulletType(){{
-                        killShooter = true;
                         instantDisappear = true;
                         fragBullets = 1;
-                        float rad = 15;
-                        fragBullet = new BasicBulletType(3, 0, NAME + "-sunspot-tip") {
-
-                            @Override
-                            public void update(Bullet b) {
-                                super.update(b);
-                                b.rotation(b.rotation() + b.fout() * b.fout() * Time.delta * 5);
-                            }
+                        float rad = 40;
+                        fragSpread = fragRandomSpread = 0;
+                        fragBullet = new BasicBulletType(5, 0, NAME + "-sunspot-tip") {
                             @Override
                             public void draw(Bullet b) {
-                                super.draw(b);
-
+                                Draw.rect(this.frontRegion, b.x, b.y, width, height, b.fout() * b.fout() * 360 * 2.5f);
                                 Draw.z(Layer.effect);
 
                                 stroke((0.7f + Mathf.absin(10, 0.7f)) * b.fin() * 1.6f, ModPal.hunter);
@@ -140,7 +135,9 @@ public class FrostUnits {
 
                                 float fastProgress = Mathf.clamp(progress * 3 - 2);
 
-                                Fill.light(b.x, b.y, 20, rad, Tmp.c1.set(ModPal.hunter).a(fastProgress), Tmp.c2.set(Color.clear));
+                                Draw.blend(Blending.additive);
+                                Fill.light(b.x, b.y, 20, rad, Tmp.c1.set(Color.white).lerp(ModPal.hunter, fastProgress).a(fastProgress * 0.2f), Tmp.c2.set(ModPal.hunter).a(0));
+                                Draw.blend();
                             }
 
                             public void createFrags(Bullet b, float x, float y) {
@@ -153,17 +150,21 @@ public class FrostUnits {
                             }
 
                             {
+                                homingPower = 0.055f;
+                                homingRange = rad * 2;
                                 layer = Layer.groundUnit + 0.1f;
                                 drag = 0.045f;
-                                collidesTiles = false;
-                                collides = false;
+                                collideTerrain = true;
+                                collidesTiles = true;
+                                collides = true;
+                                collidesAir = false;
                                 hitSound = Sounds.spark;
                                 rangeOverride = 0.0F;
                                 shootEffect = Fx.none;
                                 lifetime = 95;
                                 shrinkX = shrinkY = 0;
                                 splashDamageRadius = 55.0F;
-                                splashDamage = 90.0F;
+                                splashDamage = 5.0F;
                                 spin = 0.85f;
                                 hittable = false;
                                 collidesAir = true;
@@ -174,10 +175,13 @@ public class FrostUnits {
                                     instantDisappear = true;
                                     despawnHit = true;
                                     radius = rad;
+                                    hitPowerEffect = circleColorSpark;
                                     hitEffect = new Effect(50f, 100f, e -> {
                                         e.scaled(7f, b -> {
                                             color(ModPal.hunter, b.fout());
-                                            Fill.circle(e.x, e.y, radius);
+                                            Draw.blend(Blending.additive);
+                                            Fill.light(b.x, b.y, 20, rad, Tmp.c1.set(ModPal.hunter).a(b.fout()), Tmp.c2.set(Tmp.c1).a(b.fin() * b.fslope()));
+                                            Draw.blend();
                                         });
 
                                         color(ModPal.hunter);
@@ -187,11 +191,11 @@ public class FrostUnits {
                                         Fill.circle(e.x, e.y, 12f * e.fout());
                                         color();
                                         Fill.circle(e.x, e.y, 6f * e.fout());
-                                        Draw.blend(Blending.additive);
                                         Drawf.light(e.x, e.y, radius * 1.6f, ModPal.hunter, e.fout());
-                                        Draw.blend();
                                     });
                                     hitColor = ModPal.hunter;
+                                    status = FrostStatusEffects.conflex;
+                                    statusDuration = 15;
                                 }};
                             }
                         };
@@ -274,6 +278,8 @@ public class FrostUnits {
 
             alwaysShootWhenMoving = true;
             useEngineElevation = false;
+            canBoost = true;
+            engineSize = 0;
 
             immunities.add(StatusEffects.corroded);
 
@@ -386,10 +392,11 @@ public class FrostUnits {
                             colorTo = Liquids.water.color;
                         }});
                     }},
-                    new SwingWeapon(name + "-thruster"){{
+                    new ThrustSwingWeapon(name + "-thruster"){{
                         reload = 25;
                         x = 16/4;
                         y = -32/4;
+                        shootCone = 180;
                         shootSound = Sounds.minebeam;
                         from = 0;
                         to = 1;
@@ -400,7 +407,6 @@ public class FrostUnits {
                         baseRotation = 225;
                         rotationLimit = 50;
                         targetingBounds = 90;
-                        shootCone = 15;
                         rotateClockwise = true;
                         alternate = false;
                         shootStatusDuration = 10;
@@ -463,7 +469,7 @@ public class FrostUnits {
 
         UnitTypes.alpha.weapons.each(w -> {
             w.reload = 15;
-            w.bullet = bouncy;
+            w.bullet = sunspot.weapons.get(1).bullet;
             w.inaccuracy = 5;
         });
     }

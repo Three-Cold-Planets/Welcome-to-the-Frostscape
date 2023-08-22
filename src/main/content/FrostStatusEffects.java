@@ -14,7 +14,7 @@ import mindustry.type.StatusEffect;
 
 public class FrostStatusEffects {
     public static StatusEffect[] spriteTests = new StatusEffect[5];
-    public static StatusEffect napalm, causticCoating, attackBoost, engineBoost, lowGrav;
+    public static StatusEffect napalm, causticCoating, attackBoost, engineBoost, lowGrav, conflex;
 
     public static void load(){
         for (int i = 0; i < spriteTests.length; i++) {
@@ -79,5 +79,10 @@ public class FrostStatusEffects {
                 effect = Fx.fallSmoke;
             }
         };
+
+        conflex = new StatusEffect("conflex"){{
+            dragMultiplier = 10;
+            reloadMultiplier = 0.65f;
+        }};
     }
 }
