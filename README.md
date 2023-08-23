@@ -16,10 +16,10 @@ If any mod maker wants to make their own environmental tiles compatable with Fro
 ## Credits
 Thanks to
 
-- The development team:
-  Sh1penfire (Hey that's me!)
-  ThatOneCreator 
-  RilyProductions
+- The development team:  
+  Sh1penfire (Hey that's me!)  
+  ThatOneCreator  
+  RilyProductions  
   RandomUser
 
 - [NiChrosia#3367](https://github.com/NiChrosia) on discord for helping me throughout development (And generaly being a friend :D)
