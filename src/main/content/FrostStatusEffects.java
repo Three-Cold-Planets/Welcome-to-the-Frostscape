@@ -2,11 +2,8 @@ package main.content;
 
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
-import arc.math.Interp;
 import arc.math.Mathf;
-import arc.util.Log;
 import arc.util.Time;
-import arc.util.Tmp;
 import main.graphics.ModPal;
 import main.type.status.FrostStatusEffect;
 import mindustry.Vars;
@@ -19,6 +16,10 @@ import mindustry.type.StatusEffect;
 public class FrostStatusEffects {
     public static StatusEffect[] spriteTests = new StatusEffect[5];
     public static StatusEffect napalm, causticCoating, attackBoost, engineBoost, lowGrav, conflex;
+
+    //Internal!
+
+    public static StatusEffect conflexInternal;
 
     public static void load(){
         for (int i = 0; i < spriteTests.length; i++) {
@@ -84,7 +85,7 @@ public class FrostStatusEffects {
             }
         };
 
-        conflex = new StatusEffect("conflex"){
+        conflex = new FrostStatusEffect("conflex"){
 
             public void update(Unit u, float time){
                 super.update(u, time);
@@ -92,18 +93,28 @@ public class FrostStatusEffects {
                 u.reloadMultiplier /= reloadMultiplier;
                 //Grows by 1 per block the unit's hitbox's perimeter takes up.
                 float maxMulti = u.hitSize/Vars.tilesize * 4;
-                float multiplier = Interp.smooth2.apply(Mathf.clamp(time/(2 * 60)/maxMulti, 0, 1)) * maxMulti;
+                float multiplier = Mathf.clamp(time/(5 * 60)/maxMulti, 0, 1) * maxMulti;
                 u.dragMultiplier += multiplier * dragMultiplier;
                 u.reloadMultiplier *= Mathf.clamp(1/multiplier, 0, 1f);
-
-                Log.info(multiplier);
-
             };
+
             {
             dragMultiplier = 1.2f;
             reloadMultiplier = 0.65f;
+            transitionDamage = 0.01f;
             effect = Fx.colorSpark;
+            applyEffect = Fx.colorSpark;
             color = ModPal.hunter;
+            applyColor = ModPal.hunter;
+        }};
+
+        //Used internally to make conflex stack. As of current, units always call applied if a status already exists on a unit.
+        conflexInternal = new FrostStatusEffect("conflex-internal"){
+            public void applied(Unit unit, float time, boolean extend) {
+                unit.apply(conflex, unit.getDuration(conflex)+time/Math.max(Mathf.ceil(Mathf.log(time/4, unit.getDuration(conflex) + time)), 0));
+            }
+            {
+            show = false;
         }};
     }
 }

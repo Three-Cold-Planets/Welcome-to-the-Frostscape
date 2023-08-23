@@ -195,7 +195,7 @@ public class FrostUnits {
                                         Drawf.light(e.x, e.y, radius * 1.6f, ModPal.hunter, e.fout());
                                     });
                                     hitColor = ModPal.hunter;
-                                    status = FrostStatusEffects.conflex;
+                                    status = FrostStatusEffects.conflexInternal;
                                     statusDuration = 6.5f * 60;
                                 }};
                             }

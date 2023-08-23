@@ -1,10 +1,13 @@
 package main.type.status;
 
 import arc.math.Mathf;
+import arc.struct.ObjectMap;
+import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
 import main.world.meta.stat.FrostStats;
 import mindustry.content.Fx;
+import mindustry.entities.units.StatusEntry;
 import mindustry.gen.Unit;
 import mindustry.type.StatusEffect;
 
@@ -41,5 +44,16 @@ public class FrostStatusEffect extends StatusEffect {
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
+    }
+
+    public ObjectMap getTransitions(){
+        return transitions;
+    }
+
+    @Override
+    public boolean applyTransition(Unit unit, StatusEffect to, StatusEntry entry, float time) {
+        Log.info("TRANSITION");
+        Log.info(time);
+        return super.applyTransition(unit, to, entry, time);
     }
 }
