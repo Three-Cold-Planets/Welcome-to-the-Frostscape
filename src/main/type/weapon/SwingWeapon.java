@@ -18,9 +18,17 @@ public class SwingWeapon extends BaseWeapon {
     /**Whether to swing clockwise or not*/
     public boolean rotateClockwise;
 
+    public static boolean rotateOverride;
+
     public SwingWeapon(String name){
         super(name);
         shootCone = 360;
+    }
+
+    @Override
+    public void updateStaticFields(Unit unit, WeaponMount mount) {
+        super.updateStaticFields(unit, mount);
+        rotateOverride = false;
     }
 
     @Override
@@ -29,7 +37,7 @@ public class SwingWeapon extends BaseWeapon {
         float activation = Mathf.lerp(from, to, Mathf.clamp(Mathf.maxZero(unit.vel().len2() - threshold) / target, 0, 1)) * diff;
 
         //rotate if applicable
-        if(rotate && can && (mount.rotate || mount.shoot)){
+        if(rotateOverride || (rotate && can && (mount.rotate || mount.shoot))){
             float axisX = unit.x + Angles.trnsx(unit.rotation - 90, x, y),
                     axisY = unit.y + Angles.trnsy(unit.rotation - 90, x, y);
 

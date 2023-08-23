@@ -26,6 +26,7 @@ import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
 import mindustry.entities.part.RegionPart;
+import mindustry.entities.pattern.ShootBarrel;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -195,7 +196,7 @@ public class FrostUnits {
                                     });
                                     hitColor = ModPal.hunter;
                                     status = FrostStatusEffects.conflex;
-                                    statusDuration = 15;
+                                    statusDuration = 6.5f * 60;
                                 }};
                             }
                         };
@@ -275,6 +276,7 @@ public class FrostUnits {
             waveTrailY = -6f;
             trailScl = 1.9f;
             hitSize = 96/8;
+            lowAltitude = true;
 
             alwaysShootWhenMoving = true;
             useEngineElevation = false;
@@ -286,30 +288,39 @@ public class FrostUnits {
             weapons.addAll(
                     new VelocityWeapon(name + "-blaster") {{
                         reload = 120;
-                        recoilTime = 65;
-                        x = 24/4;
-                        shootX = -1;
-                        shootY = 4.25f;
+                        recoilTime = 130;
+                        x = 0;
+                        y = 2;
+                        shootX = -6/4f;
+                        shootY = 15/4f;
                         from = 0.55f;
                         to = 1.45f;
                         threshold = 0.6f;
                         target = 2.25f;
                         rotate = true;
                         alternate = false;
-                        rotateSpeed = 1.5f;
-                        rotationLimit = 120;
+                        mirror = false;
+                        rotateSpeed = 3.5f;
                         shootSound = Sounds.shootAlt;
                         chargeSound = Sounds.spray;
                         cooldownTime = 350f;
 
-                        shoot.firstShotDelay = 40;
-                        shoot.shotDelay = 7;
-                        shoot.shots = 6;
+
+                        shoot = new ShootBarrel(){{
+                            barrels = new float[]{
+                                    0,0,0,
+                                    13/4f, 7/4f, 0
+                            };
+                            firstShotDelay = 40;
+                            shotDelay = 7/2;
+                            shots = 6;
+                        }};
+
                         parentizeEffects = true;
                         shootStatus = StatusEffects.slow;
                         shootStatusDuration = 82;
 
-                        bullet = new RicochetBulletType(5, 35, "circle"){{
+                        bullet = new RicochetBulletType(5, 5, "circle"){{
                             chargeEffect = new Effect(40, e -> {
                                 color(Liquids.water.gasColor);
                                 alpha(Mathf.clamp(e.foutpow() * 2f));
@@ -326,7 +337,7 @@ public class FrostUnits {
                             trailWidth = 2;
                             trailColor = Liquids.water.color;
                             keepVelocity = false;
-                            lifetime = 20;
+                            lifetime = 25;
                             knockback = 4;
                             pierce = true;
                             pierceBuilding = true;
@@ -358,7 +369,7 @@ public class FrostUnits {
                                 orbSize = 2;
                                 drag = 0.05f;
                             }};
-                            intervalBullets = 2;
+                            intervalBullets = 1;
                             intervalDelay = 5;
                         }};
 
@@ -366,7 +377,7 @@ public class FrostUnits {
                             layerOffset = 0.01f;
                             under = true;
                             outline = true;
-                            moves.add(new PartMove(PartProgress.smoothReload.inv().add(-0.75f).mul(4).clamp(), -2, 0, 0));
+                            moves.add(new PartMove(PartProgress.smoothReload.inv().add(-0.75f).mul(4).clamp(), 2, 0, 0));
                             children.add(new RegionPart("-container-liquid"){{
                                 under = true;
                                 progress = PartProgress.smoothReload.inv();

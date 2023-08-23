@@ -6,7 +6,7 @@ import mindustry.gen.Unit;
 
 public class ThrustSwingWeapon extends SwingWeapon{
     public void updateStaticFields(Unit unit, WeaponMount mount){
-        can = unit.canShoot() || unit.elevation > 0;
+        can = unit.elevation > 0;
         lastReload = mount.reload;
         weaponRotation = unit.rotation - 90 + (rotate ? mount.rotation : baseRotation);
         mountX = unit.x + Angles.trnsx(unit.rotation - 90, x, y);
@@ -14,6 +14,7 @@ public class ThrustSwingWeapon extends SwingWeapon{
         bulletX = mountX + Angles.trnsx(weaponRotation, this.shootX, this.shootY);
         bulletY = mountY + Angles.trnsy(weaponRotation, this.shootX, this.shootY);
         shootAngle = bulletRotation(unit, mount, bulletX, bulletY);
+        rotateOverride = true;
     }
     public ThrustSwingWeapon(String name) {
         super(name);
@@ -21,7 +22,12 @@ public class ThrustSwingWeapon extends SwingWeapon{
 
     @Override
     public void updateShooting(Unit unit, WeaponMount mount) {
-        if(unit.elevation > 0) mount.shoot = true;
+        mount.shoot = unit.elevation > 0;
         super.updateShooting(unit, mount);
+    }
+
+    @Override
+    public void updateRotation(Unit unit, WeaponMount mount) {
+        super.updateRotation(unit, mount);
     }
 }

@@ -2,10 +2,14 @@ package main.content;
 
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.math.Interp;
 import arc.math.Mathf;
+import arc.util.Log;
 import arc.util.Time;
+import arc.util.Tmp;
 import main.graphics.ModPal;
 import main.type.status.FrostStatusEffect;
+import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Unit;
@@ -80,9 +84,26 @@ public class FrostStatusEffects {
             }
         };
 
-        conflex = new StatusEffect("conflex"){{
-            dragMultiplier = 10;
+        conflex = new StatusEffect("conflex"){
+
+            public void update(Unit u, float time){
+                super.update(u, time);
+                u.dragMultiplier /= dragMultiplier;
+                u.reloadMultiplier /= reloadMultiplier;
+                //Grows by 1 per block the unit's hitbox's perimeter takes up.
+                float maxMulti = u.hitSize/Vars.tilesize * 4;
+                float multiplier = Interp.smooth2.apply(Mathf.clamp(time/(2 * 60)/maxMulti, 0, 1)) * maxMulti;
+                u.dragMultiplier += multiplier * dragMultiplier;
+                u.reloadMultiplier *= Mathf.clamp(1/multiplier, 0, 1f);
+
+                Log.info(multiplier);
+
+            };
+            {
+            dragMultiplier = 1.2f;
             reloadMultiplier = 0.65f;
+            effect = Fx.colorSpark;
+            color = ModPal.hunter;
         }};
     }
 }
