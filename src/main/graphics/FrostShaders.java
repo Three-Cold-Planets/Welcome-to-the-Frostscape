@@ -13,6 +13,8 @@ import static mindustry.Vars.headless;
 
 public class FrostShaders {
     public static NamedShader pauseMenu, light;
+
+    public static NamedShader ice;
     public static boolean loaded = false;
     public static FrameBuffer effectBuffer,
     //captures everything before ui starts rendering
@@ -26,6 +28,7 @@ public class FrostShaders {
         try {
             pauseMenu = new NamedShader("pauseMenu");
             light = new LightShader("light", 5);
+            ice = new NamedShader("ice");
         }
         catch (IllegalArgumentException error){
             loaded = false;

@@ -46,6 +46,7 @@ import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.draw.DrawMulti;
@@ -59,7 +60,20 @@ public class FrostBlocks {
     public static final String
         baseRock = NAME + "-base-rock-0",
         baseReflector = NAME + "-base-reflector-0";
+
+    //Complex
+
+    public static Block
+            grating, plating, vent;
+
+    //Volcanic moon
+    public static Block
+            maficFloor, maficStone, maficBoulder;
+
+
+    //Hollus
     public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
+            sulphuricIce,
             frostStone, frostSnow,
             andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
             graystoneFloor, graystoneSlatedFloor,
@@ -74,311 +88,8 @@ public class FrostBlocks {
     public static SteamVentProp frostVent;
 
     public static CoreSiphon coreSiphon;
-    public static ItemTurret pyroclast = new MinRangeTurret("pyroclast"){{
-        requirements(Category.turret, ItemStack.with());
-        size = 3;
-        health = 54 * size * size;
-        reload = 235;
-        minRange = 160;
-        range = 350;
-        velocityRnd = 0.05f;
-        recoil = 6;
-        rotateSpeed = 2.5f;
-        cooldownTime = 75;
-        shootY = -8;
-        shootWarmupSpeed = 0.08f;
-        minWarmup = 0.9f;
-        squareSprite = false;
-        drawer = new DrawTurret("elevated-"){{
-            Color heatc = Pal.turretHeat;
-            heatColor = heatc;
-            liquidDraw = Liquids.oil;
-            liquidCapacity = 300;
-            parts.addAll(
-                    new RegionPart("-liquid-base"){{
-                        progress = PartProgress.recoil;
-                        heatColor = Color.clear;
-                        mirror = false;
-                        layerOffset = -0.00002f;
-                        outlineLayerOffset = -0.00002f;
-                    }},
-                    new RegionPart("-back"){{
-                        progress = PartProgress.warmup;
-                        mirror = true;
-                        moveRot = -15f;
-                        x = (30 - 6) / 4f;
-                        y = (-34.5f + 6) / 4f;
-                        moveX = 6/4;
-                        moveY = -6/4;
-                        under = true;
-                        heatColor = Color.clear;
-                        children = Seq.with(
-                                new RegionPart("-back"){
-                                    {
-                                        progress = PartProgress.recoil;
-                                        mirror = true;
-                                        moveRot = 360 -35f;
-                                        x = 0;
-                                        y = 0;
-                                        moveX = 6 / 4;
-                                        moveY = -6 / 4;
-                                        under = true;
-                                        heatColor = Color.clear;
-                                        children = Seq.with(
-                                                new RegionPart("-fang"){
-                                                    {
-                                                        progress = PartProgress.warmup;
-                                                        mirror = true;
-                                                        moveRot = -15f;
-                                                        x = 0;
-                                                        y = 0;
-                                                        moveX = 4 / 4;
-                                                        moveY = -4 / 4;
-                                                        under = true;
-                                                        heatColor = Color.clear;
-                                                    }}
-                                        );
-                                    }}
-                        );
-                    }},
-                    new RegionPart("-barrel"){{
-                        progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.recoil.inv());
-                        moveY = -9;
-                        heatColor = Color.valueOf("f03b0e");
-                        mirror = false;
-                        layerOffset = -0.00001f;
-                        outlineLayerOffset = -0.00002f;
-                    }}
-            );
-        }};
-        outlineColor = Pal.darkOutline;
 
-        ammo(
-                Items.pyratite,
-                new BulletType(){{
-                    speed = 3.5f;
-                    lifetime = 200;
-                    instantDisappear = true;
-                    for (int i = 0; i < 6; i++) {
-                        final float j = i;
-                        spawnBullets.add(new BouncyBulletType(3.5f + j/7, 5, "shell"){{
-                                             collidesBounce = true;
-                                             pierceBuilding = false;
-                                             lifetime = 200;
-                                             drag = 0.006f;
-                                             minLife = 55f;
-                                             hitEffect = Fx.blastExplosion;
-                                             despawnEffect = Fx.blastExplosion;
-                                             width = 6;
-                                             height = 6;
-                                             shrinkX = 0.9f;
-                                             shrinkY = 0.9f;
-                                             status = FrostStatusEffects.napalm;
-                                             statusDuration = 12f * 60f;
-                                             gravity = 0.00216f;
-                                             startingLift = 0.066f + j/100;
-                                             bounceShake = 0.7f;
-                                             bounceEfficiency = 0.85f;
-                                             bounceForce = 10;
-                                             bounceCap = 0;
-                                             keepLift = false;
-                                             keepHeight = false;
-                                             frontColor = Pal.lightishOrange;
-                                             backColor = Pal.lightOrange;
-                                             hitShake = 3.2f;
-                                             bounceEffect = Fx.explosion;
-                                             incendAmount = 2;
-                                             incendChance = 1;
-                                             puddleLiquid = Liquids.oil;
-                                             puddleAmount = 25;
-                                             puddles = 1;
-                                             splashDamage = 15;
-                                             splashDamageRadius = 16;
-                                             knockback = 1;
-                                             trailEffect = Fxf.emberTrail;
-                                             trailChance = 0.65f;
-                                             fragBullets = 3;
-                                             fragBullet = FrostBullets.pyraGel.fragBullet;
-                                             hitSound = Sounds.explosion;
-                                         }}
-                        );
-                    }
-                }},
-                Items.blastCompound,
-                new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
-                    frontColor = backColor = Color.white;
-                    lifetime = 17.5f;
-                    drag = 0.016f;
-                    despawnEffect = Fx.none;
-                    width = 8;
-                    height = 8;
-                    shrinkX = 1f;
-                    shrinkY = 1f;
-                    status = FrostStatusEffects.napalm;
-                    statusDuration = 12f * 60f;
-                    gravity = 0.00144f;
-                    startingLift = 0.0576f;
-                    bounceShake = 0.7f;
-                    bounceEfficiency = 0.65f;
-                    bounceForce = 10;
-                    bounceCap = 0;
-                    hitShake = 6.2f;
-                    hittable = true;
-                    hitSound = Sounds.bang;
-
-                    float[] layers = new float[]{visualHeightMax, visualHeightMin};
-
-                    hitEffect = new Effect(850, e -> {
-                        float h = Math.max(((Math3D.HeightHolder) e.data).height, 0);
-                        e.scaled(150, e1 -> {
-                            DrawUtils.parallaxOffset(e.x, e.y, h, Tmp.v1);
-                            float ox = Tmp.v1.x, oy = Tmp.v1.y;
-                            Draw.z(visualHeightMax);
-                            Lines.stroke(e1.fout() * 0.65f);
-                            color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
-                            Lines.circle(ox, oy, e1.finpow() * 35);
-
-                            Lines.stroke(e1.fout() * 3);
-                            Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 54, (x, y) -> {
-                                DrawUtils.speckOffset(e.x + x * 0.3f, e.y + y * 0.3f, h, e1.fin() * e1.lifetime, DrawUtils.sparkWeight, Tmp.v1);
-                                DrawUtils.speckOffset(e.x + x, e.y + y, h, e1.fin() * e1.lifetime, DrawUtils.sparkWeight, Tmp.v2);
-
-                                color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
-                                Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
-                                Draw.color(Color.black);
-                            });
-                        });
-
-                        float smokeH = Math.max((((Math3D.HeightHolder) e.data).height), 0) + DrawUtils.smokeDrift * e.lifetime * e.fin();
-                        float visibility = smokeH/visualHeightRange;
-                        float radius = 5 * e.fout(Interp.pow4);
-
-                        color(Color.gray);
-                        Draw.alpha(e.fout());
-                        Draw.z(visualHeightMax);
-                        Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 5), e.fin() * 54 + 6, (x, y) -> {
-                            DrawUtils.speckOffset(e.x + x,e.y + y, smokeH, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
-                            float ox = Tmp.v1.x, oy = Tmp.v1.y;
-                            Draw.alpha(visibility * e.fout() * 0.23f);
-                            Draw.z(layers[0]);
-                            Fill.circle(ox, oy, radius);
-                            Draw.alpha((1 - visibility) * e.fout() * 0.23f);
-                            Draw.z(layers[1]);
-                            Fill.circle(ox, oy, radius);
-                        });
-                    });
-
-                    trailEffect = new Effect(125, e -> {
-                        float h = (float) e.data;
-                        float radius = 8.8f * h;
-                        Draw.color(Liquids.oil.color);
-                        Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 35, (x, y) -> {
-                            DrawUtils.speckOffset(e.x + x, e.y + y, h, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
-                            float ox = Tmp.v1.x, oy = Tmp.v1.y;
-                            float visibility = h/visualHeightRange;
-                            Draw.alpha(visibility * e.fout() * 0.73f);
-                            Draw.z(layers[0]);
-                            Fill.circle(ox, oy, radius);
-                            Draw.alpha((1-visibility) * e.fout() * 0.73f);
-                            Draw.z(layers[1]);
-                            Fill.circle(ox, oy, radius);
-                        });
-                    });
-                    trailChance = 0.35f;
-                    trailRotation = true;
-                    fragBullet = new BouncyBulletType(4.5f, 5, "shell"){{
-                        collidesBounce = true;
-                        pierceBuilding = false;
-                        lifetime = 120;
-                        drag = 0.006f;
-                        minLife = 55f;
-                        hitEffect = Fx.blastExplosion;
-                        despawnEffect = Fx.blastExplosion;
-                        width = 6;
-                        height = 6;
-                        shrinkX = 0.9f;
-                        shrinkY = 0.9f;
-                        status = FrostStatusEffects.napalm;
-                        statusDuration = 12f * 60f;
-                        gravity = 0.00328f;
-                        bounceShake = 0.7f;
-                        bounceEfficiency = 0.65f;
-                        bounceForce = 10;
-                        bounceCap = 3;
-                        keepLift = true;
-                        frontColor = Pal.lightishOrange;
-                        backColor = Pal.lightOrange;
-                        hitShake = 3.2f;
-                        bounceEffect = Fx.explosion;
-                        incendAmount = 2;
-                        incendChance = 1;
-                        puddleLiquid = Liquids.oil;
-                        puddleAmount = 25;
-                        puddles = 1;
-                        splashDamage = 15;
-                        splashDamageRadius = 16;
-                        knockback = 1;
-                        trailEffect = Fxf.emberTrailHeight;
-                        trailChance = 0.65f;
-                        fragBullets = 3;
-                        fragBullet = FrostBullets.pyraGel.fragBullet;
-                        hitSound = Sounds.explosion;
-                        homing = velHomeDefault;
-                    }};
-                    fragBullets = 5;
-                    fragSpread = 5;
-                    fragRandomSpread = 5;
-                    fragLifeMin = 0.6f;
-                    fragLifeMax = 1f;
-                    fragVelocityMin = 0.6f;
-                    fragVelocityMax = 1f;
-                    fragLiftMin = 0.3f;
-                    fragLiftMax = 2f;
-                    splashDamage = 55;
-                    splashDamageRadius = 16;
-                    scaleLife = false;
-                }
-                }
-        );
-        consumeLiquids(new LiquidStack(Liquids.oil, 1.35f));
-
-        shoot = new ShootSpread(){{
-            shotDelay = 5;
-            shots = 1;
-            inaccuracy = 0;
-            spread = 0;
-        }};
-        float passiveRise = 0.2f, rise = 0.85f, riseShort = 0.35f;
-        shootSound = Sounds.artillery;
-        shootEffect = new Effect(185, e -> {
-            e.scaled(50, e1 -> {
-                Draw.color(Pal.lightPyraFlame);
-                Draw.alpha(e1.foutpow());
-
-                Lines.stroke(e1.fout() * 0.65f);
-                Lines.circle(e1.x, e1.y, e1.finpow() * 15);
-
-                Lines.stroke(e1.fout() * 3);
-                Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 35, (x, y) -> {
-                    Lines.line(e.x + x * 0.3f, e.y + y * 0.3f, e.x + x, e.y + y);
-                });
-            });
-
-            Draw.color(Pal.darkerGray);
-            Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 5) + 4), e.finpow() * 165, e.rotation, 25, (x, y) -> {
-                DrawUtils.speckOffset(e.x + x, e.y + y, e.fin() * passiveRise + rise * Mathf.dst(x, y)/165, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
-                Fill.circle(Tmp.v1.x, Tmp.v1.y, 5 * e.fout(Interp.pow4));
-            });
-
-            e.scaled(90, e1 -> {
-                Draw.color(Pal.gray);
-                Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e1.finpow() * 205, e.rotation, 25, (x, y) -> {
-                    DrawUtils.speckOffset(e.x + x, e.y + y, e.fin() * passiveRise + riseShort * Mathf.dst(x, y)/205, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
-                    Fill.circle(Tmp.v1.x, Tmp.v1.y, 5 * e1.fout(Interp.pow4));
-                });
-            });
-        });
-    }};
+    public static ItemTurret pyroclast;
     public static CoreBunker coreBunker;
     public static ThermalMine thermalLandmine;
 
@@ -387,6 +98,18 @@ public class FrostBlocks {
     public static ReflectiveWall reflectiveWall;
 
     public static void load(){
+         plating = new Floor("plating"){{
+            variants = 0;
+            solid = false;
+        }};
+
+        maficFloor = new Floor("mafic-floor");
+
+        maficStone = new StaticWall("mafic-stone");
+
+        maficBoulder = new Prop("mafic-boulder"){{
+            variants = 2;
+        }};
 
         sulphuricWater = new ParticleFloor("sulphuric-water"){{
             isLiquid = true;
@@ -447,6 +170,12 @@ public class FrostBlocks {
 
         frostStone = new Floor("frost-stone"){{
             variants = 4;
+        }};
+
+        sulphuricIce = new Floor("sulphuric-ice"){{
+            variants = 4;
+            speedMultiplier = 1.15f;
+            dragMultiplier = 0.75f;
         }};
 
         frostSnow = new Floor("frost-snow"){{
@@ -605,6 +334,312 @@ public class FrostBlocks {
                     new Vec2(-44/4, 44/4),
                     new Vec2(-44/4, -44/4)
             };
+        }};
+
+        pyroclast = new MinRangeTurret("pyroclast"){{
+            requirements(Category.turret, ItemStack.with());
+            size = 3;
+            health = 54 * size * size;
+            reload = 235;
+            minRange = 160;
+            range = 350;
+            velocityRnd = 0.05f;
+            recoil = 6;
+            rotateSpeed = 2.5f;
+            cooldownTime = 75;
+            shootY = -8;
+            shootWarmupSpeed = 0.08f;
+            minWarmup = 0.9f;
+            squareSprite = false;
+            drawer = new DrawTurret("elevated-"){{
+                Color heatc = Pal.turretHeat;
+                heatColor = heatc;
+                liquidDraw = Liquids.oil;
+                liquidCapacity = 300;
+                parts.addAll(
+                        new RegionPart("-liquid-base"){{
+                            progress = PartProgress.recoil;
+                            heatColor = Color.clear;
+                            mirror = false;
+                            layerOffset = -0.00002f;
+                            outlineLayerOffset = -0.00002f;
+                        }},
+                        new RegionPart("-back"){{
+                            progress = PartProgress.warmup;
+                            mirror = true;
+                            moveRot = -15f;
+                            x = (30 - 6) / 4f;
+                            y = (-34.5f + 6) / 4f;
+                            moveX = 6/4;
+                            moveY = -6/4;
+                            under = true;
+                            heatColor = Color.clear;
+                            children = Seq.with(
+                                    new RegionPart("-back"){
+                                        {
+                                            progress = PartProgress.recoil;
+                                            mirror = true;
+                                            moveRot = 360 -35f;
+                                            x = 0;
+                                            y = 0;
+                                            moveX = 6 / 4;
+                                            moveY = -6 / 4;
+                                            under = true;
+                                            heatColor = Color.clear;
+                                            children = Seq.with(
+                                                    new RegionPart("-fang"){
+                                                        {
+                                                            progress = PartProgress.warmup;
+                                                            mirror = true;
+                                                            moveRot = -15f;
+                                                            x = 0;
+                                                            y = 0;
+                                                            moveX = 4 / 4;
+                                                            moveY = -4 / 4;
+                                                            under = true;
+                                                            heatColor = Color.clear;
+                                                        }}
+                                            );
+                                        }}
+                            );
+                        }},
+                        new RegionPart("-barrel"){{
+                            progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.recoil.inv());
+                            moveY = -9;
+                            heatColor = Color.valueOf("f03b0e");
+                            mirror = false;
+                            layerOffset = -0.00001f;
+                            outlineLayerOffset = -0.00002f;
+                        }}
+                );
+            }};
+            outlineColor = Pal.darkOutline;
+
+            ammo(
+                    Items.pyratite,
+                    new BulletType(){{
+                        speed = 3.5f;
+                        lifetime = 200;
+                        instantDisappear = true;
+                        for (int i = 0; i < 6; i++) {
+                            final float j = i;
+                            spawnBullets.add(new BouncyBulletType(3.5f + j/7, 5, "shell"){{
+                                                 collidesBounce = true;
+                                                 pierceBuilding = false;
+                                                 lifetime = 200;
+                                                 drag = 0.006f;
+                                                 minLife = 55f;
+                                                 hitEffect = Fx.blastExplosion;
+                                                 despawnEffect = Fx.blastExplosion;
+                                                 width = 6;
+                                                 height = 6;
+                                                 shrinkX = 0.9f;
+                                                 shrinkY = 0.9f;
+                                                 status = FrostStatusEffects.napalm;
+                                                 statusDuration = 12f * 60f;
+                                                 gravity = 0.00216f;
+                                                 startingLift = 0.066f + j/100;
+                                                 bounceShake = 0.7f;
+                                                 bounceEfficiency = 0.85f;
+                                                 bounceForce = 10;
+                                                 bounceCap = 0;
+                                                 keepLift = false;
+                                                 keepHeight = false;
+                                                 frontColor = Pal.lightishOrange;
+                                                 backColor = Pal.lightOrange;
+                                                 hitShake = 3.2f;
+                                                 bounceEffect = Fx.explosion;
+                                                 incendAmount = 2;
+                                                 incendChance = 1;
+                                                 puddleLiquid = Liquids.oil;
+                                                 puddleAmount = 25;
+                                                 puddles = 1;
+                                                 splashDamage = 15;
+                                                 splashDamageRadius = 16;
+                                                 knockback = 1;
+                                                 trailEffect = Fxf.emberTrail;
+                                                 trailChance = 0.65f;
+                                                 fragBullets = 3;
+                                                 fragBullet = FrostBullets.pyraGel.fragBullet;
+                                                 hitSound = Sounds.explosion;
+                                             }}
+                            );
+                        }
+                    }},
+                    Items.blastCompound,
+                    new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
+                        frontColor = backColor = Color.white;
+                        lifetime = 17.5f;
+                        drag = 0.016f;
+                        despawnEffect = Fx.none;
+                        width = 8;
+                        height = 8;
+                        shrinkX = 1f;
+                        shrinkY = 1f;
+                        status = FrostStatusEffects.napalm;
+                        statusDuration = 12f * 60f;
+                        gravity = 0.00144f;
+                        startingLift = 0.0576f;
+                        bounceShake = 0.7f;
+                        bounceEfficiency = 0.65f;
+                        bounceForce = 10;
+                        bounceCap = 0;
+                        hitShake = 6.2f;
+                        hittable = true;
+                        hitSound = Sounds.bang;
+
+                        float[] layers = new float[]{visualHeightMax, visualHeightMin};
+
+                        hitEffect = new Effect(850, e -> {
+                            float h = Math.max(((Math3D.HeightHolder) e.data).height, 0);
+                            e.scaled(150, e1 -> {
+                                DrawUtils.parallaxOffset(e.x, e.y, h, Tmp.v1);
+                                float ox = Tmp.v1.x, oy = Tmp.v1.y;
+                                Draw.z(visualHeightMax);
+                                Lines.stroke(e1.fout() * 0.65f);
+                                color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
+                                Lines.circle(ox, oy, e1.finpow() * 35);
+
+                                Lines.stroke(e1.fout() * 3);
+                                Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 54, (x, y) -> {
+                                    DrawUtils.speckOffset(e.x + x * 0.3f, e.y + y * 0.3f, h, e1.fin() * e1.lifetime, DrawUtils.sparkWeight, Tmp.v1);
+                                    DrawUtils.speckOffset(e.x + x, e.y + y, h, e1.fin() * e1.lifetime, DrawUtils.sparkWeight, Tmp.v2);
+
+                                    color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
+                                    Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
+                                    Draw.color(Color.black);
+                                });
+                            });
+
+                            float smokeH = Math.max((((Math3D.HeightHolder) e.data).height), 0) + DrawUtils.smokeDrift * e.lifetime * e.fin();
+                            float visibility = smokeH/visualHeightRange;
+                            float radius = 5 * e.fout(Interp.pow4);
+
+                            color(Color.gray);
+                            Draw.alpha(e.fout());
+                            Draw.z(visualHeightMax);
+                            Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 5), e.fin() * 54 + 6, (x, y) -> {
+                                DrawUtils.speckOffset(e.x + x,e.y + y, smokeH, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                                float ox = Tmp.v1.x, oy = Tmp.v1.y;
+                                Draw.alpha(visibility * e.fout() * 0.23f);
+                                Draw.z(layers[0]);
+                                Fill.circle(ox, oy, radius);
+                                Draw.alpha((1 - visibility) * e.fout() * 0.23f);
+                                Draw.z(layers[1]);
+                                Fill.circle(ox, oy, radius);
+                            });
+                        });
+
+                        trailEffect = new Effect(125, e -> {
+                            float h = (float) e.data;
+                            float radius = 8.8f * h;
+                            Draw.color(Liquids.oil.color);
+                            Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 1), e.fin() * 12, e.rotation, 35, (x, y) -> {
+                                DrawUtils.speckOffset(e.x + x, e.y + y, h, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                                float ox = Tmp.v1.x, oy = Tmp.v1.y;
+                                float visibility = h/visualHeightRange;
+                                Draw.alpha(visibility * e.fout() * 0.73f);
+                                Draw.z(layers[0]);
+                                Fill.circle(ox, oy, radius);
+                                Draw.alpha((1-visibility) * e.fout() * 0.73f);
+                                Draw.z(layers[1]);
+                                Fill.circle(ox, oy, radius);
+                            });
+                        });
+                        trailChance = 0.35f;
+                        trailRotation = true;
+                        fragBullet = new BouncyBulletType(4.5f, 5, "shell"){{
+                            collidesBounce = true;
+                            pierceBuilding = false;
+                            lifetime = 120;
+                            drag = 0.006f;
+                            minLife = 55f;
+                            hitEffect = Fx.blastExplosion;
+                            despawnEffect = Fx.blastExplosion;
+                            width = 6;
+                            height = 6;
+                            shrinkX = 0.9f;
+                            shrinkY = 0.9f;
+                            status = FrostStatusEffects.napalm;
+                            statusDuration = 12f * 60f;
+                            gravity = 0.00328f;
+                            bounceShake = 0.7f;
+                            bounceEfficiency = 0.65f;
+                            bounceForce = 10;
+                            bounceCap = 3;
+                            keepLift = true;
+                            frontColor = Pal.lightishOrange;
+                            backColor = Pal.lightOrange;
+                            hitShake = 3.2f;
+                            bounceEffect = Fx.explosion;
+                            incendAmount = 2;
+                            incendChance = 1;
+                            puddleLiquid = Liquids.oil;
+                            puddleAmount = 25;
+                            puddles = 1;
+                            splashDamage = 15;
+                            splashDamageRadius = 16;
+                            knockback = 1;
+                            trailEffect = Fxf.emberTrailHeight;
+                            trailChance = 0.65f;
+                            fragBullets = 3;
+                            fragBullet = FrostBullets.pyraGel.fragBullet;
+                            hitSound = Sounds.explosion;
+                            homing = velHomeDefault;
+                        }};
+                        fragBullets = 5;
+                        fragSpread = 5;
+                        fragRandomSpread = 5;
+                        fragLifeMin = 0.6f;
+                        fragLifeMax = 1f;
+                        fragVelocityMin = 0.6f;
+                        fragVelocityMax = 1f;
+                        fragLiftMin = 0.3f;
+                        fragLiftMax = 2f;
+                        splashDamage = 55;
+                        splashDamageRadius = 16;
+                        scaleLife = false;
+                    }
+                    }
+            );
+            consumeLiquids(new LiquidStack(Liquids.oil, 1.35f));
+
+            shoot = new ShootSpread(){{
+                shotDelay = 5;
+                shots = 1;
+                inaccuracy = 0;
+                spread = 0;
+            }};
+            float passiveRise = 0.2f, rise = 0.85f, riseShort = 0.35f;
+            shootSound = Sounds.artillery;
+            shootEffect = new Effect(185, e -> {
+                e.scaled(50, e1 -> {
+                    Draw.color(Pal.lightPyraFlame);
+                    Draw.alpha(e1.foutpow());
+
+                    Lines.stroke(e1.fout() * 0.65f);
+                    Lines.circle(e1.x, e1.y, e1.finpow() * 15);
+
+                    Lines.stroke(e1.fout() * 3);
+                    Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 35, (x, y) -> {
+                        Lines.line(e.x + x * 0.3f, e.y + y * 0.3f, e.x + x, e.y + y);
+                    });
+                });
+
+                Draw.color(Pal.darkerGray);
+                Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 5) + 4), e.finpow() * 165, e.rotation, 25, (x, y) -> {
+                    DrawUtils.speckOffset(e.x + x, e.y + y, e.fin() * passiveRise + rise * Mathf.dst(x, y)/165, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                    Fill.circle(Tmp.v1.x, Tmp.v1.y, 5 * e.fout(Interp.pow4));
+                });
+
+                e.scaled(90, e1 -> {
+                    Draw.color(Pal.gray);
+                    Angles.randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e1.finpow() * 205, e.rotation, 25, (x, y) -> {
+                        DrawUtils.speckOffset(e.x + x, e.y + y, e.fin() * passiveRise + riseShort * Mathf.dst(x, y)/205, e.fin() * e.lifetime, DrawUtils.smokeWeight, Tmp.v1);
+                        Fill.circle(Tmp.v1.x, Tmp.v1.y, 5 * e1.fout(Interp.pow4));
+                    });
+                });
+            });
         }};
 
         coreBunker = new CoreBunker("core-bunker"){{
