@@ -19,6 +19,7 @@ import main.type.HollusUnitType;
 import main.type.weapon.ThrustSwingWeapon;
 import main.type.weapon.VelocityWeapon;
 import mindustry.Vars;
+import mindustry.ai.types.CargoAI;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
@@ -31,7 +32,9 @@ import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.type.UnitType;
 import mindustry.type.Weapon;
+import mindustry.type.unit.ErekirUnitType;
 
 import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
@@ -41,6 +44,9 @@ import static main.Frostscape.NAME;
 import static mindustry.content.Fx.circleColorSpark;
 
 public class FrostUnits {
+
+    public static UnitType serpieDrone;
+
     public static HollusUnitType
     sunspot, javelin, stalagmite;
 
@@ -48,6 +54,33 @@ public class FrostUnits {
     upgradeDrone;
 
     public static void load(){
+
+        serpieDrone = new ErekirUnitType("serpie-drone") {
+            {
+                controller = (u) -> new CargoAI();
+                isEnemy = false;
+                allowedInPayloads = false;
+                logicControllable = false;
+                playerControllable = false;
+                envDisabled = 0;
+                payloadCapacity = 0.0F;
+                lowAltitude = false;
+                flying = true;
+                drag = 0.06F;
+                speed = 3.5F;
+                rotateSpeed = 9.0F;
+                accel = 0.1F;
+                itemCapacity = 100;
+                health = 200.0F;
+                hitSize = 11.0F;
+                engineSize = 2.3F;
+                engineOffset = 6.5F;
+                hidden = true;
+                setEnginesMirror(new UnitType.UnitEngine[]{new UnitType.UnitEngine(6.0F, -6.0F, 2.3F, 315.0F)});
+                constructor = BuildingTetherPayloadUnit::create;
+            }
+        };
+
         sunspot = new HollusUnitType("sunspot"){{
             maxRange = 150;
             range = 10;

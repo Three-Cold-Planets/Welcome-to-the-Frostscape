@@ -23,6 +23,7 @@ import main.ui.ModTex;
 import main.ui.overlay.ScanningOverlay;
 import main.ui.overlay.SelectOverlay;
 import main.util.UIUtils;
+import main.util.WeatherUtils;
 import main.world.meta.Family;
 import main.world.meta.LoreNote;
 import main.world.systems.heat.TileHeatControl;
@@ -142,6 +143,8 @@ public class Frostscape extends Mod{
             LightBeams.get().updateBeams();
             scan.update();
             selection.update();
+
+            WeatherUtils.updateWind();
         });
 
         Events.run(Trigger.draw, () -> {
@@ -209,8 +212,8 @@ public class Frostscape extends Mod{
 
     void loadSettings(){
         ui.settings.addCategory(Core.bundle.get("settings.frostscape-title"), NAME + "-hunter", t -> {
-            t.sliderPref(Core.bundle.get("frostscape-parallax"), 100, 1, 100, 1, s -> s + "%");
-            t.sliderPref(Core.bundle.get("frostscape-wind-visual-force"), 100, 0, 800, 1, s -> s + "%");
+            t.sliderPref("frostscape-parallax", 100, 1, 100, 1, s -> s + "%");
+            t.sliderPref("frostscape-wind-visual-force", 1, 0, 8, 1, s -> s * 100 + "%");
         });
     }
 

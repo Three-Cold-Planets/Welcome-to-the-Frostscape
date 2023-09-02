@@ -49,17 +49,29 @@ import mindustry.type.LiquidStack;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.units.UnitCargoLoader;
+import mindustry.world.blocks.units.UnitCargoUnloadPoint;
 import mindustry.world.draw.DrawMulti;
 import mindustry.world.draw.DrawTurret;
 
 import static arc.graphics.g2d.Draw.color;
 import static main.Frostscape.NAME;
+import static mindustry.type.ItemStack.with;
+import static mindustry.world.meta.Env.scorching;
+import static mindustry.world.meta.Env.underwater;
 
 public class FrostBlocks {
     //Base names
     public static final String
         baseRock = NAME + "-base-rock-0",
         baseReflector = NAME + "-base-reflector-0";
+
+
+    //Serpulo Tech
+
+    public static Block
+
+        unitCargoLoader, unitCargoUnloadPoint;
 
     //Complex
 
@@ -98,6 +110,35 @@ public class FrostBlocks {
     public static ReflectiveWall reflectiveWall;
 
     public static void load(){
+        unitCargoLoader = new UnitCargoLoader("unit-cargo-loader"){{
+            unitType = FrostUnits.serpieDrone;
+            requirements(Category.distribution, with(Items.silicon, 80, Items.surgeAlloy, 50, Items.oxide, 20));
+
+            size = 3;
+            buildTime = 60f * 8f;
+            envEnabled = 1;
+            envDisabled = scorching + underwater;
+
+            consumePower(8f / 60f);
+
+            consumeLiquid(Liquids.cryofluid, 10f / 60f);
+
+            itemCapacity = 200;
+            researchCost = with(Items.silicon, 2500, Items.surgeAlloy, 20, Items.oxide, 30);
+        }};
+
+        unitCargoUnloadPoint = new UnitCargoUnloadPoint("unit-cargo-unload-point"){{
+            requirements(Category.distribution, with(Items.silicon, 60, Items.tungsten, 60));
+
+            size = 2;
+            envEnabled = 1;
+            envDisabled = scorching + underwater;
+
+            itemCapacity = 100;
+
+            researchCost = with(Items.silicon, 3000, Items.oxide, 20);
+        }};
+
          plating = new Floor("plating"){{
             variants = 0;
             solid = false;
@@ -317,7 +358,7 @@ public class FrostBlocks {
         }};
 
         coreSiphon = new CoreSiphon("core-siphon"){{
-            requirements(Category.production, ItemStack.with());
+            requirements(Category.production, with());
             liquidPadding = 6;
             this.size = 7;
             liquidCapacity = 1000;
@@ -337,7 +378,7 @@ public class FrostBlocks {
         }};
 
         pyroclast = new MinRangeTurret("pyroclast"){{
-            requirements(Category.turret, ItemStack.with());
+            requirements(Category.turret, with());
             size = 3;
             health = 54 * size * size;
             reload = 235;
@@ -502,8 +543,8 @@ public class FrostBlocks {
 
                                 Lines.stroke(e1.fout() * 3);
                                 Angles.randLenVectors(e.id + 1, (int) (Mathf.randomSeed(e.id, 3) + 5), e1.fin() * 54 + 6, e.rotation, 54, (x, y) -> {
-                                    DrawUtils.speckOffset(e.x + x * 0.3f, e.y + y * 0.3f, h, e1.fin() * e1.lifetime, DrawUtils.sparkWeight, Tmp.v1);
-                                    DrawUtils.speckOffset(e.x + x, e.y + y, h, e1.fin() * e1.lifetime, DrawUtils.sparkWeight, Tmp.v2);
+                                    DrawUtils.parallaxOffset(e.x + x * 0.3f, e.y + y * 0.3f, h, Tmp.v1);
+                                    DrawUtils.parallaxOffset(e.x + x, e.y + y, h, Tmp.v2);
 
                                     color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
                                     Lines.line(Tmp.v1.x, Tmp.v1.y, Tmp.v2.x, Tmp.v2.y);
@@ -703,7 +744,7 @@ public class FrostBlocks {
         }};
 
         thermalLandmine = new ThermalMine("thermal-landmine"){{
-            requirements(Category.effect, ItemStack.with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
+            requirements(Category.effect, with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
             health = 55;
             tileDamage = 0.75f;
             warmupSpeed = 0.002f;
@@ -721,9 +762,9 @@ public class FrostBlocks {
                                 0.65f
                         };
                         costs = new ItemStack[][]{
-                                ItemStack.with(Items.graphite, 5, Items.lead, 10),
-                                ItemStack.with(Items.metaglass, 7),
-                                ItemStack.with(Items.titanium, 10, Items.graphite, 15)
+                                with(Items.graphite, 5, Items.lead, 10),
+                                with(Items.metaglass, 7),
+                                with(Items.titanium, 10, Items.graphite, 15)
                         };
                     }},
                     new UpgradeEntry(FrostUpgrades.improvedPayload){{
@@ -743,9 +784,9 @@ public class FrostBlocks {
                                 2.8f
                         };
                         costs = new ItemStack[][]{
-                                ItemStack.with(Items.coal, 5),
-                                ItemStack.with(Items.pyratite, 10),
-                                ItemStack.with(Items.coal, 10, Items.pyratite, 25)
+                                with(Items.coal, 5),
+                                with(Items.pyratite, 10),
+                                with(Items.coal, 10, Items.pyratite, 25)
                         };
                     }}
             );
@@ -772,7 +813,7 @@ public class FrostBlocks {
         }};
 
         solarReflector = new SolarReflector("solar-reflector"){{
-            requirements(Category.effect, ItemStack.with());
+            requirements(Category.effect, with());
             data = new LightBeams.ColorData(2.4f, 2f, 1.6f);
             drawer = new DrawMulti(
                     new DrawUpgradePart(
@@ -791,14 +832,14 @@ public class FrostBlocks {
                             3.5f
                     };
                     costs = new ItemStack[][]{
-                            ItemStack.with(FrostItems.ferricPanels, 5)
+                            with(FrostItems.ferricPanels, 5)
                     };
                 }}
             );
         }};
 
         reflectiveWall = new ReflectiveWall("reflective-wall"){{
-            requirements(Category.effect, ItemStack.with());
+            requirements(Category.effect, with());
         }};
     }
 }
