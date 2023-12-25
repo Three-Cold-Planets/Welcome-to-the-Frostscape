@@ -34,7 +34,6 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
-import mindustry.type.unit.ErekirUnitType;
 
 import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
@@ -48,14 +47,38 @@ public class FrostUnits {
     public static UnitType serpieDrone;
 
     public static HollusUnitType
-    sunspot, javelin, stalagmite;
+    sunspot, javelin, stalagmite, cord, hearth, hearthDefend, hearthAttack;
 
     public static HollusUnitType
     upgradeDrone;
 
     public static void load(){
 
-        serpieDrone = new ErekirUnitType("serpie-drone") {
+        RicochetBulletType bouncy = new RicochetBulletType(6, 8, "bullet"){{
+            drag = 0.015f;
+            bounciness = 1f;
+            width = 4;
+            height = 8;
+            shrinkX = 0;
+            shrinkY = 0;
+            lifetime = 35;
+            knockback = 0.75f;
+            hitEffect = bounceEffect = Fx.none;
+            despawnEffect = Fx.hitBulletColor;
+            trailColor = Pal.suppress;
+            trailWidth = 1f;
+            trailLength = 4;
+            bounceSame = true;
+            removeAfterPierce = false;
+            pierceCap = 2;
+            pierceArmor = true;
+            status = FrostStatusEffects.conflexInternal;
+            statusDuration = 15;
+            frontColor = Color.white;
+            backColor = Pal.suppress;
+        }};
+
+        serpieDrone = new UnitType("serpie-drone") {
             {
                 controller = (u) -> new CargoAI();
                 isEnemy = false;
@@ -80,6 +103,62 @@ public class FrostUnits {
                 constructor = BuildingTetherPayloadUnit::create;
             }
         };
+
+        /*
+        hearth = new HollusUnitType("hearth"){{
+
+        }};
+
+        hearthDefend = new HollusUnitType("hearth-defend"){{
+            aiController = DroneAI::new;
+        }};
+        */
+
+        cord = new HollusUnitType("cord"){{
+            health = 560;
+            armor = 5;
+            constructor = MechUnit::create;
+            drawCell = false;
+            hitSize = 11;
+            families.add(Families.specialist);
+            weapons.add(
+                    new Weapon(NAME + "-cord-weapon"){{
+                        x = 6.325f;
+                        y = 1.5f;
+                        shootSound = Sounds.dullExplosion;
+                        bullet = new BasicBulletType(6, 15, "bullet"){
+                            @Override
+                            public void init(){
+                                super.init();
+                                range = 16 * 8;
+                            }
+
+                            {
+                            shootEffect = Fx.explosion;
+                            hitEffect = despawnEffect = Fx.hitBulletColor;
+                            width = 14;
+                            height = 12;
+                            lifetime = 10;
+                            pierceCap = 2;
+                            fragBullet = bouncy;
+                            fragLifeMin = 0.5f;
+                            fragLifeMax = 1;
+                            fragVelocityMax = 1;
+                            fragVelocityMin = 0.5f;
+                            fragBullets = 3;
+                            fragRandomSpread = 15;
+                            fragSpread = 5;
+                            status = FrostStatusEffects.conflexInternal;
+                            statusDuration = 45;
+                            frontColor = Color.white;
+                            backColor = Pal.suppress;
+                        }};
+                        reload = 45;
+                        alternate = true;
+                        top = false;
+                    }}
+            );
+        }};
 
         sunspot = new HollusUnitType("sunspot"){{
             maxRange = 150;
@@ -484,36 +563,9 @@ public class FrostUnits {
             );
         }};
 
-        RicochetBulletType bouncy = new RicochetBulletType(5, 10, "missile-large"){{
-            drag = 0.015f;
-            bounciness = 1f;
-            width = 4;
-            height = 8;
-            shrinkX = 0;
-            shrinkY = 0;
-            lifetime = 75;
-            knockback = 1.5f;
-            fragBullet = new ExplosionBulletType(10, 15){{
-                killShooter = false;
-            }};
-            fragBullets = 2;
-            hitEffect = Fx.none;
-            bounceEffect = Fx.hitBulletSmall;
-            trailColor = Pal.accent;
-            trailWidth = 1f;
-            trailLength = 4;
-            bounceSame = true;
-            bounceCap = 1;
-            pierceCap = 2;
-            removeAfterPierce = false;
-            homingRange = 32;
-            homingPower = 0.17f;
-            homingDelay = 5;
-        }};
-
         UnitTypes.alpha.weapons.each(w -> {
             w.reload = 15;
-            w.bullet = sunspot.weapons.get(1).bullet;
+            w.bullet = bouncy;
             w.inaccuracy = 5;
         });
     }

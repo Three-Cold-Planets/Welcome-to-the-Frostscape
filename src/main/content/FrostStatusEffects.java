@@ -32,7 +32,7 @@ public class FrostStatusEffects {
             speedMultiplier = 0.9f;
             effect = Fx.oily;
             color = ModPal.heat;
-            opposite(StatusEffects.melting, StatusEffects.wet);
+            opposite(StatusEffects.freezing, StatusEffects.wet);
             init(() -> {
                 affinity(StatusEffects.burning, (unit, result, time) -> unit.damagePierce(Math.min(transitionDamage, StatusEffects.burning.damage * time)));
                 affinity(StatusEffects.tarred, (unit, result, time) -> result.set(napalm, Math.min(transitionDamage/damage, result.time + time)));
@@ -102,16 +102,18 @@ public class FrostStatusEffects {
             dragMultiplier = 1.2f;
             reloadMultiplier = 0.65f;
             transitionDamage = 0.01f;
-            effect = Fx.colorSpark;
-            applyEffect = Fx.colorSpark;
+            effect = Fx.regenSuppressParticle;
+            applyEffect = Fx.regenSuppressParticle;
             color = ModPal.hunter;
             applyColor = ModPal.hunter;
         }};
 
         //Used internally to make conflex stack. As of current, units always call applied if a status already exists on a unit.
+        //Stackingg gets weaker logarithmically
         conflexInternal = new FrostStatusEffect("conflex-internal"){
             public void applied(Unit unit, float time, boolean extend) {
-                unit.apply(conflex, unit.getDuration(conflex)+time/Math.max(Mathf.ceil(Mathf.log(time/4, unit.getDuration(conflex) + time)), 0));
+                float current = unit.getDuration(conflex);
+                unit.apply(conflex, current == 0 ? time : current+time/(Mathf.log(current+2, time/current+1) + 1));
             }
             {
             show = false;

@@ -175,7 +175,8 @@ public class Frostscape extends Mod{
                 "main.util",
                 "main.world",
                 "main.world.systems.light",
-                "main.world.systems.upgrades"
+                "main.world.systems.upgrades",
+                "main.world.systems.research"
         );
 
         packages.each(name -> {

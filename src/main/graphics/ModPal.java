@@ -17,8 +17,10 @@ public class ModPal {
 
     salt = Color.valueOf("e8e4e3"),
 
-    quiteDarkOutline = Color.valueOf("#413b45"),
+    quiteDarkOutline = Color.valueOf("#39343c"),
     hunter = Color.valueOf("#dde6f0"),
+    specialist = Color.valueOf("#c49ff4"),
+
     heat = new Color(1.0F, 0.22F, 0.22F, 0.8F),
 
     lightRed = Color.valueOf("#ee96c5"),
@@ -28,6 +30,9 @@ public class ModPal {
     lightBlue = Color.valueOf("#a7ebf2"),
     darkBlue = Color.valueOf("#4066a9"),
 
-    select = Color.valueOf("#a9cc6b");
+    select = Color.valueOf("#a9cc6b"),
+
+    purpleBullet = Color.valueOf("#bf92f9"),
+    purpleBulletBack = Color.valueOf("#a447eb");
     ;
 }

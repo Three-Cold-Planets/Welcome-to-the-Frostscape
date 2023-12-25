@@ -19,6 +19,7 @@ import main.graphics.ModPal;
 import main.math.Math3D;
 import main.util.DrawUtils;
 import main.world.blocks.core.CoreBunker;
+import main.world.blocks.defense.CrumblingWall;
 import main.world.blocks.defense.MinRangeTurret;
 import main.world.blocks.defense.ThermalMine;
 import main.world.blocks.drawers.DrawUpgradePart;
@@ -109,10 +110,12 @@ public class FrostBlocks {
 
     public static ReflectiveWall reflectiveWall;
 
+    public static CrumblingWall stoneWall;
+
     public static void load(){
         unitCargoLoader = new UnitCargoLoader("unit-cargo-loader"){{
             unitType = FrostUnits.serpieDrone;
-            requirements(Category.distribution, with(Items.silicon, 80, Items.surgeAlloy, 50, Items.oxide, 20));
+            requirements(Category.distribution, with(Items.copper, 80, Items.lead, 35, Items.graphite, 50, Items.silicon, 40));
 
             size = 3;
             buildTime = 60f * 8f;
@@ -121,22 +124,19 @@ public class FrostBlocks {
 
             consumePower(8f / 60f);
 
-            consumeLiquid(Liquids.cryofluid, 10f / 60f);
+            consumeLiquid(Liquids.water, 10f / 60f);
 
             itemCapacity = 200;
-            researchCost = with(Items.silicon, 2500, Items.surgeAlloy, 20, Items.oxide, 30);
         }};
 
         unitCargoUnloadPoint = new UnitCargoUnloadPoint("unit-cargo-unload-point"){{
-            requirements(Category.distribution, with(Items.silicon, 60, Items.tungsten, 60));
+            requirements(Category.distribution, with(Items.graphite, 25, Items.silicon, 35));
 
             size = 2;
             envEnabled = 1;
             envDisabled = scorching + underwater;
 
             itemCapacity = 100;
-
-            researchCost = with(Items.silicon, 3000, Items.oxide, 20);
         }};
 
          plating = new Floor("plating"){{
@@ -312,7 +312,7 @@ public class FrostBlocks {
         }};
 
         grayWall = new StaticWall("graystone-wall"){{
-            variants = 4;
+            variants = 3;
         }};
 
         sulphurGraystone = new StaticWall("sulphur-graystone"){{
@@ -355,6 +355,10 @@ public class FrostBlocks {
             variants = 0;
             size = 1;
             breakable = alwaysReplace = false;
+        }};
+
+        stoneWall = new CrumblingWall("stone-wall"){{
+            variants = 4;
         }};
 
         coreSiphon = new CoreSiphon("core-siphon"){{
@@ -749,6 +753,7 @@ public class FrostBlocks {
             tileDamage = 0.75f;
             warmupSpeed = 0.002f;
             warmDownSpeed = 0.06f;
+
             entries.addAll(
                     new UpgradeEntry(FrostUpgrades.improvedBase){{
                         healthMultiplier = new float[]{
@@ -760,6 +765,9 @@ public class FrostBlocks {
                                 1,
                                 0.85f,
                                 0.65f
+                        };
+                        armorMultiplier = new float[]{
+                                1
                         };
                         costs = new ItemStack[][]{
                                 with(Items.graphite, 5, Items.lead, 10),

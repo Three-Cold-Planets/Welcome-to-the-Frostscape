@@ -3,17 +3,19 @@ package main.world;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import main.type.upgrade.UpgradeableBuilding;
-import main.world.systems.upgrades.UpgradeModule;
 import main.world.systems.upgrades.UpgradeEntry;
+import main.world.systems.upgrades.UpgradeModule;
 import main.world.systems.upgrades.UpgradeState;
 import mindustry.gen.Building;
 
+/** Base building entity for upgradeable blocks in Frostscape. Use as example/boilerplate for implementing upgrades in vanilla buildings */
 public abstract class BaseBuilding extends Building implements UpgradeableBuilding {
 
-    public UpgradeModule upgrades = new UpgradeModule();
+    public UpgradeModule upgrades = new UpgradeModule(this);
     public float
             damageMultiplier = 1,
             healthMultiplier = 1,
+            armorMultiplier = 1,
             speedMultiplier = 1,
             reloadMultiplier = 1,
             rangeMultiplier = 1,
@@ -21,10 +23,16 @@ public abstract class BaseBuilding extends Building implements UpgradeableBuildi
 
 
     @Override
+    public void upgraded() {
+        resetDeltas();
+        upgrades.update();
+    }
+
+    @Override
     public void updateTile() {
         super.updateTile();
         resetDeltas();
-        upgrades.update(this);
+        upgrades.update();
     }
 
     @Override
@@ -52,8 +60,8 @@ public abstract class BaseBuilding extends Building implements UpgradeableBuildi
     public void readBase(Reads read) {
         super.readBase(read);
         upgrades.read(read);
-
     }
+
     @Override
     public UpgradeModule upgrades() {
         return upgrades;
@@ -66,6 +74,7 @@ public abstract class BaseBuilding extends Building implements UpgradeableBuildi
         if(entry == null) return;
         damageMultiplier *= entry.damageMultiplier[state.level];
         healthMultiplier *= entry.healthMultiplier[state.level];
+        armorMultiplier *= entry.armorMultiplier[state.level];
         speedMultiplier *= entry.speedMultiplier[state.level];
         reloadMultiplier *= entry.reloadMultiplier[state.level];
         rangeMultiplier *= entry.rangeMultiplier[state.level];
@@ -73,7 +82,7 @@ public abstract class BaseBuilding extends Building implements UpgradeableBuildi
     }
     @Override
     public void resetDeltas() {
-        damageMultiplier = healthMultiplier = speedMultiplier = reloadMultiplier = rangeMultiplier = buildSpeedMultiplier = 1;
+        damageMultiplier = healthMultiplier = armorMultiplier = speedMultiplier = reloadMultiplier = rangeMultiplier = buildSpeedMultiplier = 1;
     }
 
     @Override

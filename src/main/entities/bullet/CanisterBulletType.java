@@ -30,10 +30,7 @@ public class CanisterBulletType extends BouncyBulletType {
 
     @Override
     public void updateBouncing(Bullet b) {
-        Log.info(b.time);
-        Log.info(b.data);
         if(!(b.data instanceof Math3D.HeightHolder)) {
-            Log.info("Hai");
             return;
         }
         Math3D.HeightHolder holder = (Math3D.HeightHolder) b.data;
@@ -41,10 +38,8 @@ public class CanisterBulletType extends BouncyBulletType {
         holder.height += holder.lift * Time.delta;
 
         if(holder.height < 0) {
-            Log.info("HIT!");
             Log.info(b.fdata);
             if(b.fdata + 1 > bounceCap && bounceCap != -1) {
-                Log.info("Applying things");
                 b.fdata = 0;
                 b.data = null;
                 b.lifetime = detonationTime;
