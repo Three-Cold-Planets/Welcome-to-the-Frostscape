@@ -2,6 +2,7 @@ package main.content;
 
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.math.Interp;
 import arc.math.Mathf;
 import arc.util.Time;
 import main.graphics.ModPal;
@@ -88,11 +89,16 @@ public class FrostStatusEffects {
         conflex = new FrostStatusEffect("conflex"){
 
             public void update(Unit u, float time){
+                float multiplier = Mathf.clamp(time/(25 * 60), 0, 1);
+                multiplier = Mathf.clamp(Interp.pow2In.apply(multiplier));
+                float prevEffectChance = effectChance;
+                effectChance *= multiplier;
                 super.update(u, time);
+                effectChance = prevEffectChance;
                 u.speedMultiplier /= speedMultiplier;
                 u.dragMultiplier /= dragMultiplier;
                 u.reloadMultiplier /= reloadMultiplier;
-                float multiplier = Mathf.clamp(time/(5 * 60), 0, 1);
+
                 u.dragMultiplier *= multiplier * dragMultiplier;
                 u.reloadMultiplier *= Mathf.clamp(1-multiplier, 0, 1f);
                 u.speedMultiplier *= Mathf.lerp(1, speedMultiplier, multiplier);
@@ -116,7 +122,7 @@ public class FrostStatusEffects {
                 //Grows by 1 per block the unit's hitbox's perimeter takes up.
                 float current = unit.getDuration(conflex);
                 float scale = Mathf.pow(unit.hitSize/Vars.tilesize, 2);
-                unit.apply(conflex, Mathf.clamp(current+(current == 0 ? time : time/(Mathf.log(current+2, time/current+1) + 1))/scale,0,60 * 5));
+                unit.apply(conflex, Mathf.clamp(current+(current == 0 ? time : time/(Mathf.log(current+2, time/current+1) + 1))/scale,0,60 * 30));
             }
             {
             show = false;

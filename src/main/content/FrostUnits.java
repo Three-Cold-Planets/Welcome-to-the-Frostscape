@@ -40,6 +40,7 @@ import mindustry.type.Weapon;
 
 import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
+import static arc.graphics.g2d.Lines.lineAngle;
 import static arc.graphics.g2d.Lines.stroke;
 import static arc.math.Angles.randLenVectors;
 import static main.Frostscape.NAME;
@@ -133,11 +134,12 @@ public class FrostUnits {
                         y = 1.125f;
                         minWarmup = 0.95f;
                         shootWarmupSpeed = 0.05f;
-                        shootSound = Sounds.dullExplosion;
+                        shootSound = Sounds.artillery;
                         reload = 65;
                         alternate = true;
                         top = false;
                         cooldownTime = 75;
+                        shake = 1.75f;
                         DrawPart.PartMove mover = new DrawPart.PartMove(DrawPart.PartProgress.recoil, 0.2f, -0.12f, 20);
 
                         parts.addAll(
@@ -192,7 +194,30 @@ public class FrostUnits {
                             collidesGround = true;
                             drag = 0.06f;
                             shootEffect = Fx.explosion;
-                            hitEffect = despawnEffect = Fx.hitBulletColor;
+                            hitSound = despawnSound = Sounds.dullExplosion;
+                            hitEffect = despawnEffect = new Effect(25, e -> {
+                                color(Pal.sapBullet);
+
+                                e.scaled(6, i -> {
+                                    stroke(3f * i.fout());
+                                    Lines.circle(e.x, e.y, 3f + i.fin() * 35);
+                                });
+
+                                color(Color.gray);
+
+                                randLenVectors(e.id, 9, 2f + 25 * e.finpow(), (x, y) -> {
+                                    Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+                                });
+
+                                color(Pal.sapBulletBack);
+                                stroke(e.fout());
+
+                                randLenVectors(e.id + 1, 8, 1f + 15 * e.finpow(), (x, y) -> {
+                                    lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+                                });
+
+                                Drawf.light(e.x, e.y, 45, Pal.sapBulletBack, 0.8f * e.fout());
+                            });
                             width = 14;
                             height = 12;
                             lifetime = 15;
