@@ -58,7 +58,7 @@ public class FrostUnits {
 
     public static void load(){
 
-        RicochetBulletType bouncy = new RicochetBulletType(6, 6, "bullet"){{
+        RicochetBulletType bouncy = new RicochetBulletType(6, 8, "bullet"){{
             drag = 0.015f;
             bounciness = 1f;
             width = 4;
@@ -76,7 +76,7 @@ public class FrostUnits {
             removeAfterPierce = false;
             pierceCap = 2;
             status = FrostStatusEffects.conflexInternal;
-            statusDuration = 10;
+            statusDuration = 15;
             frontColor = Color.white;
             backColor = Pal.suppress;
         }};
@@ -205,14 +205,14 @@ public class FrostUnits {
 
                                 color(Color.gray);
 
-                                randLenVectors(e.id, 9, 2f + 25 * e.finpow(), (x, y) -> {
+                                randLenVectors(e.id, 5, 2f + 25 * e.finpow(), (x, y) -> {
                                     Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
                                 });
 
                                 color(Pal.sapBulletBack);
                                 stroke(e.fout());
 
-                                randLenVectors(e.id + 1, 8, 1f + 15 * e.finpow(), (x, y) -> {
+                                randLenVectors(e.id + 1, 3, 1f + 15 * e.finpow(), (x, y) -> {
                                     lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
                                 });
 

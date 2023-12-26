@@ -99,14 +99,14 @@ public class FrostStatusEffects {
                 u.dragMultiplier /= dragMultiplier;
                 u.reloadMultiplier /= reloadMultiplier;
 
-                u.dragMultiplier *= multiplier * dragMultiplier;
+                u.dragMultiplier *= Mathf.lerp(1, dragMultiplier, multiplier);
                 u.reloadMultiplier *= Mathf.clamp(1-multiplier, 0, 1f);
                 u.speedMultiplier *= Mathf.lerp(1, speedMultiplier, multiplier);
             };
 
             {
             speedMultiplier = 0.2f;
-            dragMultiplier = 1.2f;
+            dragMultiplier = 1.3f;
             reloadMultiplier = 0.65f;
             transitionDamage = 0.01f;
             effect = Fx.regenSuppressParticle;
