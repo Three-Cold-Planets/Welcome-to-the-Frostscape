@@ -14,7 +14,7 @@ main: "main.Frostscape"
 description: "An experimental modification created origionally to test v7's new API, but continued as a colab. Will *not* be worked on consistently due to life.\n\n[dark[]gray]A voice lingers in the darkness, dancing around your ears. Will you join it?"
 
 #the mod version
-version: 1.3-alpha
+version: 1.4-alpha
 
 #the minimum game build required to run this mod
 minGameVersion: 140
