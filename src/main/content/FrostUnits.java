@@ -230,7 +230,7 @@ public class FrostUnits {
                             fragRandomSpread = 15;
                             fragSpread = 2.5f;
                             status = FrostStatusEffects.conflexInternal;
-                            statusDuration = 45;
+                            statusDuration = 75;
                             frontColor = Color.white;
                             backColor = Pal.suppress;
                         }};
