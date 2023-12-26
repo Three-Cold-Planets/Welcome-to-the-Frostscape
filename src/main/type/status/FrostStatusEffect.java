@@ -19,7 +19,7 @@ public class FrostStatusEffect extends StatusEffect {
     @Override
     public void setStats() {
         super.setStats();
-        stats.addPercent(FrostStats.shieldDamageMultiplier, damageMultiplier);
+        if(shieldDamageMultiplier != 1) stats.addPercent(FrostStats.shieldDamageMultiplier, damageMultiplier);
     }
 
     @Override

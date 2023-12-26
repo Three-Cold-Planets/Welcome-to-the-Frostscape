@@ -15,6 +15,7 @@ import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
 import main.entities.bullet.FrostBulletType;
 import main.entities.bullet.RicochetBulletType;
+import main.entities.part.LightPart;
 import main.graphics.ModPal;
 import main.type.HollusUnitType;
 import main.type.weapon.ThrustSwingWeapon;
@@ -56,7 +57,7 @@ public class FrostUnits {
 
     public static void load(){
 
-        RicochetBulletType bouncy = new RicochetBulletType(6, 8, "bullet"){{
+        RicochetBulletType bouncy = new RicochetBulletType(6, 6, "bullet"){{
             drag = 0.015f;
             bounciness = 1f;
             width = 4;
@@ -73,9 +74,8 @@ public class FrostUnits {
             bounceSame = true;
             removeAfterPierce = false;
             pierceCap = 2;
-            pierceArmor = true;
             status = FrostStatusEffects.conflexInternal;
-            statusDuration = 15;
+            statusDuration = 10;
             frontColor = Color.white;
             backColor = Pal.suppress;
         }};
@@ -117,6 +117,8 @@ public class FrostUnits {
         */
 
         cord = new HollusUnitType("cord"){{
+            lightOpacity = 0.15f;
+            lightRadius = 45;
             health = 560;
             armor = 5;
             speed = 0.85f;
@@ -130,37 +132,56 @@ public class FrostUnits {
                         x = 6.325f;
                         y = 1.125f;
                         minWarmup = 0.95f;
+                        shootWarmupSpeed = 0.05f;
                         shootSound = Sounds.dullExplosion;
-                        reload = 45;
+                        reload = 65;
                         alternate = true;
                         top = false;
                         cooldownTime = 75;
+                        DrawPart.PartMove mover = new DrawPart.PartMove(DrawPart.PartProgress.recoil, 0.2f, -0.12f, 20);
+
                         parts.addAll(
                             new RegionPart("-bottom"){{
+                                moves.add(mover);
                                 under = true;
                                 outline = false;
                                 heatLayerOffset = 0;
+                                heatLight = true;
                             }},
                             new RegionPart("-cover"){{
+                                moves.add(mover);
                                 moves.add(new PartMove(PartProgress.warmup, 1.15f, 1f, -40));
                                 under = true;
                                 outline = false;
                             }},
                             new RegionPart("-body"){{
+                                moves.add(mover);
                                 under = true;
+                                heatLight = true;
                             }},
                             new RegionPart("-glow"){{
+                                moves.add(mover);
                                 outline = false;
                                 progress = PartProgress.warmup.add(-0.5f).mul(2).clamp();
                                 color = Color.clear;
                                 colorTo = ModPal.specialist;
                                 blending = Blending.additive;
+                            }},
+                            new LightPart(){{
+                                x = 1;
+                                y = 1;
+                                progress = growProgress = PartProgress.warmup.mul(1.25f).clamp().curve(Interp.smoother);
+
+                                moves.add(mover);
+                                radius = 15;
+                                length = 25;
+                                stroke = 10;
+                                ocapacity = 0.4f;
                             }}
                         );
 
-                        parts.each(p -> ((RegionPart) p).moves.add(new DrawPart.PartMove(DrawPart.PartProgress.recoil, 0.2f, -0.12f, 20)));
 
-                        bullet = new BasicBulletType(5.75f, 15, "bullet"){
+                        bullet = new BasicBulletType(5.75f, 15){
                             @Override
                             public void init(){
                                 super.init();
@@ -168,21 +189,21 @@ public class FrostUnits {
                             }
 
                             {
+                            collidesGround = true;
                             drag = 0.06f;
                             shootEffect = Fx.explosion;
                             hitEffect = despawnEffect = Fx.hitBulletColor;
                             width = 14;
                             height = 12;
                             lifetime = 15;
-                            pierceCap = 2;
                             fragBullet = bouncy;
                             fragLifeMin = 0.5f;
                             fragLifeMax = 1;
                             fragVelocityMax = 1;
                             fragVelocityMin = 0.5f;
-                            fragBullets = 3;
+                            fragBullets = 5;
                             fragRandomSpread = 15;
-                            fragSpread = 5;
+                            fragSpread = 2.5f;
                             status = FrostStatusEffects.conflexInternal;
                             statusDuration = 45;
                             frontColor = Color.white;

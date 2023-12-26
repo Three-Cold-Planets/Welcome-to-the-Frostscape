@@ -14,7 +14,7 @@ public class Families {
 
     public static void load(){
         assault = new Family("assault", Color.valueOf("ffa465"));
-        assault.members.addAll(UnitTypes.dagger, UnitTypes.mace, UnitTypes.flare, UnitTypes.stell);
+        assault.members.addAll(UnitTypes.dagger, UnitTypes.mace, UnitTypes.fortress, UnitTypes.scepter, UnitTypes.reign, UnitTypes.flare, UnitTypes.horizon, UnitTypes.zenith, UnitTypes.antumbra, UnitTypes.eclipse, UnitTypes.stell, UnitTypes.locus, UnitTypes.precept, UnitTypes.vanquish, UnitTypes.conquer);
         hunter = new Family("hunter", ModPal.hunter);
         specialist = new Family("specialist", ModPal.specialist);
         specialist.members.addAll(UnitTypes.crawler, UnitTypes.atrax, UnitTypes.spiroct, UnitTypes.arkyid, UnitTypes.toxopid, UnitTypes.elude, UnitTypes.avert, UnitTypes.obviate, UnitTypes.quell, UnitTypes.disrupt);

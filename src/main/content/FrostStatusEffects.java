@@ -89,16 +89,17 @@ public class FrostStatusEffects {
 
             public void update(Unit u, float time){
                 super.update(u, time);
+                u.speedMultiplier /= speedMultiplier;
                 u.dragMultiplier /= dragMultiplier;
                 u.reloadMultiplier /= reloadMultiplier;
-                //Grows by 1 per block the unit's hitbox's perimeter takes up.
-                float maxMulti = u.hitSize/Vars.tilesize * 4;
-                float multiplier = Mathf.clamp(time/(5 * 60)/maxMulti, 0, 1) * maxMulti;
-                u.dragMultiplier += multiplier * dragMultiplier;
-                u.reloadMultiplier *= Mathf.clamp(1/multiplier, 0, 1f);
+                float multiplier = Mathf.clamp(time/(5 * 60), 0, 1);
+                u.dragMultiplier *= multiplier * dragMultiplier;
+                u.reloadMultiplier *= Mathf.clamp(1-multiplier, 0, 1f);
+                u.speedMultiplier *= Mathf.lerp(1, speedMultiplier, multiplier);
             };
 
             {
+            speedMultiplier = 0.2f;
             dragMultiplier = 1.2f;
             reloadMultiplier = 0.65f;
             transitionDamage = 0.01f;
@@ -112,8 +113,10 @@ public class FrostStatusEffects {
         //Stackingg gets weaker logarithmically
         conflexInternal = new FrostStatusEffect("conflex-internal"){
             public void applied(Unit unit, float time, boolean extend) {
+                //Grows by 1 per block the unit's hitbox's perimeter takes up.
                 float current = unit.getDuration(conflex);
-                unit.apply(conflex, current == 0 ? time : current+time/(Mathf.log(current+2, time/current+1) + 1));
+                float scale = Mathf.pow(unit.hitSize/Vars.tilesize, 2);
+                unit.apply(conflex, Mathf.clamp(current+(current == 0 ? time : time/(Mathf.log(current+2, time/current+1) + 1))/scale,0,60 * 5));
             }
             {
             show = false;
