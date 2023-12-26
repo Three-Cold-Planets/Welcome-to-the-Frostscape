@@ -30,9 +30,6 @@ public class ModPal {
     lightBlue = Color.valueOf("#a7ebf2"),
     darkBlue = Color.valueOf("#4066a9"),
 
-    select = Color.valueOf("#a9cc6b"),
-
-    purpleBullet = Color.valueOf("#bf92f9"),
-    purpleBulletBack = Color.valueOf("#a447eb");
+    select = Color.valueOf("#a9cc6b");
     ;
 }

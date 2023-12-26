@@ -1,5 +1,6 @@
 package main.content;
 
+import arc.Core;
 import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -26,6 +27,7 @@ import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
+import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.gen.*;
@@ -117,16 +119,48 @@ public class FrostUnits {
         cord = new HollusUnitType("cord"){{
             health = 560;
             armor = 5;
+            speed = 0.85f;
             constructor = MechUnit::create;
-            drawCell = false;
             hitSize = 11;
             families.add(Families.specialist);
             weapons.add(
                     new Weapon(NAME + "-cord-weapon"){{
+                        //I hate how hacky this is, but it's easier for me to do this since im in the IDE already
+                        load = () -> region = outlineRegion = Core.atlas.find("clear");
                         x = 6.325f;
-                        y = 1.5f;
+                        y = 1.125f;
+                        minWarmup = 0.95f;
                         shootSound = Sounds.dullExplosion;
-                        bullet = new BasicBulletType(6, 15, "bullet"){
+                        reload = 45;
+                        alternate = true;
+                        top = false;
+                        cooldownTime = 75;
+                        parts.addAll(
+                            new RegionPart("-bottom"){{
+                                under = true;
+                                outline = false;
+                                heatLayerOffset = 0;
+                            }},
+                            new RegionPart("-cover"){{
+                                moves.add(new PartMove(PartProgress.warmup, 1.15f, 1f, -40));
+                                under = true;
+                                outline = false;
+                            }},
+                            new RegionPart("-body"){{
+                                under = true;
+                            }},
+                            new RegionPart("-glow"){{
+                                outline = false;
+                                progress = PartProgress.warmup.add(-0.5f).mul(2).clamp();
+                                color = Color.clear;
+                                colorTo = ModPal.specialist;
+                                blending = Blending.additive;
+                            }}
+                        );
+
+                        parts.each(p -> ((RegionPart) p).moves.add(new DrawPart.PartMove(DrawPart.PartProgress.recoil, 0.2f, -0.12f, 20)));
+
+                        bullet = new BasicBulletType(5.75f, 15, "bullet"){
                             @Override
                             public void init(){
                                 super.init();
@@ -134,11 +168,12 @@ public class FrostUnits {
                             }
 
                             {
+                            drag = 0.06f;
                             shootEffect = Fx.explosion;
                             hitEffect = despawnEffect = Fx.hitBulletColor;
                             width = 14;
                             height = 12;
-                            lifetime = 10;
+                            lifetime = 15;
                             pierceCap = 2;
                             fragBullet = bouncy;
                             fragLifeMin = 0.5f;
@@ -153,9 +188,6 @@ public class FrostUnits {
                             frontColor = Color.white;
                             backColor = Pal.suppress;
                         }};
-                        reload = 45;
-                        alternate = true;
-                        top = false;
                     }}
             );
         }};
@@ -417,7 +449,6 @@ public class FrostUnits {
                         chargeSound = Sounds.spray;
                         cooldownTime = 350f;
 
-
                         shoot = new ShootBarrel(){{
                             barrels = new float[]{
                                     0,0,0,
@@ -485,16 +516,18 @@ public class FrostUnits {
                             intervalDelay = 5;
                         }};
 
-                        parts.addAll(new RegionPart("-container"){{
+                        parts.addAll(new RegionPart("-cartridge"){{
                             layerOffset = 0.01f;
                             under = true;
                             outline = true;
-                            moves.add(new PartMove(PartProgress.smoothReload.inv().add(-0.75f).mul(4).clamp(), 2, 0, 0));
-                            children.add(new RegionPart("-container-liquid"){{
+                            moves.add(new PartMove(PartProgress.smoothReload.inv().add(-0.75f).mul(4).clamp().inv(), -2, 0, 0));
+                            children.add(new RegionPart("-cartridge-liquid"){{
                                 under = true;
                                 progress = PartProgress.smoothReload.inv();
                                 color = Color.clear;
                                 colorTo = Liquids.water.color;
+                                layerOffset = 0.01f;
+                                outline = false;
                             }});
                         }});
                         parts.add(new RegionPart("-body-front"){{
