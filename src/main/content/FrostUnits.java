@@ -31,6 +31,7 @@ import mindustry.entities.bullet.*;
 import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootBarrel;
+import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -67,13 +68,12 @@ public class FrostUnits {
             shrinkY = 0;
             lifetime = 35;
             knockback = 0.75f;
-            hitEffect = bounceEffect = Fx.none;
-            despawnEffect = Fx.hitBulletColor;
+            hitEffect = bounceEffect = despawnEffect = Fx.hitBulletColor;
             trailColor = Pal.suppress;
             trailWidth = 1f;
             trailLength = 4;
             bounceSame = true;
-            removeAfterPierce = false;
+            bounceCap = 5;
             pierceCap = 2;
             status = FrostStatusEffects.conflexInternal;
             statusDuration = 15;
@@ -126,7 +126,75 @@ public class FrostUnits {
             constructor = MechUnit::create;
             hitSize = 11;
             families.add(Families.specialist);
+            deathSound = Sounds.dullExplosion;
+            deathExplosionEffect = new Effect(40, e -> {
+                color(Pal.sapBullet);
+
+                e.scaled(6, i -> {
+                    stroke(3f * i.fout());
+                    Lines.circle(e.x, e.y, 3f + i.fin() * 15);
+                });
+
+                e.scaled(15, e1 -> {
+                    color(Color.gray);
+
+                    randLenVectors(e1.id, 5, 2f + 25 * e1.finpow(), (x, y) -> {
+                        Fill.circle(e.x + x, e.y + y, e1.fout() * 4f + 0.5f);
+                    });
+
+                    color(Pal.sapBulletBack);
+                    stroke(e.fout());
+
+                    randLenVectors(e1.id + 1, 3, 1f + 15 * e1.finpow(), (x, y) -> {
+                        lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e1.fout() * 3f);
+                    });
+
+                    Drawf.light(e.x, e.y, 65, Pal.sapBulletBack, 0.8f * e1.fout());
+                });
+
+                color(Pal.darkerMetal);
+
+                randLenVectors(e.id, 5, 3f + e.fin() * 8f, (x, y) -> {
+                    Fill.square(e.x + x, e.y + y, e.fout() * 2f + 0.5f, 45 + e.fin() * 15);
+                });
+            });
+
             weapons.add(
+                    new Weapon(){{
+                        shootOnDeath = true;
+                        shootCone = 180;
+                        reload = 60;
+                        ejectEffect = Fx.none;
+                        shootSound = Sounds.none;
+                        x = y = shootY = 0.0f;
+                        mirror = false;
+                        noAttack = true;
+                        controllable = false;
+                        rotate = false;
+
+                        shoot = new ShootSpread(){{
+                               shots = 4;
+                        }};
+                        inaccuracy = 30;
+                        bullet = new BombBulletType(){{
+                            //Separate shoot effect to help angle the sparks
+                            shootEffect = new Effect(15, e -> {
+                                color(Color.white, Pal.lightOrange, e.fin());
+                                stroke(0.5f + e.fout());
+
+                                randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 15, (x, y) -> {
+                                    float ang = Mathf.angle(x, y);
+                                    lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
+                                });
+                            });
+                            instantDisappear = true;
+                            speed = 5;
+                            fragBullets = 3;
+                            fragRandomSpread = 30;
+                            fragBullet = bouncy;
+                            despawnEffect = hitEffect = Fx.none;
+                        }};
+                    }},
                     new Weapon(NAME + "-cord-weapon"){{
                         //I hate how hacky this is, but it's easier for me to do this since im in the IDE already
                         load = () -> region = outlineRegion = Core.atlas.find("clear");
@@ -200,7 +268,7 @@ public class FrostUnits {
 
                                 e.scaled(6, i -> {
                                     stroke(3f * i.fout());
-                                    Lines.circle(e.x, e.y, 3f + i.fin() * 35);
+                                    Lines.circle(e.x, e.y, 3f + i.fin() * 15);
                                 });
 
                                 color(Color.gray);

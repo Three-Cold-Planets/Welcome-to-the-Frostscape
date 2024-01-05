@@ -18,7 +18,6 @@ import main.math.MathUtils;
 import main.math.MultiInterp;
 import main.world.BaseBlock;
 import main.world.BaseBuilding;
-import main.world.UpgradesType;
 import main.world.blocks.environment.CrackedBlock;
 import mindustry.Vars;
 import mindustry.content.Fx;
@@ -194,11 +193,6 @@ public class CoreSiphon extends BaseBlock {
     }
 
     public class CoreSiphonBuild extends BaseBuilding {
-
-        @Override
-        public UpgradesType type() {
-            return (UpgradesType) block;
-        }
 
         public boolean doneDrilling = false;
         public IntMap<Integer> drillPositions = new IntMap<Integer>();

@@ -10,7 +10,7 @@ public interface Upgradeable {
     UpgradesType type();
     UpgradeModule upgrades();
 
-    void upgraded();
+    void upgraded(UpgradeState state);
     void applyDeltas(UpgradeState state);
     void resetDeltas();
 }

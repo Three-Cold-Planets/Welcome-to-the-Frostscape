@@ -45,7 +45,7 @@ public class BaseCore extends CoreBlock implements UpgradesBlock {
 
     public class BaseCoreBuild extends CoreBuild implements UpgradeableBuilding {
         @Override
-        public void upgraded() {
+        public void upgraded(UpgradeState state) {
 
         }
 

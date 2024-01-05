@@ -99,5 +99,6 @@ public class UpgradeModule extends BlockModule {
         current.installing = false;
         current.installed = true;
         if(entry.listener != null) entry.listener.get(upgradeable);
+        parent.upgraded(current);
     }
 }

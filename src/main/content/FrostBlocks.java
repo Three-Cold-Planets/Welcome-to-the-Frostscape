@@ -16,6 +16,7 @@ import main.entities.bullet.BouncyBulletType;
 import main.entities.part.AccelPartProgress;
 import main.graphics.Layers;
 import main.graphics.ModPal;
+import main.math.Interps;
 import main.math.Math3D;
 import main.util.DrawUtils;
 import main.world.blocks.core.CoreBunker;
@@ -358,7 +359,45 @@ public class FrostBlocks {
         }};
 
         stoneWall = new CrumblingWall("stone-wall"){{
+            health = 280;
+            requirements(Category.defense, with(FrostItems.stone, 6, FrostItems.rust, 4));
             variants = 4;
+            plating = 8;
+            armor = 3;
+            destroyEffect = new Effect(210, n -> {
+
+                n.scaled(48, e -> {
+                    Draw.color(Color.gray);
+                    Draw.alpha(0.9F);
+
+                    Angles.randLenVectors(e.id, 4, 35 * e.fin(), e.rotation, 180, (x,y) -> {
+                        Fill.circle(e.x + x, e.y + y, 8 * e.fout());
+                    });
+
+                    Angles.randLenVectors(e.id, 3, 10 * e.fin(), e.rotation, 180, (x,y) -> {
+                        Fill.rect(e.x + x, e.y + y, 8 * e.fout(), 8 * e.fout(), 45);
+                    });
+
+                    Draw.color(Pal.lighterOrange, Pal.lightOrange, Color.gray, e.fin());
+                    Lines.stroke(1.5f * e.fout());
+                    Angles.randLenVectors(e.id + 1, 8, 1 + 23 * e.finpow(), (x, y) -> {
+                        Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1.0F + e.fout() * 3.0F);
+                    });
+                });
+
+
+                n.scaled(15, i -> {
+                    Draw.color(Color.gray);
+                    Lines.stroke(i.fout() * 1);
+                    Lines.circle(n.x, n.y, 3 + i.fin() * 10);
+                });
+
+                Draw.z(Layer.debris);
+                Draw.color(Pal.redSpark, Pal.darkPyraFlame, Pal.darkMetal, n.fin(Interp.pow4));
+                Angles.randLenVectors(n.id, 5, 26 * n.fin(Interps.fadePow), n.rotation, 180, (x, y) -> {
+                    Fill.rect(n.x + x, n.y + y, 4 * n.fout(), 8 * n.fout(), 45 + Angles.angle(x,y));
+                });
+            });
         }};
 
         coreSiphon = new CoreSiphon("core-siphon"){{
@@ -795,6 +834,11 @@ public class FrostBlocks {
                                 with(Items.coal, 5),
                                 with(Items.pyratite, 10),
                                 with(Items.coal, 10, Items.pyratite, 25)
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.alwaysArmed){{
+                        costs = new ItemStack[][]{
+                                with(Items.silicon, 3)
                         };
                     }}
             );

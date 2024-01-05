@@ -6,8 +6,7 @@ public class FrostUpgrades {
 
     public static Upgrade improvedWelding, INVINCIBLE, wheeeez,
             //Landmine-related upgrades
-            improvedBase, improvedPayload
-            ;
+            improvedBase, improvedPayload, alwaysArmed;
     public static void load(){
         improvedWelding = new Upgrade("improved-welding"){{
 
@@ -25,6 +24,11 @@ public class FrostUpgrades {
         }};
 
         improvedPayload = new Upgrade("improved-payload-landmine"){{
+
+        }};
+
+        //Allows landmines to trigger regardless of enabled state or team of unit
+        alwaysArmed = new Upgrade("always-armed-landmine"){{
 
         }};
     }

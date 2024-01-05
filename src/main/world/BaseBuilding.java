@@ -23,7 +23,7 @@ public abstract class BaseBuilding extends Building implements UpgradeableBuildi
 
 
     @Override
-    public void upgraded() {
+    public void upgraded(UpgradeState state) {
         resetDeltas();
         upgrades.update();
     }
@@ -33,11 +33,6 @@ public abstract class BaseBuilding extends Building implements UpgradeableBuildi
         super.updateTile();
         resetDeltas();
         upgrades.update();
-    }
-
-    @Override
-    public void draw() {
-        super.draw();
     }
 
     @Override
@@ -88,5 +83,10 @@ public abstract class BaseBuilding extends Building implements UpgradeableBuildi
     @Override
     public Building self() {
         return this;
+    }
+
+    @Override
+    public UpgradesType type() {
+        return (UpgradesBlock) block;
     }
 }
