@@ -4,7 +4,6 @@ import arc.Core;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.TextureRegion;
 import arc.util.Eachable;
-import arc.util.Log;
 import main.type.upgrade.UpgradeableBuilding;
 import main.world.systems.upgrades.Upgrade;
 import main.world.systems.upgrades.UpgradeState;
@@ -61,8 +60,6 @@ public class DrawUpgradePart extends UpgradeDrawer{
         TextureRegion current = base;
         int index = 0;
         for (int i = 0; i < size; i++) {
-            Log.info(index);
-            Log.info(index < indexes.length);
             if(index < indexes.length && indexes[index] == i) {
                 current = values[index];
                 index++;

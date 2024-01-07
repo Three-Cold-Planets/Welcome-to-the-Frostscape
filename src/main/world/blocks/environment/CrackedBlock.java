@@ -46,22 +46,20 @@ public class CrackedBlock extends Floor {
 
     @Override
     public void renderUpdate(UpdateRenderState tile) {
-        super.renderUpdate(tile);
+        if(tile.tile.floor() != this) return;
 
         int index = Mathf.randomSeed(tile.tile.pos(), 0, Math.max(0, variantRegions.length - 1));
 
-        float lava = maxBlinkTime - lava(tile.tile.x, tile.tile.y) * blinkTimeRange;
+        float lava = maxBlinkTime - delay(tile.tile.x, tile.tile.y) * blinkTimeRange;
 
         tile.data += Time.delta;
-        if(tile.data >= maxBlinkTime + lava) {
+        if(tile.data >= maxBlinkTime + lava && tile.tile.block() == Blocks.air) {
             tile.data = lava;
             glowEffect.lifetime = maxBlinkTime;
             glowEffect.create(tile.tile.worldx(), tile.tile.worldy(), 0, Color.white, topVariantRegions[index]);
         }
     }
-
-    //Think of it like a shader for effect delay
-    public float lava(int x, int y){
-        return Mathf.cos(x + y + Time.time/maxBlinkTime);
+    public float delay(int x, int y){
+        return Mathf.mod(Mathf.sin(Mathf.cos(x * y + x + y + Time.time * 5.2f) + y * 9.4f) * 18.29f, 1) * maxBlinkTime;
     }
 }

@@ -324,7 +324,7 @@ public class FrostUnits {
             engines.clear();
             aiController = () -> new FixedFlyingAI();
             setEnginesMirror(
-                        new ActivationEngine(24/4, -30/4, 3.5f, 15 - 90, 0.45f, 1, 1, 3.5f)
+                        new ActivationEngine(24/4, -30/4, 3.5f, 15 - 90, 0.25f, 1, 1, 7.5f)
             );
             abilities.add(
                     new MoveDamageLineAbility(9, 40/4, 0.85f, 6/4, 1, 4.5f, 0, true, true, Fx.colorSpark, Fx.hitLancer),

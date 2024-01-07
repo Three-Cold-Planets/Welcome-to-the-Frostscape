@@ -28,9 +28,12 @@ import main.world.blocks.drawers.ReflectorDrawer;
 import main.world.blocks.drill.CoreSiphon;
 import main.world.blocks.environment.CrackedBlock;
 import main.world.blocks.environment.ParticleFloor;
+import main.world.blocks.environment.PowerPlugFloor;
 import main.world.blocks.environment.SteamVentProp;
 import main.world.blocks.light.ReflectiveWall;
 import main.world.blocks.light.SolarReflector;
+import main.world.blocks.power.PowerPlug;
+import main.world.systems.bank.ResourceBankHandler;
 import main.world.systems.light.LightBeams;
 import main.world.systems.upgrades.UpgradeEntry;
 import mindustry.content.Fx;
@@ -48,8 +51,8 @@ import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
+import mindustry.type.Planet;
 import mindustry.world.Block;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.units.UnitCargoLoader;
 import mindustry.world.blocks.units.UnitCargoUnloadPoint;
@@ -68,52 +71,83 @@ public class FrostBlocks {
         baseRock = NAME + "-base-rock-0",
         baseReflector = NAME + "-base-reflector-0";
 
-
-    //Serpulo Tech
-
     public static Block
 
-        unitCargoLoader, unitCargoUnloadPoint;
+        //Serpulo Tech
+        unitCargoLoader, unitCargoUnloadPoint,
 
-    //Complex
+        //environment
 
-    public static Block
-            grating, plating, vent;
+        //floors - complex
+        grating, plating, platingCross, socket, powerSocket, powerSocketLarge, itemSocket, itemSocketLarge, liquidSocket, liquidSocketLarge,
 
-    //Volcanic moon
-    public static Block
-            maficFloor, maficStone, maficBoulder;
+        //floors - hollus
+        sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
+        sulphuricIce,
+        frostStone, frostSnow,
+        andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
+        crackedAndesiteFloor, fracturedAndesiteFloor,
+        graystoneFloor, graystoneSlatedFloor,
+        volcanicDaciteFloor, roughVolcanicDaciteFloor,
+        tephra,
 
+        //floors - volcanic moon
+        maficFloor,
 
-    //Hollus
-    public static Floor sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
-            sulphuricIce,
-            frostStone, frostSnow,
-            andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
-            graystoneFloor, graystoneSlatedFloor,
-            volcanicDaciteFloor, roughVolcanicDaciteFloor,
-            tephra;
+        //props - hollus
+        algae, frostCluster, wornBoulderLarge, wornBoulderHuge, frostVent,
 
-    public static Prop algae, frostCluster, wornBoulderLarge, wornBoulderHuge;
+        //props - complex
 
-    public static CrackedBlock crackedAndesiteFloor, fracturedAndesiteFloor;
-    public static StaticWall frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall;
-    public static StaticTree tephraWall;
-    public static SteamVentProp frostVent;
+        //props - volcanic moon
 
-    public static CoreSiphon coreSiphon;
+        maficBoulder,
 
-    public static ItemTurret pyroclast;
-    public static CoreBunker coreBunker;
-    public static ThermalMine thermalLandmine;
+        //walls - hollus
+        frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall, tephraWall,
 
-    public static SolarReflector solarReflector;
+        //walls - complex
+        enclosureWall,
 
-    public static ReflectiveWall reflectiveWall;
+        //walls - volcanic moon
+        maficStone,
 
-    public static CrumblingWall stoneWall;
+    //production - hollus
+    coreSiphon,
+
+    //storage - hollus
+    coreBunker,
+
+    //defense - hollus
+    pyroclast,
+    thermalLandmine,
+
+    //light - hollus
+    solarReflector,
+
+    reflectiveWall,
+
+    //power - complex
+    powerPlug, conductiveWall,
+
+    //defense - complex
+    stoneWall;
 
     public static void load(){
+        //region internal
+        //you REALLY don't want to mess with theese
+
+        ResourceBankHandler.block = new Block("resource-bank-handler"){{
+            update = false;
+            destructible = false;
+            consumesPower = true;
+            hasPower = true;
+            outputsPower = true;
+
+            consumePowerBuffered(0);
+        }};
+
+        //endregion
         unitCargoLoader = new UnitCargoLoader("unit-cargo-loader"){{
             unitType = FrostUnits.serpieDrone;
             requirements(Category.distribution, with(Items.copper, 80, Items.lead, 35, Items.graphite, 50, Items.silicon, 40));
@@ -140,9 +174,47 @@ public class FrostBlocks {
             itemCapacity = 100;
         }};
 
-         plating = new Floor("plating"){{
+
+        //Region environment
+
+        grating = new Floor("grating"){{
             variants = 0;
             solid = false;
+        }};
+
+        plating = new Floor("plating"){{
+            variants = 0;
+            solid = false;
+            blendGroup = grating;
+        }};
+
+        platingCross = new Floor("plating-cross"){{
+            variants = 0;
+            solid = false;
+            blendGroup = grating;
+        }};
+
+        socket = new Floor("socket"){{
+            variants = 0;
+            solid = false;
+        }};
+
+        powerSocket = new PowerPlugFloor("power-socket"){{
+            lightColor = Pal.powerLight.cpy().a(0.06f);
+            glowColor = Pal.powerLight;
+            effect = Fxf.powerSpark;
+            chance = 0.006f;
+            blendGroup = socket;
+        }};
+
+        powerSocketLarge = new PowerPlugFloor("power-socket-large"){{
+            lightColor = Pal.powerLight.cpy().a(0.11f);
+            glowColor = Pal.powerLight;
+            lightRadius = 52;
+            secondaryLightRadius = 21;
+            effect = Fxf.powerSpark;
+            chance = 0.006f;
+            blendGroup = socket;
         }};
 
         maficFloor = new Floor("mafic-floor");
@@ -299,6 +371,8 @@ public class FrostBlocks {
             maxBlinkTime = 60 * 6;
         }};
 
+        enclosureWall = new StaticWall("enclosure-wall");
+
         frostWall = new StaticWall("frost-wall"){{
             variants = 3;
         }};
@@ -358,6 +432,10 @@ public class FrostBlocks {
             breakable = alwaysReplace = false;
         }};
 
+        //endregion
+
+        //region defense
+
         stoneWall = new CrumblingWall("stone-wall"){{
             health = 280;
             requirements(Category.defense, with(FrostItems.stone, 6, FrostItems.rust, 4));
@@ -400,25 +478,165 @@ public class FrostBlocks {
             });
         }};
 
-        coreSiphon = new CoreSiphon("core-siphon"){{
-            requirements(Category.production, with());
-            liquidPadding = 6;
-            this.size = 7;
-            liquidCapacity = 1000;
-            boost = consumeLiquid(Liquids.water, 0.05F);
-            heatColor = new Color(ModPal.heat).a(0.35f);
-            boost.boost();
-            drillEffectRnd = 0.1f;
-            updateEffectChance = 0.15f;
-            rotateSpeed = 5;
-            drills = 4;
-            positions = new Vec2[]{
-                    new Vec2(44/4, 44/4),
-                    new Vec2(44/4, -44/4),
-                    new Vec2(-44/4, 44/4),
-                    new Vec2(-44/4, -44/4)
-            };
+        reflectiveWall = new ReflectiveWall("reflective-wall"){{
+            requirements(Category.effect, with());
         }};
+
+        thermalLandmine = new ThermalMine("thermal-landmine"){{
+            requirements(Category.effect, with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
+            health = 55;
+            tileDamage = 0.75f;
+            warmupSpeed = 0.04f;
+            warmDownSpeed = 0.15f;
+
+            entries.addAll(
+                    new UpgradeEntry(FrostUpgrades.improvedBase){{
+                        healthMultiplier = new float[]{
+                                1.1f,
+                                1.5f,
+                                3.5f
+                        };
+                        speedMultiplier = new float[]{
+                                1,
+                                0.85f,
+                                0.65f
+                        };
+                        armorMultiplier = new float[]{
+                                1
+                        };
+                        costs = new ItemStack[][]{
+                                with(Items.graphite, 5, Items.lead, 10),
+                                with(Items.metaglass, 7),
+                                with(Items.titanium, 10, Items.graphite, 15)
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.improvedPayload){{
+                        damageMultiplier = new float[]{
+                                1.2f,
+                                1.5f,
+                                1.8f
+                        };
+                        reloadMultiplier = new float[]{
+                                1,
+                                1.3f,
+                                2
+                        };
+                        rangeMultiplier = new float[]{
+                                1.5f,
+                                2.1f,
+                                2.8f
+                        };
+                        costs = new ItemStack[][]{
+                                with(Items.coal, 5),
+                                with(Items.pyratite, 10),
+                                with(Items.coal, 10, Items.pyratite, 25)
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.alwaysArmed){{
+                        costs = new ItemStack[][]{
+                                with(Items.silicon, 3)
+                        };
+                    }}
+            );
+            drawer = new DrawMulti(
+                    new DrawUpgradePart(
+                            NAME + "-thermal-landmine-base0",
+                            new String[]{
+                                    NAME + "-thermal-landmine-base0",
+                                    NAME + "-thermal-landmine-base1",
+                                    NAME + "-thermal-landmine-base2"
+                            },
+                            FrostUpgrades.improvedBase
+                    ),
+                    new DrawUpgradePart(
+                            NAME + "-thermal-landmine-payload0",
+                            new String[]{
+                                    NAME + "-thermal-landmine-payload0",
+                                    NAME + "-thermal-landmine-payload1",
+                                    NAME + "-thermal-landmine-payload2"
+                            },
+                            FrostUpgrades.improvedPayload
+                    )
+            );
+        }};
+
+        //endregion
+
+        //region power
+
+        powerPlug = new PowerPlug("power-plug"){{
+            requirements(Category.power, with(FrostItems.rust, 30));
+            category = Category.power;
+            consumePowerBuffered(4000);
+        }};
+
+        //endregion
+
+        //region storage
+
+        coreBunker = new CoreBunker("core-bunker"){{
+
+            consumeLiquid(Liquids.water, 0.01f);
+            liquidPadding = 5;
+
+            float centerOffset = 55/4, floatMirrorSide = 17/4;
+
+            hitboxEdges = new float[]{
+                    -floatMirrorSide, centerOffset,
+                    floatMirrorSide, centerOffset,
+                    centerOffset, floatMirrorSide,
+                    centerOffset, -floatMirrorSide,
+                    floatMirrorSide, -centerOffset,
+                    -floatMirrorSide, -centerOffset,
+                    -centerOffset, -floatMirrorSide,
+                    -centerOffset, floatMirrorSide
+            };
+
+            squareSprite = false;
+
+            requirements(Category.effect, ItemStack.empty);
+            size = 5;
+            mountPoses = new Seq<>();
+            for (int i = 1; i < Geometry.d8.length; i += 2) {
+                mountPoses.add(new Vec2(Geometry.d8[i].x * 26/2, Geometry.d8[i].y * 26/2));
+            }
+            units.addAll(
+                    new UnitEntry(null, new ResearchedLockedCond(FrostResearch.improvedWelding), 180, UnitTypes.pulsar),
+                    new UnitEntry(new ResearchedLockedCond(FrostResearch.improvedWelding), null, 300, UnitTypes.quasar)
+            );
+            entries.addAll(
+                    new UpgradeEntry(FrostUpgrades.improvedBase){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.improvedPayload){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.improvedWelding){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.INVINCIBLE){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.wheeeez){{
+                        costs = new ItemStack[][]{
+                                ItemStack.empty
+                        };
+                    }}
+            );
+            defaultEntry = units.get(0);
+        }};
+
+        //endregion
+
+        //region turrets
 
         pyroclast = new MinRangeTurret("pyroclast"){{
             requirements(Category.turret, with());
@@ -499,6 +717,9 @@ public class FrostBlocks {
             }};
             outlineColor = Pal.darkOutline;
 
+            shake = 1.2f;
+            Planet p = null;
+
             ammo(
                     Items.pyratite,
                     new BulletType(){{
@@ -571,6 +792,7 @@ public class FrostBlocks {
                         hitShake = 6.2f;
                         hittable = true;
                         hitSound = Sounds.bang;
+                        shake = 1.7f;
 
                         float[] layers = new float[]{visualHeightMax, visualHeightMin};
 
@@ -726,144 +948,9 @@ public class FrostBlocks {
             });
         }};
 
-        coreBunker = new CoreBunker("core-bunker"){{
+        //endregion
 
-            consumeLiquid(Liquids.water, 0.01f);
-            liquidPadding = 5;
-
-            float centerOffset = 55/4, floatMirrorSide = 17/4;
-
-            hitboxEdges = new float[]{
-                    -floatMirrorSide, centerOffset,
-                    floatMirrorSide, centerOffset,
-                    centerOffset, floatMirrorSide,
-                    centerOffset, -floatMirrorSide,
-                    floatMirrorSide, -centerOffset,
-                    -floatMirrorSide, -centerOffset,
-                    -centerOffset, -floatMirrorSide,
-                    -centerOffset, floatMirrorSide
-            };
-
-            squareSprite = false;
-
-            requirements(Category.effect, ItemStack.empty);
-            size = 5;
-            mountPoses = new Seq<>();
-            for (int i = 1; i < Geometry.d8.length; i += 2) {
-                mountPoses.add(new Vec2(Geometry.d8[i].x * 26/2, Geometry.d8[i].y * 26/2));
-            }
-            units.addAll(
-                    new UnitEntry(null, new ResearchedLockedCond(FrostResearch.improvedWelding), 180, UnitTypes.pulsar),
-                    new UnitEntry(new ResearchedLockedCond(FrostResearch.improvedWelding), null, 300, UnitTypes.quasar)
-            );
-            entries.addAll(
-                    new UpgradeEntry(FrostUpgrades.improvedBase){{
-                        costs = new ItemStack[][]{
-                                ItemStack.empty
-                        };
-                    }},
-                    new UpgradeEntry(FrostUpgrades.improvedPayload){{
-                        costs = new ItemStack[][]{
-                                ItemStack.empty
-                        };
-                    }},
-                    new UpgradeEntry(FrostUpgrades.improvedWelding){{
-                        costs = new ItemStack[][]{
-                                ItemStack.empty
-                        };
-                    }},
-                    new UpgradeEntry(FrostUpgrades.INVINCIBLE){{
-                        costs = new ItemStack[][]{
-                                ItemStack.empty
-                        };
-                    }},
-                    new UpgradeEntry(FrostUpgrades.wheeeez){{
-                        costs = new ItemStack[][]{
-                                ItemStack.empty
-                        };
-                    }}
-            );
-            defaultEntry = units.get(0);
-        }};
-
-        thermalLandmine = new ThermalMine("thermal-landmine"){{
-            requirements(Category.effect, with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
-            health = 55;
-            tileDamage = 0.75f;
-            warmupSpeed = 0.002f;
-            warmDownSpeed = 0.06f;
-
-            entries.addAll(
-                    new UpgradeEntry(FrostUpgrades.improvedBase){{
-                        healthMultiplier = new float[]{
-                                1.1f,
-                                1.5f,
-                                3.5f
-                        };
-                        speedMultiplier = new float[]{
-                                1,
-                                0.85f,
-                                0.65f
-                        };
-                        armorMultiplier = new float[]{
-                                1
-                        };
-                        costs = new ItemStack[][]{
-                                with(Items.graphite, 5, Items.lead, 10),
-                                with(Items.metaglass, 7),
-                                with(Items.titanium, 10, Items.graphite, 15)
-                        };
-                    }},
-                    new UpgradeEntry(FrostUpgrades.improvedPayload){{
-                        damageMultiplier = new float[]{
-                                1.2f,
-                                1.5f,
-                                1.8f
-                        };
-                        reloadMultiplier = new float[]{
-                                1,
-                                1.3f,
-                                2
-                        };
-                        rangeMultiplier = new float[]{
-                                1.5f,
-                                2.1f,
-                                2.8f
-                        };
-                        costs = new ItemStack[][]{
-                                with(Items.coal, 5),
-                                with(Items.pyratite, 10),
-                                with(Items.coal, 10, Items.pyratite, 25)
-                        };
-                    }},
-                    new UpgradeEntry(FrostUpgrades.alwaysArmed){{
-                        costs = new ItemStack[][]{
-                                with(Items.silicon, 3)
-                        };
-                    }}
-            );
-            drawer = new DrawMulti(
-                    new DrawUpgradePart(
-                            NAME + "-thermal-landmine-base0",
-                            new String[]{
-                                    NAME + "-thermal-landmine-base0",
-                                    NAME + "-thermal-landmine-base1",
-                                    NAME + "-thermal-landmine-base2"
-                            },
-                            FrostUpgrades.improvedBase
-                    ),
-                    new DrawUpgradePart(
-                            NAME + "-thermal-landmine-payload0",
-                            new String[]{
-                                    NAME + "-thermal-landmine-payload0",
-                                    NAME + "-thermal-landmine-payload1",
-                                    NAME + "-thermal-landmine-payload2"
-                            },
-                            FrostUpgrades.improvedPayload
-                    )
-            );
-        }};
-
+        //region light
         solarReflector = new SolarReflector("solar-reflector"){{
             requirements(Category.effect, with());
             data = new LightBeams.ColorData(2.4f, 2f, 1.6f);
@@ -890,8 +977,29 @@ public class FrostBlocks {
             );
         }};
 
-        reflectiveWall = new ReflectiveWall("reflective-wall"){{
-            requirements(Category.effect, with());
+        //region crafting
+
+        coreSiphon = new CoreSiphon("core-siphon"){{
+            requirements(Category.production, with());
+            liquidPadding = 6;
+            this.size = 7;
+            liquidCapacity = 1000;
+            boost = consumeLiquid(Liquids.water, 0.05F);
+            heatColor = new Color(ModPal.heat).a(0.35f);
+            boost.boost();
+            drillEffectRnd = 0.1f;
+            updateEffectChance = 0.15f;
+            rotateSpeed = 5;
+            drills = 4;
+            positions = new Vec2[]{
+                    new Vec2(44/4, 44/4),
+                    new Vec2(44/4, -44/4),
+                    new Vec2(-44/4, 44/4),
+                    new Vec2(-44/4, -44/4)
+            };
         }};
+
+        //endregion
+
     }
 }

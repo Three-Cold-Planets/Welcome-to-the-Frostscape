@@ -26,6 +26,7 @@ import main.util.UIUtils;
 import main.util.WeatherUtils;
 import main.world.meta.Family;
 import main.world.meta.LoreNote;
+import main.world.systems.bank.ResourceBankHandler;
 import main.world.systems.heat.TileHeatControl;
 import main.world.systems.light.LightBeams;
 import main.world.systems.research.ResearchHandler;
@@ -118,31 +119,30 @@ public class Frostscape extends Mod{
                 }
         );
 
-        Events.run(ClientLoadEvent.class, () -> ModTex.load(NAME));
         Events.run(ContentInitEvent.class, this::loadSplash);
 
         Events.run(WinEvent.class, this::loadSplash);
 
-
         //Most of theese are singletons for the sake of being able to port these over to the Arctic-Insurrection mod more easly.
         SaveVersion.addCustomChunk("upgrade-handler", UpgradeHandler.get());
-        Events.run(EventType.ClientLoadEvent.class, () -> {
-            UpgradeHandler.upgrades.each(Upgrade::load);
-        });
 
         SaveVersion.addCustomChunk("research-handler", ResearchHandler.get());
         SaveVersion.addCustomChunk("tile-heat-control", TileHeatControl.get());
         SaveVersion.addCustomChunk("light-beams", LightBeams.get());
+        SaveVersion.addCustomChunk("resource-bank", ResourceBankHandler.get());
 
         Events.on(StateChangeEvent.class, e -> {
             if(e.from == GameState.State.playing && e.to == GameState.State.menu) LightBeams.get().lights.clear();
         });
 
         Events.run(Trigger.update, () -> {
-            if(!Vars.state.isPlaying()) return;
-            LightBeams.get().updateBeams();
             scan.update();
             selection.update();
+
+            if(!Vars.state.isPlaying()) return;
+            LightBeams.get().updateBeams();
+            ResourceBankHandler.power.graph.update();
+            ResourceBankHandler.liquids.updateFlow();
 
             WeatherUtils.updateWind();
         });
@@ -152,6 +152,16 @@ public class Frostscape extends Mod{
             Draw.draw(Layer.overlayUI, scan::draw);
             Draw.draw(Layer.buildBeam, scan::drawScan);
             Draw.draw(Layer.light + 1, LightBeams.get()::draw);
+        });
+
+        Events.run(EventType.WorldLoadEndEvent.class, () -> {
+            ResourceBankHandler.setup();
+        });
+
+        Events.run(EventType.ClientLoadEvent.class, () -> {
+            UpgradeHandler.upgrades.each(Upgrade::load);
+            ModTex.load(NAME);
+            ResourceBankHandler.init();
         });
     }
 
@@ -176,7 +186,8 @@ public class Frostscape extends Mod{
                 "main.world",
                 "main.world.systems.light",
                 "main.world.systems.upgrades",
-                "main.world.systems.research"
+                "main.world.systems.research",
+                "main.world.systems.bank"
         );
 
         packages.each(name -> {

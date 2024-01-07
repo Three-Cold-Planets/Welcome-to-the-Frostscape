@@ -3,7 +3,6 @@ package main.world.blocks.defense;
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.io.Reads;
 import main.world.BaseBlock;
 import main.world.BaseBuilding;
@@ -58,6 +57,12 @@ public class CrumblingWall extends BaseBlock implements UpgradesType {
             updateState();
         }
 
+        @Override
+        public void heal(float amount) {
+            super.heal(amount);
+            updateState();
+        }
+
         public void updateState(){
             stage = Mathf.clamp(Mathf.ceil((1 - healthf()) * variants), 1, variants);
         }
@@ -72,7 +77,6 @@ public class CrumblingWall extends BaseBlock implements UpgradesType {
         public void readBase(Reads read) {
             super.readBase(read);
             updateState();
-            Log.info(health);
         }
     }
 }

@@ -16,11 +16,13 @@ import main.graphics.ModPal;
 import main.math.MultiInterp;
 import main.util.DrawUtils;
 import mindustry.Vars;
+import mindustry.content.Blocks;
 import mindustry.content.Liquids;
 import mindustry.entities.Effect;
-import mindustry.gen.Building;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.world.Tile;
 
 import static arc.graphics.g2d.Draw.color;
 import static arc.math.Angles.randLenVectors;
@@ -66,14 +68,24 @@ public class Fxf {
 
     glowEffect = new Effect(0, e -> {
         Draw.z(Layer.floor);
-        Building b = Vars.world.buildWorld(e.x, e.y);
-        if(b != null) return;
+        Tile t = Vars.world.tileWorld(e.x, e.y);
+        if(t.block() != Blocks.air) return;
         TextureRegion region = (TextureRegion) e.data;
         Draw.alpha(e.fslope() * e.fslope());
         Draw.rect(region, e.x, e.y, e.rotation);
         Draw.blend(Blending.additive);
         Draw.rect(region, e.x, e.y, e.rotation);
         Draw.blend();
+    }),
+
+    powerSpark = new Effect(16, e -> {
+        Draw.color(Color.white, Pal.powerLight, e.fin());
+        Lines.stroke(e.fout() * 2 + 0.2f);
+        Angles.randLenVectors(e.id, 3, 3 + 16 * e.fin(), e.rotation, 180, (x,y) -> {
+            Tmp.v1.trns(Mathf.angle(x,y), e.fslope() * 3.6f + 0.7f).add(e.x + x, e.y + y);
+            Lines.line(e.x + x, e.y + y, Tmp.v1.x, Tmp.v1.y);
+            Drawf.light(e.x + x, e.y + y, Tmp.v1.x, Tmp.v1.y, Lines.getStroke(), Draw.getColor(), 0.45f);
+        });
     }),
 
     sulphuricSmoke = new Effect(450, 100, e -> {

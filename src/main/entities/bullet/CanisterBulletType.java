@@ -4,7 +4,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.util.Log;
 import arc.util.Time;
 import main.math.Math3D;
 import mindustry.Vars;
@@ -38,7 +37,6 @@ public class CanisterBulletType extends BouncyBulletType {
         holder.height += holder.lift * Time.delta;
 
         if(holder.height < 0) {
-            Log.info(b.fdata);
             if(b.fdata + 1 > bounceCap && bounceCap != -1) {
                 b.fdata = 0;
                 b.data = null;

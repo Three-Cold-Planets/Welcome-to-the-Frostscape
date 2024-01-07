@@ -160,6 +160,13 @@ public class ThermalMine extends UpgradeableMine{
                     }).size(32).padBottom(-4).padRight(2);
                 }).left();
             }
+
+            if (Vars.net.active() && this.lastAccessed != null) {
+                table.row();
+                table.add(Core.bundle.format("lastaccessed", new Object[]{this.lastAccessed})).growX().wrap().left();
+            }
+
+            table.marginBottom(-5.0F);
         }
 
         @Override

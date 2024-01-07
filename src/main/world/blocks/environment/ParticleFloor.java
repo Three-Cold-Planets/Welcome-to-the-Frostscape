@@ -32,7 +32,8 @@ public class ParticleFloor extends Floor {
     }
     @Override
     public void renderUpdate(UpdateRenderState tile) {
-        if(Mathf.chanceDelta(chance)) {
+        //gota check twice cause stuff can block the floor
+        if(Mathf.chanceDelta(chance) && updateRender(tile.tile)) {
             effect.at(tile.tile.worldx(), tile.tile.worldy());
         }
     }

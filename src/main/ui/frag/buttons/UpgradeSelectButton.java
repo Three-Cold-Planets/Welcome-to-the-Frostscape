@@ -13,7 +13,6 @@ import arc.struct.IntMap;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Align;
-import arc.util.Log;
 import arc.util.Time;
 import main.type.upgrade.UpgradeableBuilding;
 import main.ui.frag.BlockSelectFrag;
@@ -163,15 +162,12 @@ public class UpgradeSelectButton extends BlockSelectFrag.SelectButton {
             maxLevel = Math.max(maxLevel, entry.stacks() - 1);
             Seq<UpgradeState> curStates = Seq.with();
             states.each(s -> {
-                Log.info(s);
                 if(!s.installed || s.level < entry.stacks()) {
                     curStates.add(s);
                 }
             });
             if(!curStates.isEmpty()) currentStates.put(entry, curStates);
         });
-        Log.info(currentStates);
-        Log.info(currentMap);
         i = 0;
         info.add(topBar).left().top().height(40).width(400);
         rebuildInfoButtons();

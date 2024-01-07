@@ -1,17 +1,12 @@
 package main.world.systems.heat;
 
 import arc.Core;
-import arc.Events;
 import arc.math.Mathf;
 import arc.math.geom.Geometry;
 import arc.struct.IntMap;
-import arc.struct.Seq;
 import arc.util.Log;
-import mindustry.Vars;
-import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.io.SaveFileReader;
-import mindustry.io.SaveVersion;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -65,7 +60,6 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
         heatThread.setPriority(Thread.NORM_PRIORITY - 1);
         heatThread.setDaemon(true);
         heatThread.start();
-        Log.info("Started Heat");
     }
     public void setTileValues(int index, float energy, float mass, MaterialPreset preset){
         energyValues[index] = energy;
@@ -146,7 +140,6 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
     }
 
     public void tick(){
-        Log.info("Ticking");
         setup.update(this);
         updateFlow();
         updateEnergy();
@@ -228,10 +221,6 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
     public float kelvins(int index){
         tmpMP1 = tilePropertyAssociations.get(index);
         if(tmpMP1 == null) {
-            Log.info("-----");
-            Log.info(index);
-            Log.info(tilePropertyAssociations.size);
-            Log.info("-----");
             return 0;
         }
         return kelvins(energyValues[index], massValues[index], tmpMP1.specificHeatCapacity);
