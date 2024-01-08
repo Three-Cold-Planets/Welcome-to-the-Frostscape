@@ -23,6 +23,8 @@ import main.world.blocks.core.CoreBunker;
 import main.world.blocks.defense.CrumblingWall;
 import main.world.blocks.defense.MinRangeTurret;
 import main.world.blocks.defense.ThermalMine;
+import main.world.blocks.drawers.DrawConstantLight;
+import main.world.blocks.drawers.DrawGenerateLight;
 import main.world.blocks.drawers.DrawUpgradePart;
 import main.world.blocks.drawers.ReflectorDrawer;
 import main.world.blocks.drill.CoreSiphon;
@@ -56,8 +58,7 @@ import mindustry.world.Block;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.units.UnitCargoLoader;
 import mindustry.world.blocks.units.UnitCargoUnloadPoint;
-import mindustry.world.draw.DrawMulti;
-import mindustry.world.draw.DrawTurret;
+import mindustry.world.draw.*;
 
 import static arc.graphics.g2d.Draw.color;
 import static main.Frostscape.NAME;
@@ -128,7 +129,7 @@ public class FrostBlocks {
     reflectiveWall,
 
     //power - complex
-    powerPlug, conductiveWall,
+    powerPlug, powerPlugLarge, conductiveWall,
 
     //defense - complex
     stoneWall;
@@ -205,6 +206,7 @@ public class FrostBlocks {
             effect = Fxf.powerSpark;
             chance = 0.006f;
             blendGroup = socket;
+            overrideMapColor = Pal.powerLight;
         }};
 
         powerSocketLarge = new PowerPlugFloor("power-socket-large"){{
@@ -215,15 +217,10 @@ public class FrostBlocks {
             effect = Fxf.powerSpark;
             chance = 0.006f;
             blendGroup = socket;
+            overrideMapColor = Pal.powerLight;
         }};
 
         maficFloor = new Floor("mafic-floor");
-
-        maficStone = new StaticWall("mafic-stone");
-
-        maficBoulder = new Prop("mafic-boulder"){{
-            variants = 2;
-        }};
 
         sulphuricWater = new ParticleFloor("sulphuric-water"){{
             isLiquid = true;
@@ -373,6 +370,9 @@ public class FrostBlocks {
 
         enclosureWall = new StaticWall("enclosure-wall");
 
+
+        maficStone = new StaticWall("mafic-stone");
+
         frostWall = new StaticWall("frost-wall"){{
             variants = 3;
         }};
@@ -430,6 +430,10 @@ public class FrostBlocks {
             variants = 0;
             size = 1;
             breakable = alwaysReplace = false;
+        }};
+
+        maficBoulder = new Prop("mafic-boulder"){{
+            variants = 2;
         }};
 
         //endregion
@@ -567,7 +571,41 @@ public class FrostBlocks {
         powerPlug = new PowerPlug("power-plug"){{
             requirements(Category.power, with(FrostItems.rust, 30));
             category = Category.power;
-            consumePowerBuffered(4000);
+            consumePowerBuffered(200);
+            maxExchanged = 5;
+            drawer = new DrawMulti(new DrawBlock[]{
+                    new DrawDefault(),
+                    new DrawGlowRegion(){{
+                        color = Pal.powerLight;
+                    }},
+                    new DrawGenerateLight(),
+                    new DrawConstantLight()
+            });
+        }};
+
+        powerPlugLarge = new PowerPlug("power-plug-large"){{
+            requirements(Category.power, with(FrostItems.rust, 30));
+            category = Category.power;
+            size = 3;
+            consumePowerBuffered(2500);
+            maxExchanged = 40;
+            lightRadius = 52;
+            drawer = new DrawMulti(new DrawBlock[]{
+                    new DrawDefault(),
+                    new DrawGlowRegion(){{
+                        color = Pal.powerLight;
+                    }},
+                    new DrawGlowRegion("-top-glow"){{
+                        color = Color.white;
+                        glowScale = 25;
+                        glowIntensity = 0.25f;
+                        alpha = 0.35f;
+                    }},
+                    new DrawGenerateLight(){{
+                        baseRadius = 84;
+                    }},
+                    new DrawConstantLight()
+            });
         }};
 
         //endregion

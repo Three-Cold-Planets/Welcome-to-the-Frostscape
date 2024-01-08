@@ -5,4 +5,9 @@ public class PowerPlugFloor extends GlowingFloor{
     public PowerPlugFloor(String name) {
         super(name);
     }
+
+    @Override
+    public void init() {
+        super.init();
+    }
 }

@@ -53,6 +53,8 @@ import static mindustry.Vars.ui;
 
 public class Frostscape extends Mod{
 
+    public static boolean photosensitiveMode;
+
     public static NativeJavaPackage p = null;
 
     public static final String NAME = "hollow-frostscape";
@@ -224,8 +226,13 @@ public class Frostscape extends Mod{
 
     void loadSettings(){
         ui.settings.addCategory(Core.bundle.get("settings.frostscape-title"), NAME + "-hunter", t -> {
-            t.sliderPref("frostscape-parallax", 100, 1, 100, 1, s -> s + "%");
-            t.sliderPref("frostscape-wind-visual-force", 1, 0, 8, 1, s -> s * 100 + "%");
+            t.sliderPref(Core.bundle.get("settings.frostscape-parallax"), 100, 1, 100, 1, s -> s + "%");
+            t.sliderPref(Core.bundle.get("settings.frostscape-wind-visual-force"), 1, 0, 8, 1, s -> s * 100 + "%");
+            t.checkPref(Core.bundle.get("settings.frostscape-flashing-lights-safety"), false, b -> {
+                photosensitiveMode = b;
+            });
+            t.row();
+            t.add(Core.bundle.get("settings.frostscape.flashingwarning")).wrap().left().growX().padTop(3);
         });
     }
 

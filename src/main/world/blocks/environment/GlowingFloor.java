@@ -10,12 +10,15 @@ import arc.math.geom.Point2;
 import arc.util.Time;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
+import mindustry.graphics.MultiPacker;
 import mindustry.world.Tile;
+
+import static main.Frostscape.photosensitiveMode;
 
 public class GlowingFloor extends ParticleFloor {
     public TextureRegion glowRegion;
     public float secondaryLightRadius;
-    public Color secondaryLightColor, glowColor;
+    public Color secondaryLightColor, glowColor, overrideMapColor;
 
     public GlowingFloor(String name) {
         super(name);
@@ -27,6 +30,12 @@ public class GlowingFloor extends ParticleFloor {
     }
 
     @Override
+    public void createIcons(MultiPacker packer) {
+        super.createIcons(packer);
+        if(overrideMapColor != null) mapColor = overrideMapColor;
+    }
+
+    @Override
     public void load() {
         super.load();
         glowRegion = Core.atlas.find(name + "-glow");
@@ -34,7 +43,7 @@ public class GlowingFloor extends ParticleFloor {
 
     @Override
     public void drawEnvironmentLight(Tile tile) {
-        float alpha = Mathf.clamp(Mathf.clamp(1 - Mathf.clamp(Mathf.sin(Time.time + Mathf.randomSeed(Point2.pack(tile.x, tile.y), 0, 96) + 1.9f, 12, 1))) * 2) - Math.abs(Mathf.sin(6, 0.05f));
+        float alpha = (!photosensitiveMode ? Mathf.clamp(Mathf.clamp(1 - Mathf.clamp(Mathf.sin(Time.time + Mathf.randomSeed(Point2.pack(tile.x, tile.y), 0, 96) + 1.9f, 12, 1))) * 2) : 1) - Math.abs(Mathf.sin(6, 0.05f));
         Draw.blend(Blending.additive);
         Drawf.light(tile.worldx(), tile.worldy(), this.lightRadius, this.lightColor, this.lightColor.a * alpha);
         Drawf.light(tile.worldx(), tile.worldy(), this.secondaryLightRadius, this.secondaryLightColor, this.secondaryLightColor.a * alpha);
