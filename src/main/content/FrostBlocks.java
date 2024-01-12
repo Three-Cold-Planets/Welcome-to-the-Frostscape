@@ -19,8 +19,10 @@ import main.graphics.ModPal;
 import main.math.Interps;
 import main.math.Math3D;
 import main.util.DrawUtils;
+import main.world.blocks.PlugBlock;
 import main.world.blocks.core.CoreBunker;
 import main.world.blocks.defense.CrumblingWall;
+import main.world.blocks.defense.LightningMine;
 import main.world.blocks.defense.MinRangeTurret;
 import main.world.blocks.defense.ThermalMine;
 import main.world.blocks.drawers.DrawConstantLight;
@@ -28,10 +30,7 @@ import main.world.blocks.drawers.DrawGenerateLight;
 import main.world.blocks.drawers.DrawUpgradePart;
 import main.world.blocks.drawers.ReflectorDrawer;
 import main.world.blocks.drill.CoreSiphon;
-import main.world.blocks.environment.CrackedBlock;
-import main.world.blocks.environment.ParticleFloor;
-import main.world.blocks.environment.PowerPlugFloor;
-import main.world.blocks.environment.SteamVentProp;
+import main.world.blocks.environment.*;
 import main.world.blocks.light.ReflectiveWall;
 import main.world.blocks.light.SolarReflector;
 import main.world.blocks.power.PowerPlug;
@@ -116,12 +115,20 @@ public class FrostBlocks {
     //production - hollus
     coreSiphon,
 
+    //distribution - complex
+
+    itemPlug,
+
+    //fluids - complex
+
+    liquidPlug,
+
     //storage - hollus
     coreBunker,
 
     //defense - hollus
     pyroclast,
-    thermalLandmine,
+    thermalLandmine, lightningMine,
 
     //light - hollus
     solarReflector,
@@ -201,23 +208,69 @@ public class FrostBlocks {
         }};
 
         powerSocket = new PowerPlugFloor("power-socket"){{
-            lightColor = Pal.powerLight.cpy().a(0.06f);
-            glowColor = Pal.powerLight;
+            lightColor = ModPal.glowYellow.cpy().a(0.06f);
+            secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
+            glowColor = ModPal.glowYellow;
             effect = Fxf.powerSpark;
             chance = 0.006f;
             blendGroup = socket;
-            overrideMapColor = Pal.powerLight;
+            overrideMapColor = ModPal.glowYellow;
         }};
 
         powerSocketLarge = new PowerPlugFloor("power-socket-large"){{
-            lightColor = Pal.powerLight.cpy().a(0.11f);
-            glowColor = Pal.powerLight;
+            lightColor = ModPal.glowYellow.cpy().a(0.11f);
+            secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
+            glowColor = ModPal.glowYellow;
             lightRadius = 52;
             secondaryLightRadius = 21;
             effect = Fxf.powerSpark;
             chance = 0.006f;
             blendGroup = socket;
-            overrideMapColor = Pal.powerLight;
+            overrideMapColor = ModPal.glowYellow;
+        }};
+
+        liquidSocket = new GlowingFloor("liquid-socket"){{
+            lightColor = ModPal.glowMagenta.cpy().a(0.06f);
+            secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
+            glowColor = ModPal.glowMagenta;
+            effect = Fxf.powerSpark;
+            chance = 0.006f;
+            blendGroup = socket;
+            overrideMapColor = ModPal.glowMagenta;
+        }};
+
+        liquidSocketLarge = new GlowingFloor("liquid-socket-large"){{
+            lightColor = ModPal.glowMagenta.cpy().a(0.11f);
+            secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
+            glowColor = ModPal.glowMagenta;
+            lightRadius = 52;
+            secondaryLightRadius = 21;
+            effect = Fxf.powerSpark;
+            chance = 0.006f;
+            blendGroup = socket;
+            overrideMapColor = ModPal.glowMagenta;
+        }};
+
+        itemSocket = new GlowingFloor("item-socket"){{
+            lightColor = ModPal.glowCyan.cpy().a(0.06f);
+            secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
+            glowColor = ModPal.glowCyan;
+            effect = Fxf.powerSpark;
+            chance = 0.006f;
+            blendGroup = socket;
+            overrideMapColor = ModPal.glowCyan;
+        }};
+
+        itemSocketLarge = new GlowingFloor("item-socket-large"){{
+            lightColor = ModPal.glowCyan.cpy().a(0.11f);
+            secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
+            glowColor = ModPal.glowCyan;
+            lightRadius = 52;
+            secondaryLightRadius = 21;
+            effect = Fxf.powerSpark;
+            chance = 0.006f;
+            blendGroup = socket;
+            overrideMapColor = ModPal.glowCyan;
         }};
 
         maficFloor = new Floor("mafic-floor");
@@ -564,6 +617,59 @@ public class FrostBlocks {
             );
         }};
 
+        lightningMine = new LightningMine("lightning-mine"){{
+            requirements(Category.defense, with(Items.silicon, 25, Items.surgeAlloy, 5));
+
+            entries.addAll(
+                    new UpgradeEntry(FrostUpgrades.improvedBase){{
+                        healthMultiplier = new float[]{
+                                1.1f,
+                                1.5f,
+                                3.5f
+                        };
+                        speedMultiplier = new float[]{
+                                1,
+                                0.85f,
+                                0.65f
+                        };
+                        armorMultiplier = new float[]{
+                                1
+                        };
+                        costs = new ItemStack[][]{
+                                with(Items.graphite, 5, Items.lead, 10),
+                                with(Items.metaglass, 7),
+                                with(Items.titanium, 10, Items.graphite, 15)
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.improvedPayload){{
+                        damageMultiplier = new float[]{
+                                1.2f,
+                                1.5f,
+                                1.8f
+                        };
+                        reloadMultiplier = new float[]{
+                                1,
+                                1.3f,
+                                2
+                        };
+                        rangeMultiplier = new float[]{
+                                1.5f,
+                                2.1f,
+                                2.8f
+                        };
+                        costs = new ItemStack[][]{
+                                with(Items.silicon, 5),
+                                with(Items.surgeAlloy, 10),
+                                with(Items.graphite, 10, Items.surgeAlloy, 25)
+                        };
+                    }},
+                    new UpgradeEntry(FrostUpgrades.alwaysArmed){{
+                        costs = new ItemStack[][]{
+                                with(Items.silicon, 3)
+                        };
+                    }}
+            );
+        }};
         //endregion
 
         //region power
@@ -585,7 +691,6 @@ public class FrostBlocks {
 
         powerPlugLarge = new PowerPlug("power-plug-large"){{
             requirements(Category.power, with(FrostItems.rust, 30));
-            category = Category.power;
             size = 3;
             consumePowerBuffered(2500);
             maxExchanged = 40;
@@ -608,6 +713,20 @@ public class FrostBlocks {
             });
         }};
 
+        //endregion
+
+        //region distribution
+        itemPlug = new PlugBlock("item-plug"){{
+            requirements(Category.distribution, with(FrostItems.rust, 30));
+            validFloors.add(itemSocket, itemSocketLarge);
+        }};
+        //endregion
+
+        //region fluids
+        liquidPlug = new PlugBlock("liquid-plug"){{
+            requirements(Category.liquid, with(FrostItems.rust, 30));
+            validFloors.add(liquidSocket, liquidSocketLarge);
+        }};
         //endregion
 
         //region storage

@@ -12,6 +12,7 @@ public class ModPal {
 
     aluminium = Color.valueOf("#a0a3b4"),
 
+    ferricPanel = Color.valueOf("#eee5f6"),
     ice = Color.valueOf("#9ccaed"),
     sulphur = Color.valueOf("#beab77"),
 
@@ -29,6 +30,11 @@ public class ModPal {
     darkGreen = Color.valueOf("#238b3f"),
     lightBlue = Color.valueOf("#a7ebf2"),
     darkBlue = Color.valueOf("#4066a9"),
+
+    glowCyan = Color.valueOf("1baef8"),
+    glowYellow = Color.valueOf("f8b50d"),
+
+    glowMagenta = Color.valueOf("bf08f7"),
 
     select = Color.valueOf("#a9cc6b");
     ;

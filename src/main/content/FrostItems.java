@@ -43,7 +43,7 @@ public class FrostItems {
         }};
 
         ferricPanels = new Item("ferric-panels"){{
-            color = Color.valueOf("#eee5f6");
+            color = ModPal.ferricPanel;
         }};
 
         thermite = new Item("thermite"){{
