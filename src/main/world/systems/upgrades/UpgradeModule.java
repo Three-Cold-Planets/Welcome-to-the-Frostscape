@@ -8,10 +8,11 @@ import mindustry.world.modules.BlockModule;
 
 public class UpgradeModule extends BlockModule {
 
+    public Upgradeable parent;
     public Seq<UpgradeState> states = new Seq<>();
 
-    public UpgradeModule(){
-
+    public UpgradeModule(Upgradeable parent){
+        this.parent = parent;
     }
 
     public UpgradeState getState(Upgrade upgrade){
@@ -23,9 +24,9 @@ public class UpgradeModule extends BlockModule {
         return state;
     }
 
-    public void update(Upgradeable u){
+    public void update(){
         states.each(s -> {
-            if(!s.installing && s.installed) u.applyDeltas(s);
+            if(!s.installing && s.installed) parent.applyDeltas(s);
         });
     }
 
@@ -41,6 +42,7 @@ public class UpgradeModule extends BlockModule {
         for (int i = 0; i < size; i++) {
             states.add(new UpgradeState().read(read));
         }
+        update();
     }
 
     public float getProgress(UpgradeState.ProgressType type){
@@ -80,16 +82,23 @@ public class UpgradeModule extends BlockModule {
             return;
         }
         //Don't create a new state if it's maxed
-        if(current.level == (entry.stacks() - 1)) return;
+        if(!entry.repeatable && (current.level == (entry.stacks() - 1))) return;
         //start on the next stack
-        if(UpgradeHandler.get().instantUpgrades){
-            current.level++;
-            current.installing = false;
-            current.installed = true;
+        if(UpgradeHandler.get().instantUpgrades || entry.baseInstallTime == -1){
+            install(parent,entry);
         }else {
             current.installing = true;
             current.progress = 0;
             current.cost = entry.costs[current.level];
         };
+    }
+
+    public void install(Upgradeable upgradeable, UpgradeEntry entry){
+        UpgradeState current = states.find(state -> state.upgrade == entry.upgrade);
+        if(!entry.repeatable) current.level++;
+        current.installing = false;
+        current.installed = true;
+        if(entry.listener != null) entry.listener.get(upgradeable);
+        parent.upgraded(current);
     }
 }

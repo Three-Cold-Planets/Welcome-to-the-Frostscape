@@ -1,13 +1,15 @@
 package main.entities.unit;
 
 import mindustry.gen.UnitEntity;
-import mindustry.type.Item;
-import mindustry.type.ItemStack;
+import mindustry.gen.Unitc;
 
 public class DroneUnit extends UnitEntity {
-    public ItemStack[] crateInventory = ItemStack.empty;
 
-    public void addItem(Item item, float amount){
+    public Unitc parent;
 
+    @Override
+    public void update() {
+        super.update();
+        if(parent.dead()) kill();
     }
 }

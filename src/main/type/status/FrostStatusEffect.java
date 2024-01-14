@@ -1,6 +1,7 @@
 package main.type.status;
 
 import arc.math.Mathf;
+import arc.struct.ObjectMap;
 import arc.util.Time;
 import arc.util.Tmp;
 import main.world.meta.stat.FrostStats;
@@ -18,7 +19,7 @@ public class FrostStatusEffect extends StatusEffect {
     @Override
     public void setStats() {
         super.setStats();
-        stats.addPercent(FrostStats.shieldDamageMultiplier, damageMultiplier);
+        if(shieldDamageMultiplier != 1) stats.addPercent(FrostStats.shieldDamageMultiplier, damageMultiplier);
     }
 
     @Override
@@ -41,5 +42,9 @@ public class FrostStatusEffect extends StatusEffect {
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize/2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0, color, parentizeEffect ? unit : null);
         }
+    }
+
+    public ObjectMap getTransitions(){
+        return transitions;
     }
 }

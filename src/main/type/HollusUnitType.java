@@ -44,8 +44,8 @@ public class HollusUnitType extends UnitType{
     @Override
     public void setStats() {
         super.setStats();
-        stats.useCategories = true;
 
+        stats.useCategories = true;
         if(families != null && families.size > 0){
             StatUtils.addFamilyStats(stats, families);
         }

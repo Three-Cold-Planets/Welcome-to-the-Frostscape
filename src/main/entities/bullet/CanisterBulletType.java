@@ -4,7 +4,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.Mathf;
-import arc.util.Log;
 import arc.util.Time;
 import main.math.Math3D;
 import mindustry.Vars;
@@ -30,10 +29,7 @@ public class CanisterBulletType extends BouncyBulletType {
 
     @Override
     public void updateBouncing(Bullet b) {
-        Log.info(b.time);
-        Log.info(b.data);
         if(!(b.data instanceof Math3D.HeightHolder)) {
-            Log.info("Hai");
             return;
         }
         Math3D.HeightHolder holder = (Math3D.HeightHolder) b.data;
@@ -41,10 +37,7 @@ public class CanisterBulletType extends BouncyBulletType {
         holder.height += holder.lift * Time.delta;
 
         if(holder.height < 0) {
-            Log.info("HIT!");
-            Log.info(b.fdata);
             if(b.fdata + 1 > bounceCap && bounceCap != -1) {
-                Log.info("Applying things");
                 b.fdata = 0;
                 b.data = null;
                 b.lifetime = detonationTime;

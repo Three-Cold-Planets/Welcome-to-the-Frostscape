@@ -6,7 +6,6 @@ import arc.struct.Seq;
 import arc.util.Time;
 import main.world.BaseBlock;
 import main.world.BaseBuilding;
-import main.world.UpgradesType;
 import main.world.systems.light.LightBeams;
 import main.world.systems.light.LightBeams.LightSource;
 import main.world.systems.light.Lightc;
@@ -97,11 +96,6 @@ public class SolarReflector extends BaseBlock {
         @Override
         public boolean exists() {
             return added;
-        }
-
-        @Override
-        public UpgradesType type() {
-            return (UpgradesType) block;
         }
 
         @Override

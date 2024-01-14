@@ -1,6 +1,8 @@
 package main.entities.bullet;
 
+import arc.math.geom.Geometry;
 import arc.math.geom.Intersector;
+import arc.math.geom.Vec2;
 import arc.util.Tmp;
 import mindustry.Vars;
 import mindustry.content.Fx;
@@ -24,7 +26,7 @@ public class RicochetBulletType extends BasicBulletType {
     public boolean bounceSame = true;
 
     //how many ticks inbetween collisions being cleared. Set around 15/20 or lower to make bullet reliable in low fps. -1 to disable
-    public int bounceInternal = -1;
+    public int bounceInternal = 2;
 
     public boolean useRange = true;
 
@@ -43,29 +45,61 @@ public class RicochetBulletType extends BasicBulletType {
 
     @Override
     public void update(Bullet b){
-        if(bounceInternal != -1 && b.timer.get(1, bounceInternal)){{
+        if(bounceSame && bounceInternal != -1 && b.timer.get(1, bounceInternal)){{
             b.collided.clear();
         }}
         super.update(b);
+        RicochetBulletData data = (RicochetBulletData) b.data;
+        data.lastX = data.curX;
+        data.curX = b.x;
+        data.lastY = data.curY;
+        data.curY = b.y;
+    }
+
+    @Override
+    public void init(Bullet b) {
+        super.init(b);
+        b.data = new RicochetBulletData();
     }
 
     @Override
     public void hitEntity(Bullet b, Hitboxc entity, float health) {
         b.fdata++;
         if ((bounceCap == -1 || b.fdata <= bounceCap) && bounceUnits) {
-            if(b.collided.size >= 1) b.collided.pop();
+            if(b.collided.size >= 1 && bounceInternal == -1) b.collided.pop();
             if((entity instanceof Unit)) {
             Unit unit = (Unit) entity;
                 //Bring bullet back to point of intersection
-                float rotation = b.vel.angle();
-                b.vel.setAngle(360 + rotation - (rotation - b.angleTo(entity)) * 2);
-                b.vel.rotate(180);
-                Tmp.v1.trns(b.angleTo(unit.x, unit.y) + 180, unit.hitSize).add(unit.x, unit.y).add(b.vel);
+                RicochetBulletData data = (RicochetBulletData) b.data;
+                entity.hitbox(Tmp.r1);
+                Tmp.v1.set(b.x - b.lastX, b.y - b.lastY);
+                Tmp.v1.setLength(Tmp.v1.len() + ((Unit) entity).hitSize).add(b.x, b.y);
 
-                b.x = Tmp.v1.x;
-                b.y = Tmp.v1.y;
+                Vec2 collisionPoint = Geometry.raycastRect(b.lastX, b.lastY, Tmp.v1.x, Tmp.v1.y, Tmp.r1);
+
+                if(collisionPoint != null) {
+                    b.set(collisionPoint);
+                }
+
+                float dx = b.lastX - entity.getX();
+                float dy = b.lastY - entity.getY();
+
+                float angle = 270;
+                if(Math.abs(dx) > Math.abs(dy)){
+                    //Angle to the right or left
+                    angle = 0;
+                    if(dx > 0) angle = 180;
+                }
+                //If dy is upwards angle faces up
+                else if(dy > 0) angle = 90;
+
+                float newRotation = (angle - (b.rotation() + 180)) * 2 + b.rotation() + 180;
+                b.rotation(newRotation);
+
                 b.vel.add(((Unit) entity).vel());
+                b.set(b.x + b.vel.x, b.y + b.vel.y);
                 bounceEffect.at(b.x, b.y, b.vel.angle());
+
             }
         }
         super.hitEntity(b, entity, health);
@@ -113,10 +147,10 @@ public class RicochetBulletType extends BasicBulletType {
                 }
                 Tmp.v1.add(build.x, build.y);
                 Tmp.v2.add(build.x, build.y);
-                Tmp.v5.set(b.x, b.y);
+                Tmp.v3.set(b.x, b.y);
                 Intersector.intersectLines(Tmp.v1, Tmp.v2, Tmp.v3.set(b), Tmp.v4.trns(b.vel.angle() + 180, size * 2).add(b.x, b.y), Tmp.v5);
-                b.x = Tmp.v5.x;
-                b.y = Tmp.v5.y;
+                b.x = Tmp.v3.x;
+                b.y = Tmp.v3.y;
 
                 if (flipX) {
                     b.vel.x *= -1 * bounciness;
@@ -130,5 +164,9 @@ public class RicochetBulletType extends BasicBulletType {
             }
         }
         super.hitTile(b, build, x, y, initialHealth, direct);
+    }
+
+    public static class RicochetBulletData{
+        public float lastX, lastY, curX, curY;
     }
 }

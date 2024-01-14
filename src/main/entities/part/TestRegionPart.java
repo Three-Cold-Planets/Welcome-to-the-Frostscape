@@ -4,7 +4,6 @@ import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Mathf;
-import arc.util.Log;
 import arc.util.Tmp;
 import mindustry.entities.part.RegionPart;
 import mindustry.graphics.Drawf;
@@ -20,7 +19,6 @@ public class TestRegionPart extends RegionPart {
 
     @Override
     public void draw(PartParams params) {
-        Log.info("Part side multi: " + params.sideMultiplier);
         float z = Draw.z();
         if(layer > 0) Draw.z(layer);
         //TODO 'under' should not be special cased like this...
@@ -57,9 +55,7 @@ public class TestRegionPart extends RegionPart {
                     ry = params.y + Tmp.v1.y,
                     rot = mr * sign + params.rotation - 90;
 
-            Log.info("Draw.xscl value is: " + Draw.xscl + ", and sign is: " + sign);
             Draw.xscl *= sign;
-            Log.info("Draw.xscl is now: " + Draw.xscl);
 
             if(outline && drawRegion){
                 Draw.z(prevZ + outlineLayerOffset);
@@ -118,6 +114,5 @@ public class TestRegionPart extends RegionPart {
                 }
             }
         }
-        Log.info("Ending Draw.xscl is now: " + Draw.xscl);
     }
 }

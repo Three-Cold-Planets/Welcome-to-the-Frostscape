@@ -28,11 +28,13 @@ public class ParticleFloor extends Floor {
 
     @Override
     public boolean updateRender(Tile tile) {
-        return emitBlocked || tile.block() == Blocks.air;
+        return true;
     }
+
     @Override
     public void renderUpdate(UpdateRenderState tile) {
-        if(Mathf.chanceDelta(chance)) {
+        //gota check twice cause stuff can block the floor
+        if(Mathf.chanceDelta(chance) && (emitBlocked || tile.tile.block() == Blocks.air)) {
             effect.at(tile.tile.worldx(), tile.tile.worldy());
         }
     }

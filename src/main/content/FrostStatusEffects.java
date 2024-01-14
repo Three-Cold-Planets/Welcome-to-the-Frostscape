@@ -4,9 +4,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.util.Log;
 import arc.util.Time;
-import arc.util.Tmp;
 import main.graphics.ModPal;
 import main.type.status.FrostStatusEffect;
 import mindustry.Vars;
@@ -20,6 +18,10 @@ public class FrostStatusEffects {
     public static StatusEffect[] spriteTests = new StatusEffect[5];
     public static StatusEffect napalm, causticCoating, attackBoost, engineBoost, lowGrav, conflex;
 
+    //Internal!
+
+    public static StatusEffect conflexInternal;
+
     public static void load(){
         for (int i = 0; i < spriteTests.length; i++) {
             spriteTests[i] = new StatusEffect("test-" + i){{}};
@@ -31,7 +33,7 @@ public class FrostStatusEffects {
             speedMultiplier = 0.9f;
             effect = Fx.oily;
             color = ModPal.heat;
-            opposite(StatusEffects.melting, StatusEffects.wet);
+            opposite(StatusEffects.freezing, StatusEffects.wet);
             init(() -> {
                 affinity(StatusEffects.burning, (unit, result, time) -> unit.damagePierce(Math.min(transitionDamage, StatusEffects.burning.damage * time)));
                 affinity(StatusEffects.tarred, (unit, result, time) -> result.set(napalm, Math.min(transitionDamage/damage, result.time + time)));
@@ -84,26 +86,46 @@ public class FrostStatusEffects {
             }
         };
 
-        conflex = new StatusEffect("conflex"){
+        conflex = new FrostStatusEffect("conflex"){
 
             public void update(Unit u, float time){
+                float multiplier = Mathf.clamp(time/(25 * 60), 0, 1);
+                multiplier = Mathf.clamp(Interp.pow2In.apply(multiplier));
+                float prevEffectChance = effectChance;
+                effectChance *= multiplier;
                 super.update(u, time);
+                effectChance = prevEffectChance;
+                u.speedMultiplier /= speedMultiplier;
                 u.dragMultiplier /= dragMultiplier;
                 u.reloadMultiplier /= reloadMultiplier;
-                //Grows by 1 per block the unit's hitbox's perimeter takes up.
-                float maxMulti = u.hitSize/Vars.tilesize * 4;
-                float multiplier = Interp.smooth2.apply(Mathf.clamp(time/(2 * 60)/maxMulti, 0, 1)) * maxMulti;
-                u.dragMultiplier += multiplier * dragMultiplier;
-                u.reloadMultiplier *= Mathf.clamp(1/multiplier, 0, 1f);
 
-                Log.info(multiplier);
-
+                u.dragMultiplier *= Mathf.lerp(1, dragMultiplier, multiplier);
+                u.reloadMultiplier *= Mathf.clamp(1-multiplier, 0, 1f);
+                u.speedMultiplier *= Mathf.lerp(1, speedMultiplier, multiplier);
             };
+
             {
-            dragMultiplier = 1.2f;
+            speedMultiplier = 0.2f;
+            dragMultiplier = 1.3f;
             reloadMultiplier = 0.65f;
-            effect = Fx.colorSpark;
+            transitionDamage = 0.01f;
+            effect = Fx.regenSuppressParticle;
+            applyEffect = Fx.regenSuppressParticle;
             color = ModPal.hunter;
+            applyColor = ModPal.hunter;
+        }};
+
+        //Used internally to make conflex stack. As of current, units always call applied if a status already exists on a unit.
+        //Stackingg gets weaker logarithmically
+        conflexInternal = new FrostStatusEffect("conflex-internal"){
+            public void applied(Unit unit, float time, boolean extend) {
+                //Grows by 1 per block the unit's hitbox's perimeter takes up.
+                float current = unit.getDuration(conflex);
+                float scale = Mathf.pow(unit.hitSize/Vars.tilesize, 2);
+                unit.apply(conflex, Mathf.clamp(current+(current == 0 ? time : time/(Mathf.log(current+2, time/current+1) + 1))/scale,0,60 * 30));
+            }
+            {
+            show = false;
         }};
     }
 }

@@ -7,7 +7,7 @@ import mindustry.type.Item;
 
 public class FrostItems {
     //Ferric/Aluminium tech for all biomes
-    public static Item magnetite, bauxite, ferricPanels, aluminium, thermite,
+    public static Item stone, rust, magnetite, bauxite, ferricPanels, aluminium, thermite,
     //Salts and clays
     hailite,
     //Meltables items
@@ -17,6 +17,15 @@ public class FrostItems {
     //Culloi tech for snow
     culloi;
     public static void load(){
+
+        stone = new Item("stone"){{
+            color = Color.valueOf("8f8f94");
+        }};
+
+        rust = new Item("rust"){{
+            color = Color.valueOf("d0997a");
+        }};
+
         magnetite = new Item("magnetite-shards"){{
             color = Color.valueOf("e7bdbd");
         }};
@@ -34,7 +43,7 @@ public class FrostItems {
         }};
 
         ferricPanels = new Item("ferric-panels"){{
-            color = Color.valueOf("#eee5f6");
+            color = ModPal.ferricPanel;
         }};
 
         thermite = new Item("thermite"){{

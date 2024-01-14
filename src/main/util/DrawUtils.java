@@ -14,9 +14,9 @@ public class DrawUtils {
 
     //Weights for different materials
     public static float
-        sparkWeight = 1,
-        smokeWeight = 0.05f,
-        heavySmokeWeight = 0.15f;
+        sparkWeight = 0.1f,
+        smokeWeight = 0.005f,
+        heavySmokeWeight = 0.015f;
 
     //Height gain/second for different materials
     public static float
@@ -30,9 +30,9 @@ public class DrawUtils {
     }
 
     public static void windOffset(float magnitude, float weight, Vec2 out){
-        out.set(WeatherUtils.windDirection());
-        out.scl(magnitude * Core.settings.getInt("frostscape-wind-visual-force")/100, magnitude * Core.settings.getInt("frostscape-wind-visual-force")/100);
-        float length = Math.max(out.len() - weight, 0);
+        out.set(WeatherUtils.wind);
+        out.scl(Core.settings.getInt("frostscape-wind-visual-force"));
+        float length = Math.max(out.len() - weight, 0) * magnitude;
         out.setLength(length);
     }
 

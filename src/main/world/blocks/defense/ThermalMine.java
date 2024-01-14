@@ -6,8 +6,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
-import arc.scene.ui.Image;
-import arc.scene.ui.layout.Table;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.Vars;
@@ -15,6 +13,7 @@ import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
+import mindustry.gen.Sounds;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
@@ -22,8 +21,9 @@ import mindustry.ui.Bar;
 import mindustry.world.Tile;
 
 public class ThermalMine extends UpgradeableMine{
+
     protected static boolean unitFound;
-    public float radius = 24, lightMulti = 0.95f;
+    public float radius = 24, varianceScl = 13, varianceMag = 4, lightMulti = 0.35f;
 
     public Effect heatEffect;
     public float effectInterval = -1;
@@ -40,6 +40,7 @@ public class ThermalMine extends UpgradeableMine{
         cooldown = 15;
         tileDamage = 2;
         heatEffect = Fx.fire;
+        shootSound = Sounds.noammo;
     }
 
     @Override
@@ -66,11 +67,11 @@ public class ThermalMine extends UpgradeableMine{
     }
 
     public class ThermalMineBuild extends UpgradeableMineBuild{
-        public float warmup = 0, heatRadius = 0, effectTimer, active;
+        public float heatRadius = 0, effectTimer, active;
 
         @Override
         public void draw() {
-            Draw.alpha(warmup);
+            Draw.alpha(team == Vars.player.team() ? warmup * 0.75f + 0.35f : warmup);
             super.draw();
             Draw.blend(Blending.additive);
             Draw.z(Layer.flyingUnitLow);
@@ -80,7 +81,7 @@ public class ThermalMine extends UpgradeableMine{
         }
 
         public float getRadius(){
-            return radius * rangeMultiplier;
+            return (radius + Mathf.sin(varianceScl, varianceMag)) * rangeMultiplier;
         }
 
         @Override
@@ -91,14 +92,13 @@ public class ThermalMine extends UpgradeableMine{
         @Override
         public void updateTile() {
             super.updateTile();
-            boolean activated = active > 0;
+            boolean activated = activated();
 
-            warmup = Mathf.approach(warmup, activated ? 1 : 0, activated ? warmupSpeed * speedMultiplier : warmDownSpeed * speedMultiplier);
+            warmup = Mathf.approachDelta(warmup, activated ? 1 : 0, activated ? warmupSpeed * speedMultiplier : warmDownSpeed * speedMultiplier);
             heatRadius = Mathf.approach(heatRadius, activated ? getRadius() : 0, warmup);
             if(warmup < 0.001F) heatRadius = 0;
 
             if(activated) {
-
                 if(effectTimer++ >= effectInterval) {
                     effectTimer %= effectInterval;
                     heatEffect.at(x, y);
@@ -120,26 +120,11 @@ public class ThermalMine extends UpgradeableMine{
             }
         }
 
-        @Override
-        public boolean displayable() {
+
+        public boolean activated(){
             return active > 0.001F;
         }
 
-        @Override
-        public void display(Table table) {
-            table.table((t) -> {
-                t.left();
-                t.add(warmup > 0.001F ? new Image(this.block.getDisplayIcon(this.tile)) : new Image(this.tile.floor().uiIcon)).size(32.0F);
-                t.labelWrap(() -> warmup > 0.001F ? this.getDisplayName() : this.tile.floor().localizedName + "..?").left().width(190.0F).padLeft(5.0F);
-            }).growX().left();
-            table.row();
-            if (this.team == Vars.player.team() && warmup > 0.001F) {
-                table.table((bars) -> {
-                    bars.defaults().growX().height(18.0F).pad(4.0F);
-                    this.displayBars(bars);
-                }).growX();
-            }
-        }
 
         @Override
         public void triggered() {

@@ -1,5 +1,6 @@
 ## Overview
-Welcome to the Frostscape is an indev v7 campaign-based mod which focuses on unit control, stealth and various new systems. There are multiple ways to play, being assault, defense and stealth. The mod takes place on four planets & multiple introductory moons. The mod is being developed by [@Sh1penfire](https://github.com/Sh1penfire) in [Mod Centre](https://discord.gg/XrFhAZys7T). It is currently in it's wip stage and a MVP (Minimum Viable Product) is being developed.
+
+Welcome to the Frostscape is an indev v7 campaign-based mod which focuses on unit control, stealth and various new systems. The mod takes place on Hollus and its three moons. Development is being lead by [@Sh1penfire](https://github.com/Sh1penfire) along with [@ThatOneCreator](https://github.com/shadow5927), [@RilyProductions](https://github.com/RilyProductions) & [@RandomUser](https://github.com/RandomUserRU). It is currently in it's wip stage and is being used as a progress dump for Hollus's content.
 
 Main test mod for Hollus as part of https://github.com/Three-Cold-Planets, check out our other projects. Thank you :D
 
@@ -16,7 +17,11 @@ If any mod maker wants to make their own environmental tiles compatable with Fro
 ## Credits
 Thanks to
 
-- Sh1penfire#0868 (Hey that's me!)
+- The development team:  
+  Sh1penfire (Hey that's me!)  
+  ThatOneCreator  
+  RilyProductions  
+  RandomUser
 
 - [NiChrosia#3367](https://github.com/NiChrosia) on discord for helping me throughout development (And generaly being a friend :D)
 
