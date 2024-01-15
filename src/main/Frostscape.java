@@ -45,8 +45,6 @@ import mindustry.mod.Mods;
 import mindustry.ui.dialogs.BaseDialog;
 import rhino.ImporterTopLevel;
 import rhino.NativeJavaPackage;
-import mindustry.mod.*;
-import main.gen.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -204,7 +202,6 @@ public class Frostscape extends Mod{
     }
 
     public void loadContent(){
-        EntityRegistry.register();
         long current = Time.millis();
         FrostContentLoader.load();
         final float time = Time.timeSinceMillis(current);

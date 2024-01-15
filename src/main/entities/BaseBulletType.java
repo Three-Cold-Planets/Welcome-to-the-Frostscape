@@ -26,6 +26,8 @@ public class BaseBulletType extends BasicBulletType {
 
     public Prov<Trail> trailProv;
 
+
+
     @Override
     public void init() {
         super.init();

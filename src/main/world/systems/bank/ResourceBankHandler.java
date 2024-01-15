@@ -32,6 +32,7 @@ public class ResourceBankHandler implements SaveFileReader.CustomChunk {
 
     public ResourceBankHandler(){
 
+
     }
 
     public static void init(){

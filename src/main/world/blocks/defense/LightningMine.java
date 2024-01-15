@@ -5,11 +5,10 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.math.geom.Position;
-import arc.math.geom.Vec2;
+import arc.struct.IntSeq;
 import arc.struct.Seq;
 import arc.util.Time;
-import main.content.Fxf;
+import main.entities.ModDamage;
 import main.graphics.ModPal;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
@@ -30,7 +29,7 @@ public class LightningMine extends UpgradeableMine{
             //Damage percent lost when damaging
             pierceDamageFactor,
             //Damage lost per world unit traveled. Applied after pierce damage factor
-            distanceDamageFactor, segmentLength;
+            distanceDamageFalloff, segmentLength;
     public float width, arc;
     public float range, activationRange;
 
@@ -40,6 +39,7 @@ public class LightningMine extends UpgradeableMine{
     public Effect hitEffect = Fx.hitLancer;
 
     public float warmupSpeed, warmDownSpeed;
+    public Color color;
 
     public LightningMine(String name) {
         super(name);
@@ -50,7 +50,7 @@ public class LightningMine extends UpgradeableMine{
         arc = 0.35f;
         activationRange = 74;
         pierceDamageFactor = 0.85f;
-        distanceDamageFactor = 0.65f;
+        distanceDamageFalloff = 0.65f;
         damage = 85;
         segmentLength = 4;
         sectorFrac = 0.05f;
@@ -58,12 +58,13 @@ public class LightningMine extends UpgradeableMine{
         warmupSpeed = 0.015f;
         warmDownSpeed = 0.025f;
         tileDamage = 0.8f;
+        color = ModPal.glowCyan;
     }
 
     @Override
     public void load() {
         super.load();
-        if(range == 0) range = damage/distanceDamageFactor;
+        if(range == 0) range = damage/distanceDamageFalloff;
         if(sectors == 0) sectors = ((int) range/16) + 3;
     }
 
@@ -124,7 +125,6 @@ public class LightningMine extends UpgradeableMine{
                 if(!targets.contains(unit)) targets.add(unit);
             }
 
-            Seq<Unit> chain = new Seq<Unit>();
             index = 0;
             list.each(u -> {
                 index++;
@@ -132,66 +132,7 @@ public class LightningMine extends UpgradeableMine{
                     if(targets.contains(u)) targets.remove(u);
                     if(u.dst(this) > trange) return;
                     damage(tileDamage);
-                    chain(this, u, chain, damage * damageMultiplier);
-                });
-            });
-        }
-
-        public void chain(Position origin, Unit current, Seq<Unit> collided, float power){
-            shootSound.at(x, y, Mathf.random(soundMinPitch, soundMaxPitch));
-            //Scales down width based on percent of power left
-            float w = width * power/(damage * damageMultiplier);
-            Fxf.chainLightning.at(current.x, current.y, 0, ModPal.lightBlue, new Fxf.VisualLightningHolder() {
-                @Override
-                public Vec2 start() {
-                    return new Vec2(origin.getX(), origin.getY());
-                }
-
-                @Override
-                public Vec2 end() {
-                    return new Vec2(current.x, current.y);
-                }
-
-                @Override
-                public float width() {
-                    return w;
-                }
-
-                @Override
-                public float segLength(){
-                    return segmentLength;
-                }
-
-                @Override
-                public float arc() {
-                    return arc;
-                }
-            });
-            hitEffect.at(current.x, current.y, 0, ModPal.glowCyan);
-            float newDamage = power - distanceDamageFactor * origin.dst(current);
-            current.damage(newDamage);
-            if(!current.dead) collided.add(current);
-
-            float effectiveRange = power/distanceDamageFactor;
-
-            final float newPower = newDamage * (pierceDamageFactor == 0 ? 1 : pierceDamageFactor);
-
-            Time.run(15, () -> {
-                Seq<Unit> units = Groups.unit.intersect(current.x - effectiveRange, current.y - effectiveRange, effectiveRange * 2, effectiveRange * 2);
-                units.sort(u -> u.dst(this));
-                if(units.contains(current)) units.remove(current);
-                list.clear();
-                for (int i = 0; i < Math.min(branches, units.size); i++) {
-                    Unit unit = units.get(i);
-                    if(collided.contains(unit)) continue;
-                    float dst = unit.dst(current);
-                    if(dst > effectiveRange) break;
-                    list.add(unit);
-                }
-                if(list.size == 0) return;
-                float numberMultiplier = 1.0f/list.size;
-                list.each(u -> {
-                    chain(current, u, collided, newPower * numberMultiplier);
+                    ModDamage.chain(this, u, new IntSeq(), shootSound, hitEffect, damage * damageMultiplier, damage * damageMultiplier, width, distanceDamageFalloff, pierceDamageFactor, branches, segmentLength, arc, color);
                 });
             });
         }

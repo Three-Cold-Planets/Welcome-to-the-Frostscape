@@ -11,6 +11,7 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
+import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
 import main.graphics.Layers;
@@ -130,6 +131,7 @@ public class Fxf {
     chainLightning = new Effect(25f, 300f, e -> {
         if(!(e.data instanceof VisualLightningHolder)) return;
         VisualLightningHolder p = (VisualLightningHolder) e.data;
+        Log.info(p.width());
 
         int seed = e.id + (int) e.time;
         //get the start and ends of the lightning, then the distance between them
