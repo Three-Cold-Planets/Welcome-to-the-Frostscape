@@ -5,6 +5,7 @@ Main test mod for Hollus as part of https://github.com/Three-Cold-Planets, check
 
 ## Current Goal
 Currently the next milestone in development that im aiming to hit is finishing the MVP. I don't have an estamated time of completion for it, but join the [discord server](https://discord.gg/XrFhAZys7T), or check the [trello](https://trello.com/b/2g9oENth/hollow-frostscape) to keep up with development!
+(Note: Currently shifting progress on Arctic Insurection off the current server. Will post a new link when its ready! :D)
 
 ## Dependancies/Compatabilities
 
