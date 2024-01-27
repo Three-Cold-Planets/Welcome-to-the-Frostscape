@@ -273,7 +273,21 @@ public class FrostBlocks {
             overrideMapColor = ModPal.glowCyan;
         }};
 
-        maficFloor = new Floor("mafic-floor");
+        maficFloor = new Floor("mafic-floor"){{
+            variants = 3;
+        }};
+
+        denseMaficFloor = new Floor("dense-mafic-floor"){{
+            variants = 3;
+        }};
+
+        obsidianFloor = new Floor("obsidian-floor"){{
+            variants = 3;
+        }};
+
+        roughObsidianFloor = new Floor("rough-obsidian-floor");
+            variants = 3;
+        }};
 
         sulphuricWater = new ParticleFloor("sulphuric-water"){{
             isLiquid = true;
@@ -421,10 +435,26 @@ public class FrostBlocks {
             maxBlinkTime = 60 * 6;
         }};
 
+        crackedObsidianFloor = new CrackedBlock("cracked-obsidian-floor"){{
+            variants = 3;
+            blendGroup = obsidianFloor;
+            blinkTimeRange = 60 * 7;
+            maxBlinkTime = 60 * 10;
+        }};
+
         enclosureWall = new StaticWall("enclosure-wall");
 
-
         maficStone = new StaticWall("mafic-stone");
+
+        obsidian = new StaticWall("obsidian");
+
+        obsidianSpikes = new StaticTree("obsidian-spikes"){{
+            variants = 3;
+        }};
+
+        redCrystalTree = new StaticTree("red-crystal-tree"){{
+            variants = 3;
+        }};
 
         frostWall = new StaticWall("frost-wall"){{
             variants = 3;
