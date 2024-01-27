@@ -37,12 +37,14 @@ import main.world.blocks.power.PowerPlug;
 import main.world.systems.bank.ResourceBankHandler;
 import main.world.systems.light.LightBeams;
 import main.world.systems.upgrades.UpgradeEntry;
-import mindustry.content.Fx;
-import mindustry.content.Items;
-import mindustry.content.Liquids;
-import mindustry.content.UnitTypes;
+import mindustry.content.*;
 import mindustry.entities.Effect;
+import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.ExplosionBulletType;
+import mindustry.entities.bullet.MissileBulletType;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Sounds;
@@ -52,11 +54,14 @@ import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
-import mindustry.type.Planet;
+import mindustry.type.Weapon;
+import mindustry.type.unit.MissileUnitType;
 import mindustry.world.Block;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.units.UnitCargoLoader;
 import mindustry.world.blocks.units.UnitCargoUnloadPoint;
+import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.world.draw.*;
 
 import static arc.graphics.g2d.Draw.color;
@@ -127,7 +132,7 @@ public class FrostBlocks {
     coreBunker,
 
     //defense - hollus
-    pyroclast,
+    pyroclast, cryonis,
     thermalLandmine, lightningMine,
 
     //light - hollus
@@ -798,7 +803,7 @@ public class FrostBlocks {
         pyroclast = new MinRangeTurret("pyroclast"){{
             requirements(Category.turret, with());
             size = 3;
-            health = 54 * size * size;
+            health = 153 * size * size;
             reload = 235;
             minRange = 160;
             range = 350;
@@ -875,7 +880,6 @@ public class FrostBlocks {
             outlineColor = Pal.darkOutline;
 
             shake = 1.2f;
-            Planet p = null;
 
             ammo(
                     Items.pyratite,
@@ -1105,6 +1109,149 @@ public class FrostBlocks {
             });
         }};
 
+        cryonis = new ItemTurret("cryonis"){{
+            size = 3;
+            health = 153 * size * size;
+            reload = 500;
+            range = 253;
+            shootY = -3.5f;
+            recoil = 2.5f;
+            minWarmup = 0.8f;
+            shootWarmupSpeed = 0.05f;
+            warmupMaintainTime = 30;
+            ammoPerShot = 35;
+            maxAmmo = 85;
+            coolant = consume(new ConsumeLiquid(Liquids.nitrogen, 0.015f));
+            coolantMultiplier = 1.8f;
+            outlineColor = Pal.darkOutline;
+            shootSound = Sounds.cannon;
+            soundPitchMax = 3;
+            soundPitchMin = 2.6f;
+            ammo(
+                    FrostItems.ice,
+                    new MissileBulletType(4.6f, 1){{
+                        ammoMultiplier = 1;
+                        spawnUnit = new MissileUnitType("cryonis-shard") {
+                            {
+                                shootEffect = new MultiEffect(Fx.shootSmall, new Effect(45, e -> {
+                                    e.scaled(8, e1 -> {
+                                        Lines.stroke(e1.fout() * 1.7f);
+                                        Lines.circle(e.x, e.y, e1.fin() * 25 + 4);
+                                    });
+                                    Draw.color(Color.white, ModPal.ice, e.fout());
+                                    Angles.randLenVectors(e.id, 8, 85 * e.finpow(), e.rotation, 35, (x, y) -> {
+                                        Fill.square(e.x + x, e.y + y, e.fout() * 3, 45);
+                                    });
+                                }));
+                                speed = 4.6F;
+                                drag = 0.05f;
+                                maxRange = 6;
+                                lifetime = 55;
+                                outlineColor = ModPal.darkBlue;
+                                engineSize = 2;
+                                engineOffset = 0;
+                                rotateSpeed = 0;
+                                missileAccelTime = 0;
+                                trailColor = ModPal.ice;
+                                trailLength = 3;
+                                trailWidth = 15;
+                                lowAltitude = true;
+                                drawCell = false;
+                                loopSound = Sounds.none;
+                                deathSound = Sounds.none;
+                                health = 400;
+                                armor = 30;
+                                deathExplosionEffect  = new MultiEffect(Fx.pulverize, new Effect(45, e -> {
+                                    e.scaled(15, e1 -> {
+                                        Lines.stroke(3 * e1.fout());
+                                        Lines.circle(e.x, e.y, e1.fin() * 25 + 4);
+                                    });
+                                    Draw.color(Color.white, ModPal.ice, e.fout());
+                                    Angles.randLenVectors(e.id, 8, 35 * e.finpow(), e.rotation, 180, (x, y) -> {
+                                        Fill.square(e.x + x, e.y + y, e.fout() * 3, 45);
+                                    });
+                                }));
+                                lightRadius = 0;
+
+
+                                weapons.add(new Weapon() {{
+                                        soundPitchMax = 1.8f;
+                                        soundPitchMin = 2.3f;
+                                        shootSound = Sounds.plasmaboom;
+                                        shootCone = 360;
+                                        mirror = false;
+                                        reload = 1;
+                                        shootOnDeath = true;
+                                        bullet = new ExplosionBulletType(470, 10){{
+                                            fragLifeMin = 0.7f;
+                                            fragLifeMax = 1f;
+                                            hitEffect = Fx.none;
+                                            shootEffect = Fx.none;
+                                            status = StatusEffects.freezing;
+                                            statusDuration = 165;
+                                            fragBullet = new BasicBulletType(6, 8, "bullet"){{
+                                                drag = 0.015f;
+                                                width = 4;
+                                                height = 8;
+                                                shrinkX = 0;
+                                                shrinkY = 0;
+                                                lifetime = 35;
+                                                hitEffect = despawnEffect = Fx.hitBulletColor;
+                                                trailColor = ModPal.ice;
+                                                trailWidth = 1f;
+                                                trailLength = 4;
+                                                pierce = true;
+                                                pierceCap = 2;
+                                                status = StatusEffects.wet;
+                                                statusDuration = 370;
+                                                frontColor = Color.white;
+                                                backColor = ModPal.ice;
+                                                puddles = 2;
+                                                puddleRange = 3;
+                                                puddleLiquid = Liquids.nitrogen;
+                                                despawnHit = true;
+                                            }};
+                                        }};
+                                    }
+                                });
+                            }
+                        };
+                    }}
+            );
+
+            requirements(Category.turret, with(FrostItems.stone, 50, FrostItems.rust, 80, FrostItems.aluminium, 120));
+            drawer = new DrawTurret("elevated-") {{
+                parts.addAll(new RegionPart("-barrel") {
+                    {
+                        progress = PartProgress.warmup;
+                        heatProgress = PartProgress.warmup;
+                        heatColor = Color.red;
+                        moveRot = -11;
+                        moveX = 1;
+                        moveY = -1.2f;
+                        mirror = true;
+                        moves.add(new PartMove(PartProgress.reload.inv(), 0, 0, -11));
+                    }}, new RegionPart("-shard") {{
+                    progress = PartProgress.reload.curve(Interp.pow2In);
+                    colorTo = new Color(1, 1, 1, 0);
+                    color = Color.white;
+                    mixColorTo = Pal.accent;
+                    mixColor = new Color(1, 1, 1, 0);
+                    outline = false;
+                    under = true;
+                    layerOffset = -0.01F;
+                    y = 3;
+                    moves.add(new DrawPart.PartMove(PartProgress.warmup, 0, -3, 0));
+                }}, new RegionPart("-mid"){{
+                    heatProgress = PartProgress.reload.add(-0.6f).add((p) -> {
+                        return Mathf.sin(15.0F, 0.4f) * p.smoothReload + 0.2f * p.warmup;
+                    });
+                }});
+            };
+            };
+
+        }};
+
         //endregion
 
         //region light
@@ -1139,7 +1286,7 @@ public class FrostBlocks {
         coreSiphon = new CoreSiphon("core-siphon"){{
             requirements(Category.production, with());
             liquidPadding = 6;
-            this.size = 7;
+            size = 7;
             liquidCapacity = 1000;
             boost = consumeLiquid(Liquids.water, 0.05F);
             heatColor = new Color(ModPal.heat).a(0.35f);

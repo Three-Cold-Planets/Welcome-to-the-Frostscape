@@ -19,8 +19,10 @@ public class ModPal {
     salt = Color.valueOf("e8e4e3"),
 
     quiteDarkOutline = Color.valueOf("#39343c"),
-    hunter = Color.valueOf("#dde6f0"),
     specialist = Color.valueOf("#c49ff4"),
+    hunter = Color.valueOf("#dde6f0"),
+    swarm = Color.valueOf("f0725c"),
+    gelid = Color.valueOf("f4e888"),
 
     heat = new Color(1.0F, 0.22F, 0.22F, 0.8F),
 

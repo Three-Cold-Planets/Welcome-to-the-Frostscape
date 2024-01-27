@@ -42,9 +42,8 @@ public class FamilyDescriptionDialog extends BaseDialog {
         cont.clear();
         maxWidth = Core.scene.getWidth();
         current = family;
-        
 
-        cont.table(table -> {
+        cont.pane(table -> {
             table.table(t -> {
                 t.image(family.flag).size(240, 120).left();
                 t.table(info -> {
@@ -72,11 +71,11 @@ public class FamilyDescriptionDialog extends BaseDialog {
                         end.add("END OF DOCUMENT");
                         end.background(ModTex.diagonalBoundary);
                     }).top().width(maxWidth/2);
-                }).scrollX(false).width(maxWidth/2).left();
+                }).scrollX(false).width(maxWidth/2).fillY().left();
 
-                t.pane(unitList).width(maxWidth/2).height(600).right();
+                t.pane(unitList).width(maxWidth/2).fillY().right();
 
-            }).height(600).padTop(10);
+            }).width(maxWidth).fillY().padTop(10);
             table.row();
             table.table(s -> {
                 s.image(Icon.zoom).left();
@@ -87,7 +86,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
                 }).left().padLeft(10);
             }).padLeft(maxWidth/2);
             rebuildList();
-        }).fill();
+        }).fill().scrollX(false);
 
         show();
     }
@@ -111,7 +110,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
 
             endingMessage = "END OF DOCUMENT";
 
-            int columns = Mathf.floor(maxWidth/60);
+            int columns = Math.max(Mathf.floor(maxWidth/60/2 - 1), 1);
 
             map.each((type, members) -> {
                 members.each(member -> {
@@ -140,6 +139,6 @@ public class FamilyDescriptionDialog extends BaseDialog {
         unitList.table(end -> {
             end.add(endingMessage);
             end.background(ModTex.diagonalBoundary);
-        }).top().width(maxWidth / 2);
+        }).top().width(maxWidth/2);
     }
 }
