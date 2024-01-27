@@ -7,7 +7,8 @@ import arc.scene.event.ClickListener;
 import arc.scene.event.HandCursorListener;
 import arc.scene.ui.Label;
 import arc.struct.Seq;
-import arc.util.*;
+import arc.util.Time;
+import arc.util.Tmp;
 import main.ui.FrostUI;
 import main.world.meta.Family;
 import main.world.meta.stat.FrostStats;
@@ -17,12 +18,15 @@ import mindustry.world.Block;
 import mindustry.world.meta.Stats;
 
 public class StatUtils {
-    public static float cycleSpeed = 2f;
+    public static float cycleSpeed = 0.04f;
+    public static float offset = 0;
 
     public static void addFamilyStats(Stats stats, Seq<Family> families){
+        offset = 0;
         stats.add(FrostStats.familyLink, table -> {
             table.row();
             families.each(family -> {
+                offset += Mathf.pi/4;
                 table.table(t -> {
                     t.setBackground(Tex.whiteui);
                     Color color = Pal.darkestGray.cpy();
@@ -40,7 +44,7 @@ public class StatUtils {
 
                     t.update(() -> {
                         t.setColor(color.lerp(listener.isOver() ? Pal.lightishGray : Pal.darkestGray, Time.delta));
-                        label.setColor(Tmp.c1.set(Color.white).lerp(family.color, Mathf.sin(Time.time * cycleSpeed)));
+                        label.setColor(Tmp.c1.set(Color.white).lerp(family.color, Mathf.sin(Time.time * cycleSpeed + offset)));
                     });
 
                     t.clicked(() -> {
