@@ -92,7 +92,7 @@ public class FrostBlocks {
         tephra,
 
         //floors - volcanic moon
-        maficFloor,
+        maficFloor, denseMaficFloor, obsidianFloor, roughObsidianFloor, crackedObsidianFloor,
 
         //props - hollus
         algae, frostCluster, wornBoulderLarge, wornBoulderHuge, frostVent,
@@ -100,8 +100,7 @@ public class FrostBlocks {
         //props - complex
 
         //props - volcanic moon
-
-        maficBoulder,
+        maficBoulder, obsidianSpikes, redCrystalProp,
 
         //walls - hollus
         frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall, tephraWall,
@@ -110,7 +109,7 @@ public class FrostBlocks {
         enclosureWall,
 
         //walls - volcanic moon
-        maficStone,
+        maficStone, obsidian,
 
     //production - hollus
     coreSiphon,
@@ -442,17 +441,23 @@ public class FrostBlocks {
             maxBlinkTime = 60 * 10;
         }};
 
-        enclosureWall = new StaticWall("enclosure-wall");
+        enclosureWall = new StaticWall("enclosure-wall"){{
+            variants = 3;
+        }};
 
-        maficStone = new StaticWall("mafic-stone");
+        maficStone = new StaticWall("mafic-stone"){{
+            variants = 3;
+        }};
 
-        obsidian = new StaticWall("obsidian");
+        obsidian = new StaticWall("obsidian"){{
+            variants = 3;
+        }};
 
         obsidianSpikes = new StaticTree("obsidian-spikes"){{
             variants = 3;
         }};
 
-        redCrystalTree = new StaticTree("red-crystal-tree"){{
+        redCrystalProp = new StaticTree("red-crystal-prop"){{
             variants = 3;
         }};
 
