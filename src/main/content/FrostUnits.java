@@ -703,7 +703,7 @@ public class FrostUnits {
                                 }},
                                 new RegionPart("-top"){{
                                     under = true;
-                                    moves.add(new PartMove(p -> p.smoothReload, 0f, 1.5f, 0f));
+                                    moves.add(new PartMove(PartProgress.smoothReload, 0f, 1.5f, 0f));
                                 }}
                         );
                     }}
