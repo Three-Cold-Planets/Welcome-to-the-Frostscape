@@ -39,7 +39,6 @@ import main.world.systems.light.LightBeams;
 import main.world.systems.upgrades.UpgradeEntry;
 import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.ExplosionBulletType;
 import mindustry.entities.bullet.MissileBulletType;
@@ -1113,20 +1112,24 @@ public class FrostBlocks {
             size = 3;
             health = 153 * size * size;
             reload = 500;
-            range = 253;
+            range = 350;
             shootY = -3.5f;
             recoil = 2.5f;
             minWarmup = 0.8f;
             shootWarmupSpeed = 0.045f;
             warmupMaintainTime = 30;
+            rotateSpeed = 3.5f;
             ammoPerShot = 35;
             maxAmmo = 85;
+            cooldownTime = 75;
             coolant = consume(new ConsumeLiquid(Liquids.nitrogen, 0.015f));
             coolantMultiplier = 1.8f;
             outlineColor = Pal.darkOutline;
             shootSound = Sounds.cannon;
             soundPitchMax = 3;
             soundPitchMin = 2.6f;
+            shoot.firstShotDelay = 45;
+            moveWhileCharging = true;
             ammo(
                     FrostItems.ice,
                     new MissileBulletType(4.6f, 1){{
@@ -1146,7 +1149,7 @@ public class FrostBlocks {
                                 speed = 4.6F;
                                 drag = 0.05f;
                                 maxRange = 6;
-                                lifetime = 55;
+                                lifetime = 74;
                                 outlineColor = ModPal.darkBlue;
                                 engineSize = 2;
                                 engineOffset = 0;
@@ -1182,6 +1185,7 @@ public class FrostBlocks {
                                         mirror = false;
                                         reload = 1;
                                         shootOnDeath = true;
+                                        x = y = shootX = shootY = 0;
                                         bullet = new ExplosionBulletType(470, 10){{
                                             fragLifeMin = 0.7f;
                                             fragLifeMax = 1f;
@@ -1189,27 +1193,64 @@ public class FrostBlocks {
                                             shootEffect = Fx.none;
                                             status = StatusEffects.freezing;
                                             statusDuration = 165;
-                                            fragBullet = new BasicBulletType(6, 8, "bullet"){{
-                                                drag = 0.015f;
-                                                width = 4;
-                                                height = 8;
-                                                shrinkX = 0;
-                                                shrinkY = 0;
-                                                lifetime = 35;
-                                                hitEffect = despawnEffect = Fx.hitBulletColor;
-                                                trailColor = ModPal.ice;
-                                                trailWidth = 1f;
-                                                trailLength = 4;
-                                                pierce = true;
-                                                pierceCap = 2;
-                                                status = StatusEffects.wet;
-                                                statusDuration = 370;
-                                                frontColor = Color.white;
-                                                backColor = ModPal.ice;
-                                                puddles = 2;
-                                                puddleRange = 3;
-                                                puddleLiquid = Liquids.nitrogen;
-                                                despawnHit = true;
+                                            fragBullets = 7;
+                                            fragRandomSpread = 10;
+                                            fragSpread = 51;
+                                            knockback = 12;
+                                            fragBullet = new MissileBulletType(){{
+                                                spawnUnit = new MissileUnitType("cryonis-shard-frag"){{
+                                                    speed = 8.6F;
+                                                    drag = 0.05f;
+                                                    maxRange = 6;
+                                                    lifetime = 9;
+                                                    outlineColor = ModPal.darkBlue;
+                                                    engineSize = 0.7f;
+                                                    engineOffset = 0;
+                                                    rotateSpeed = 0;
+                                                    missileAccelTime = 0;
+                                                    trailColor = ModPal.ice;
+                                                    trailLength = 3;
+                                                    trailWidth = 15;
+                                                    lowAltitude = true;
+                                                    drawCell = false;
+                                                    loopSound = Sounds.none;
+                                                    deathSound = Sounds.none;
+                                                    health = 15;
+                                                    armor = 3;
+                                                    deathExplosionEffect  = new MultiEffect(Fx.pulverize, new Effect(28, e -> {
+                                                        e.scaled(8, e1 -> {
+                                                            Lines.stroke(2 * e1.fout());
+                                                            Lines.circle(e.x, e.y, e1.fin() * 17 + 2);
+                                                        });
+                                                        Draw.color(Color.white, ModPal.ice, e.fout());
+                                                        Angles.randLenVectors(e.id, 3, 23 * e.finpow(), e.rotation, 180, (x, y) -> {
+                                                            Fill.square(e.x + x, e.y + y, e.fout() * 3, 45);
+                                                        });
+                                                    }));
+                                                    lightRadius = 0;
+                                                    weapons.add(new Weapon() {{
+                                                        soundPitchMax = 1.8f;
+                                                        soundPitchMin = 2.3f;
+                                                        shootSound = Sounds.splash;
+                                                        shootCone = 360;
+                                                        mirror = false;
+                                                        reload = 1;
+                                                        shootOnDeath = true;
+                                                        x = y = shootX = shootY = 0;
+                                                        bullet = new ExplosionBulletType(35, 5){{
+                                                            fragLifeMin = 0.7f;
+                                                            fragLifeMax = 1f;
+                                                            hitEffect = Fx.none;
+                                                            shootEffect = Fx.none;
+                                                            status = StatusEffects.freezing;
+                                                            statusDuration = 45;
+                                                            puddleLiquid = Liquids.water;
+                                                            puddles = 2;
+                                                            puddleAmount = 15;
+                                                            knockback = 4;
+                                                        }};
+                                                    }});
+                                                }};
                                             }};
                                         }};
                                     }
@@ -1221,55 +1262,59 @@ public class FrostBlocks {
             requirements(Category.turret, with(FrostItems.stone, 50, FrostItems.rust, 80, FrostItems.aluminium, 120));
             Seq<DrawPart.PartMove> shardMoves = Seq.with(
                     new DrawPart.PartMove(DrawPart.PartProgress.warmup, 0, -3, 0),
-                    new DrawPart.PartMove(new AccelPartProgress(1, 0.9f, -0.095f, 0, 6, 20, p -> Math.min(DrawPart.PartProgress.reload.inv().add(-0.90f).clamp().mul(10).get(p), DrawPart.PartProgress.warmup.get(p))), 0, -5, 0)
+                    new DrawPart.PartMove(new AccelPartProgress(1, 0.9f, -0.095f, 0, 6, 20, DrawPart.PartProgress.charge.inv().clamp()), 0, -5, 0)
             );
             drawer = new DrawTurret("elevated-") {{
-                parts.addAll(new RegionPart("-shard") {{
-                    progress = PartProgress.reload.curve(Interp.pow2In);
-                    colorTo = new Color(1, 1, 1, 0);
-                    color = Color.white;
-                    mixColorTo = Pal.accent;
-                    mixColor = new Color(1, 1, 1, 0);
-                    layerOffset = -0.01f;
-                    y = 3;
-                    under = true;
-                    outline = false;
-                    moves.addAll(shardMoves);
-                }}, new RegionPart("-shard-cover"){{
-                        progress = PartProgress.warmup.mul(2);
+                parts.addAll(
+                    new RegionPart("-shard") {{
+                        progress = PartProgress.reload.curve(Interp.pow2In).add(p -> Mathf.zero(PartProgress.charge.get(p)) ? 0 : -1).clamp();
+                        colorTo = new Color(1, 1, 1, 0);
                         color = Color.white;
-                        colorTo = new Color(1,1,1,0);
+                        mixColorTo = Pal.accent;
+                        mixColor = new Color(1, 1, 1, 0);
+                        layerOffset = -0.01f;
                         y = 3;
+                        under = true;
                         outline = false;
                         moves.addAll(shardMoves);
-                }},
-                new RegionPart("-barrel") {{
-                        progress = PartProgress.warmup;
-                        heatProgress = PartProgress.warmup;
-                        heatColor = Color.red;
-                        moveRot = -14;
-                        moveX = 1;
-                        moveY = -1.2f;
-                        mirror = true;
-                        moves.add(new PartMove(PartProgress.reload.inv(), 0, 0, -11));
+                    }}, new RegionPart("-shard-cover"){{
+                            progress = PartProgress.warmup.mul(2).add(PartProgress.reload.curve(Interp.pow2In)).clamp();
+                            color = Color.white;
+                            colorTo = new Color(1,1,1,0);
+                            layerOffset = -0.01f;
+                            y = 3;
+                            under = true;
+                            outline = false;
+                            moves.addAll(shardMoves);
                     }},
-                new RegionPart("-blade"){{
-                    mirror = true;
-                    progress = PartProgress.warmup;
-                    moveRot = -8;
-                    moveY = -0.75f;
-                    moveX = 1;
-                    heatProgress = PartProgress.warmup;
-                    heatColor = ModPal.ice;
-                }},
-                new RegionPart("-mid"){{
-                    moveY = -1.5f;
-                    progress = PartProgress.warmup;
-                    heatProgress = PartProgress.reload.add(-0.8f).add((p) -> {
-                        return Mathf.sin(15.0F, 0.8f) * p.smoothReload * p.warmup;
-                    });
-                }});
-            };
+                    new RegionPart("-barrel") {{
+                            progress = PartProgress.warmup;
+                            heatProgress = PartProgress.warmup;
+                            heatColor = Color.red;
+                            moveRot = -14;
+                            moveX = 1;
+                            moveY = -1.2f;
+                            mirror = true;
+                            moves.add(new PartMove(PartProgress.reload.inv().add(PartProgress.charge.inv().mul(PartProgress.warmup)).compress(0, 1).add(p -> Mathf.zero(PartProgress.charge.get(p)) ? 0 : 1), 0, 0, -11));
+                        }},
+                    new RegionPart("-blade"){{
+                        mirror = true;
+                        progress = PartProgress.warmup;
+                        moveRot = -8;
+                        moveY = -0.75f;
+                        moveX = 1;
+                        heatProgress = PartProgress.warmup;
+                        heatColor = ModPal.ice;
+                    }},
+                    new RegionPart("-mid"){{
+                        moveY = -1.5f;
+                        progress = PartProgress.warmup;
+                        moves.add(new PartMove(PartProgress.recoil, 0, -1.5f, 0));
+                        heatProgress = PartProgress.heat.add(-0.4f).add((p) -> {
+                            return Mathf.sin(8.0F, 0.6f) * p.smoothReload * p.warmup;
+                        });
+                    }});
+                };
             };
 
         }};
