@@ -1117,7 +1117,7 @@ public class FrostBlocks {
             shootY = -3.5f;
             recoil = 2.5f;
             minWarmup = 0.8f;
-            shootWarmupSpeed = 0.05f;
+            shootWarmupSpeed = 0.045f;
             warmupMaintainTime = 30;
             ammoPerShot = 35;
             maxAmmo = 85;
@@ -1159,8 +1159,8 @@ public class FrostBlocks {
                                 drawCell = false;
                                 loopSound = Sounds.none;
                                 deathSound = Sounds.none;
-                                health = 400;
-                                armor = 30;
+                                health = 120;
+                                armor = 10;
                                 deathExplosionEffect  = new MultiEffect(Fx.pulverize, new Effect(45, e -> {
                                     e.scaled(15, e1 -> {
                                         Lines.stroke(3 * e1.fout());
@@ -1218,33 +1218,55 @@ public class FrostBlocks {
                         };
                     }}
             );
-
             requirements(Category.turret, with(FrostItems.stone, 50, FrostItems.rust, 80, FrostItems.aluminium, 120));
+            Seq<DrawPart.PartMove> shardMoves = Seq.with(
+                    new DrawPart.PartMove(DrawPart.PartProgress.warmup, 0, -3, 0),
+                    new DrawPart.PartMove(new AccelPartProgress(1, 0.9f, -0.095f, 0, 6, 20, p -> Math.min(DrawPart.PartProgress.reload.inv().add(-0.90f).clamp().mul(10).get(p), DrawPart.PartProgress.warmup.get(p))), 0, -5, 0)
+            );
             drawer = new DrawTurret("elevated-") {{
-                parts.addAll(new RegionPart("-barrel") {
-                    {
-                        progress = PartProgress.warmup;
-                        heatProgress = PartProgress.warmup;
-                        heatColor = Color.red;
-                        moveRot = -11;
-                        moveX = 1;
-                        moveY = -1.2f;
-                        mirror = true;
-                        moves.add(new PartMove(PartProgress.reload.inv(), 0, 0, -11));
-                    }}, new RegionPart("-shard") {{
+                parts.addAll(new RegionPart("-shard") {{
                     progress = PartProgress.reload.curve(Interp.pow2In);
                     colorTo = new Color(1, 1, 1, 0);
                     color = Color.white;
                     mixColorTo = Pal.accent;
                     mixColor = new Color(1, 1, 1, 0);
-                    outline = false;
-                    under = true;
-                    layerOffset = -0.01F;
+                    layerOffset = -0.01f;
                     y = 3;
-                    moves.add(new DrawPart.PartMove(PartProgress.warmup, 0, -3, 0));
-                }}, new RegionPart("-mid"){{
-                    heatProgress = PartProgress.reload.add(-0.6f).add((p) -> {
-                        return Mathf.sin(15.0F, 0.4f) * p.smoothReload + 0.2f * p.warmup;
+                    under = true;
+                    outline = false;
+                    moves.addAll(shardMoves);
+                }}, new RegionPart("-shard-cover"){{
+                        progress = PartProgress.warmup.mul(2);
+                        color = Color.white;
+                        colorTo = new Color(1,1,1,0);
+                        y = 3;
+                        outline = false;
+                        moves.addAll(shardMoves);
+                }},
+                new RegionPart("-barrel") {{
+                        progress = PartProgress.warmup;
+                        heatProgress = PartProgress.warmup;
+                        heatColor = Color.red;
+                        moveRot = -14;
+                        moveX = 1;
+                        moveY = -1.2f;
+                        mirror = true;
+                        moves.add(new PartMove(PartProgress.reload.inv(), 0, 0, -11));
+                    }},
+                new RegionPart("-blade"){{
+                    mirror = true;
+                    progress = PartProgress.warmup;
+                    moveRot = -8;
+                    moveY = -0.75f;
+                    moveX = 1;
+                    heatProgress = PartProgress.warmup;
+                    heatColor = ModPal.ice;
+                }},
+                new RegionPart("-mid"){{
+                    moveY = -1.5f;
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.reload.add(-0.8f).add((p) -> {
+                        return Mathf.sin(15.0F, 0.8f) * p.smoothReload * p.warmup;
                     });
                 }});
             };
