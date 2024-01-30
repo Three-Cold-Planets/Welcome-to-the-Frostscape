@@ -11,8 +11,10 @@ import arc.math.geom.Geometry;
 import arc.math.geom.Point2;
 import arc.math.geom.Vec2;
 import arc.struct.Seq;
+import arc.util.Time;
 import arc.util.Tmp;
 import main.entities.bullet.BouncyBulletType;
+import main.entities.bullet.RicochetBulletType;
 import main.entities.part.AccelPartProgress;
 import main.entities.part.EffectPart;
 import main.graphics.Layers;
@@ -38,15 +40,18 @@ import main.world.blocks.power.PowerPlug;
 import main.world.systems.bank.ResourceBankHandler;
 import main.world.systems.light.LightBeams;
 import main.world.systems.upgrades.UpgradeEntry;
+import mindustry.Vars;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.ExplosionBulletType;
+import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.entities.bullet.MissileBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.gen.Building;
 import mindustry.gen.Sounds;
 import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Layer;
@@ -58,13 +63,16 @@ import mindustry.type.Weapon;
 import mindustry.type.unit.MissileUnitType;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.units.UnitCargoLoader;
 import mindustry.world.blocks.units.UnitCargoUnloadPoint;
 import mindustry.world.consumers.ConsumeLiquid;
 import mindustry.world.draw.*;
 
+import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
+import static arc.math.Angles.randLenVectors;
 import static main.Frostscape.NAME;
 import static mindustry.type.ItemStack.with;
 import static mindustry.world.meta.Env.scorching;
@@ -132,7 +140,7 @@ public class FrostBlocks {
     coreBunker,
 
     //defense - hollus
-    pyroclast, cryonis,
+    pyroclast, cryonis, rivulet,
     thermalLandmine, lightningMine,
 
     //light - hollus
@@ -1035,6 +1043,7 @@ public class FrostBlocks {
         }};
 
         cryonis = new ItemTurret("cryonis"){{
+            requirements(Category.turret, with(FrostItems.stone, 50, FrostItems.rust, 80, FrostItems.aluminium, 120));
             size = 3;
             health = 153 * size * size;
             reload = 420;
@@ -1186,7 +1195,6 @@ public class FrostBlocks {
                         };
                     }}
             );
-            requirements(Category.turret, with(FrostItems.stone, 50, FrostItems.rust, 80, FrostItems.aluminium, 120));
             Seq<DrawPart.PartMove> shardMoves = Seq.with(
                     new DrawPart.PartMove(DrawPart.PartProgress.warmup, 0, -3, 0),
                     new DrawPart.PartMove(new AccelPartProgress(1, 0.9f, -0.095f, 0, 6, 20, DrawPart.PartProgress.charge.inv().clamp()), 0, -5, 0)
@@ -1258,6 +1266,91 @@ public class FrostBlocks {
                 };
             };
 
+        }};
+
+        rivulet = new LiquidTurret("rivulet"){{
+            requirements(Category.turret, with(FrostItems.stone, 20, FrostItems.rust, 35, FrostItems.ferricPanels, 60, FrostItems.aluminium, 25));
+            size = 2;
+
+            shootWarmupSpeed = 0.1f;
+            minWarmup = 0.35f;
+            shoot.shotDelay = 7.5f;
+            shoot.shots = 3;
+            reload = 12.5f;
+            shootY = 3;
+            shootEffect = Fx.shootLiquid;
+            recoil = 0;
+
+            ammo(Liquids.water, new RicochetBulletType(5, 5, "circle"){{
+                chargeEffect = new Effect(40, e -> {
+                    color(Liquids.water.gasColor);
+                    alpha(Mathf.clamp(e.foutpow() * 2f));
+
+                    randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 6) + 12), e.finpow() * 45, e.rotation, 40, (x, y) -> {
+                        Fill.circle(e.x + x, e.y + y, e.finpow() * 1.5f);
+                    });
+                });
+
+                frontColor = hitColor = Liquids.water.color;
+
+                shrinkX = shrinkY = 0;
+                width = height = 4;
+                trailLength = 8;
+                trailWidth = 2;
+                trailColor = Liquids.water.color;
+                keepVelocity = false;
+                lifetime = 15;
+                knockback = 4;
+                pierce = true;
+                pierceBuilding = true;
+                pierceArmor = true;
+                status = StatusEffects.wet;
+                statusDuration = 180;
+                hitEffect = Fx.none;
+                despawnEffect = Fx.none;
+                fragOnHit = true;
+                trailRotation = true;
+                bounceEffect = trailEffect = new Effect(45, e -> {
+                    color(Liquids.water.color);
+                    alpha(Mathf.clamp(e.fslope() * e.fslope() * 2f));
+                    Color color = Draw.getColor();
+
+                    randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 6), e.finpow() * 45, e.rotation, 5 + 25 * e.fin(), (x, y) -> {
+                        Building b = Vars.world.buildWorld(e.x + x, e.y + y);
+                        if (b != null)
+                            alpha(color.a * (b.dst2(e.x + x, e.y + y) / b.hitSize() / b.hitSize() / 2 + 0.5f));
+                        Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
+                        Draw.color(color);
+                    });
+                });
+                trailChance = 1;
+                fragSpread = 3;
+                fragBullets = 3;
+                fragRandomSpread = 15;
+                fragBullet = intervalBullet = new LiquidBulletType(Liquids.water) {{
+                    speed = 3;
+                    lifetime = 25;
+                    orbSize = 2;
+                    drag = 0.05f;
+                }};
+                intervalBullets = 1;
+                intervalDelay = 1;
+                intervalRandomSpread = 15;
+            }});
+
+            outlineColor = ModPal.quiteDarkOutline;
+
+            drawer = new DrawTurret("elevated-"){{
+                parts.addAll(
+                    new RegionPart("-turbine-blade"){{
+                        layerOffset = 0.03f;
+                        outline = false;
+                        moves.add(new PartMove(p -> Mathf.mod(Time.time/25, 1), 0, 0, 360));
+                        x = -8/4;
+                        y = -17/4;
+                    }}
+                );
+            }};
         }};
 
         /*
