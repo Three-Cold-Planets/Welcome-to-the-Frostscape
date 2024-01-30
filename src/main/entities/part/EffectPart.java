@@ -43,7 +43,6 @@ public class EffectPart extends DrawPart {
         effect.at(partParams.x + Tmp.v2.x, partParams.y + Tmp.v2.y, rotation + partParams.rotation);
 
         if(!mirror) return;
-        Log.info("hai");
 
         Tmp.v3.set(Tmp.v1).scl(-1,1).rotate(partParams.rotation - 90);
         effect.at(partParams.x + Tmp.v3.x, partParams.y + Tmp.v3.y, partParams.rotation - rotation, color);
