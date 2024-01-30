@@ -1,5 +1,5 @@
 ## Overview
-Welcome to the Frostscape is an indev v7 campaign-based mod which focuses on unit control, stealth and various new systems. This is my in the Three Cold Planets colab. The mod takes place on Hollus and its three moons. Development is being lead by [@Sh1penfire](https://github.com/Sh1penfire) along with [@ThatOneCreator](https://github.com/shadow5927), [@RilyProductions](https://github.com/RilyProductions) & [@RandomUser](https://github.com/RandomUserRU). It is currently in it's wip stage and is being used as a progress dump for Hollus's content.
+Welcome to the Frostscape is an indev v7 campaign-based mod which focuses on unit control, stealth and various new systems. The mod takes place in a new system with several cold planets. Development is being lead by [@Sh1penfire](https://github.com/Sh1penfire) along with [@ThatOneCreator](https://github.com/shadow5927), [@RilyProductions](https://github.com/RilyProductions) & [@RandomUser](https://github.com/RandomUserRU). It is currently in it's wip stage and is being used as a progress dump for Hollus's content.
 
 Main test mod for Hollus as part of https://github.com/Three-Cold-Planets, check out our other projects/the main mod. Thank you :D
 
@@ -30,5 +30,7 @@ Thanks to
 -Determiedmech1#6702, Ssem#4539, PsychicFireSong#5026 on discord for being active on mod suggestions in Mod Centre (Join the server [here](https://discord.gg/XrFhAZys7T))
 
 -[Goobrr](https://github.com/Goobrr) for the [Grimoire](https://github.com/Goobrr/Grimoire) API
+
+-[GlenFolker](https://github.com/GlennFolker) for the mod template (thank god for the d8 fix)
 
 -You for using the mod! (Maybe)
