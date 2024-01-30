@@ -27,8 +27,6 @@ import static mindustry.world.blocks.power.PowerNode.makeBatteryBalance;
 public class PowerPlug extends PlugBlock {
 
     public float maxExchanged = 4;
-    //Percentage increase/tick. Caps out at 1
-    public float warmupSpeed = 0.029f;
     public PowerPlug(String name) {
         super(name);
         solid = true;
@@ -66,17 +64,14 @@ public class PowerPlug extends PlugBlock {
         public BusState state = BusState.stable;
         public float lastExchanged;
         public float lastStatus;
-        public boolean active;
 
         @Override
         public void updateTile() {
             super.updateTile();
-            exchangePower();
-            this.warmup = Mathf.lerpDelta(this.warmup, active ? 1 : 0, warmupSpeed * this.timeScale);
         }
 
-        public void exchangePower(){
-            active = false;
+        @Override
+        public void exchange(){
             if(ResourceBankHandler.powerCap == 0) {
                 state = BusState.disabled;
                 return;

@@ -24,6 +24,7 @@ public class PlugBlock extends BaseBlock {
     public Effect workEffect = Fx.none;
     public float workEffectRange;
     public float effectChance = 0.13f;
+    public float warmupSpeed = 0.029f;
 
     public PlugBlock(String name) {
         super(name);
@@ -89,12 +90,20 @@ public class PlugBlock extends BaseBlock {
     public class PlugBuild extends BaseBuilding{
         public float sum;
         public float warmup;
+        public boolean active;
 
         @Override
         public void updateTile() {
             super.updateTile();
+            active = false;
+            exchange();
+            warmup = Mathf.lerpDelta(this.warmup, active ? 1 : 0, warmupSpeed * this.timeScale);
             if(Mathf.chance(warmup * effectChance * delta())) workEffect.at(this.x + Mathf.range(workEffectRange), this.y + Mathf.range(workEffectRange));
         }
+
+        public void exchange(){
+
+        };
 
         @Override
         public float warmup(){

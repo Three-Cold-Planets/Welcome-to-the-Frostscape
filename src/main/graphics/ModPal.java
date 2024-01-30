@@ -14,6 +14,11 @@ public class ModPal {
 
     ferricPanel = Color.valueOf("#eee5f6"),
     ice = Color.valueOf("#9ccaed"),
+
+    gel = Color.valueOf("#45283c"),
+
+    algae = Color.valueOf("#719537"),
+
     sulphur = Color.valueOf("#beab77"),
 
     salt = Color.valueOf("e8e4e3"),

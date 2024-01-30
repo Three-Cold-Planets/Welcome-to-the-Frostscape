@@ -14,8 +14,8 @@ public class FrostItems {
     ice,
     //Volcanic tech
     sulphur,
-    //Culloi tech for snow
-    culloi;
+    //Gel tech
+    algaeMuffin, gel;
     public static void load(){
 
         stone = new Item("stone"){{
@@ -56,6 +56,14 @@ public class FrostItems {
 
         ice = new Item("ice"){{
             color = ModPal.ice;
+        }};
+
+        algaeMuffin = new Item("algae-muffin"){{
+            color = ModPal.algae;
+        }};
+
+        gel = new Item("gel"){{
+            color = ModPal.gel;
         }};
     }
 }

@@ -14,6 +14,7 @@ import arc.struct.Seq;
 import arc.util.Tmp;
 import main.entities.bullet.BouncyBulletType;
 import main.entities.part.AccelPartProgress;
+import main.entities.part.EffectPart;
 import main.graphics.Layers;
 import main.graphics.ModPal;
 import main.math.Interps;
@@ -811,8 +812,6 @@ public class FrostBlocks {
             rotateSpeed = 2.5f;
             cooldownTime = 75;
             shootY = -8;
-            shootWarmupSpeed = 0.08f;
-            minWarmup = 0.9f;
             squareSprite = false;
             drawer = new DrawTurret("elevated-"){{
                 Color heatc = Pal.turretHeat;
@@ -820,60 +819,37 @@ public class FrostBlocks {
                 liquidDraw = Liquids.oil;
                 liquidCapacity = 300;
                 parts.addAll(
-                        new RegionPart("-liquid-base"){{
-                            progress = PartProgress.recoil;
-                            heatColor = Color.clear;
-                            mirror = false;
-                            layerOffset = -0.00002f;
-                            outlineLayerOffset = -0.00002f;
-                        }},
-                        new RegionPart("-back"){{
-                            progress = PartProgress.warmup;
-                            mirror = true;
-                            moveRot = -15f;
-                            x = (30 - 6) / 4f;
-                            y = (-34.5f + 6) / 4f;
-                            moveX = 6/4;
-                            moveY = -6/4;
-                            under = true;
-                            heatColor = Color.clear;
-                            children = Seq.with(
-                                    new RegionPart("-back"){
-                                        {
-                                            progress = PartProgress.recoil;
-                                            mirror = true;
-                                            moveRot = 360 -35f;
-                                            x = 0;
-                                            y = 0;
-                                            moveX = 6 / 4;
-                                            moveY = -6 / 4;
-                                            under = true;
-                                            heatColor = Color.clear;
-                                            children = Seq.with(
-                                                    new RegionPart("-fang"){
-                                                        {
-                                                            progress = PartProgress.warmup;
-                                                            mirror = true;
-                                                            moveRot = -15f;
-                                                            x = 0;
-                                                            y = 0;
-                                                            moveX = 4 / 4;
-                                                            moveY = -4 / 4;
-                                                            under = true;
-                                                            heatColor = Color.clear;
-                                                        }}
-                                            );
-                                        }}
-                            );
-                        }},
-                        new RegionPart("-barrel"){{
-                            progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.recoil.inv());
-                            moveY = -9;
-                            heatColor = Color.valueOf("f03b0e");
-                            mirror = false;
-                            layerOffset = -0.00001f;
-                            outlineLayerOffset = -0.00002f;
-                        }}
+                    new RegionPart("-hinges"){{
+                        progress = PartProgress.recoil;
+                        under = true;
+                    }},
+                    new RegionPart("-barrel"){{
+                        progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.recoil.inv().mul(0.5f));
+                        moveY = -9;
+                        heatColor = Color.valueOf("f03b0e");
+                        mirror = false;
+                        layerOffset = -0.00001f;
+                        outlineLayerOffset = -0.00002f;
+                    }},
+                    new RegionPart("-top"){{
+
+                    }},
+                    new EffectPart(){{
+                        progress = PartProgress.heat;
+                        effect = new Effect(35f, (e) -> {
+                            Draw.color(Pal.gray, Color.darkGray, e.fin());
+                            Draw.alpha(e.fout() * 2);
+                            Angles.randLenVectors(e.id, 2, e.finpow() * 22, e.rotation, 35, (x, y) -> {
+                                Fill.circle(e.x + x, e.y + y, e.fin() * 3.5f);
+                            });
+                        });
+
+                        mirror = true;
+                        rotation = 225;
+                        x = 24/4;
+                        y = -30/4;
+                        effectChance = 1;
+                    }}
                 );
             }};
             outlineColor = Pal.darkOutline;
@@ -881,57 +857,7 @@ public class FrostBlocks {
             shake = 1.2f;
 
             ammo(
-                    Items.pyratite,
-                    new BulletType(){{
-                        speed = 3.5f;
-                        lifetime = 200;
-                        instantDisappear = true;
-                        for (int i = 0; i < 6; i++) {
-                            final float j = i;
-                            spawnBullets.add(new BouncyBulletType(3.5f + j/7, 5, "shell"){{
-                                                 collidesBounce = true;
-                                                 pierceBuilding = false;
-                                                 lifetime = 200;
-                                                 drag = 0.006f;
-                                                 minLife = 55f;
-                                                 hitEffect = Fx.blastExplosion;
-                                                 despawnEffect = Fx.blastExplosion;
-                                                 width = 6;
-                                                 height = 6;
-                                                 shrinkX = 0.9f;
-                                                 shrinkY = 0.9f;
-                                                 status = FrostStatusEffects.napalm;
-                                                 statusDuration = 12f * 60f;
-                                                 gravity = 0.00216f;
-                                                 startingLift = 0.066f + j/100;
-                                                 bounceShake = 0.7f;
-                                                 bounceEfficiency = 0.85f;
-                                                 bounceForce = 10;
-                                                 bounceCap = 0;
-                                                 keepLift = false;
-                                                 keepHeight = false;
-                                                 frontColor = Pal.lightishOrange;
-                                                 backColor = Pal.lightOrange;
-                                                 hitShake = 3.2f;
-                                                 bounceEffect = Fx.explosion;
-                                                 incendAmount = 2;
-                                                 incendChance = 1;
-                                                 puddleLiquid = Liquids.oil;
-                                                 puddleAmount = 25;
-                                                 puddles = 1;
-                                                 splashDamage = 15;
-                                                 splashDamageRadius = 16;
-                                                 knockback = 1;
-                                                 trailEffect = Fxf.emberTrail;
-                                                 trailChance = 0.65f;
-                                                 fragBullets = 3;
-                                                 fragBullet = FrostBullets.pyraGel.fragBullet;
-                                                 hitSound = Sounds.explosion;
-                                             }}
-                            );
-                        }
-                    }},
-                    Items.blastCompound,
+                    FrostItems.thermite,
                     new BouncyBulletType(3.5f, 10, NAME + "-napalm-canister"){{
                         frontColor = backColor = Color.white;
                         lifetime = 17.5f;
@@ -958,7 +884,7 @@ public class FrostBlocks {
 
                         hitEffect = new Effect(850, e -> {
                             float h = Math.max(((Math3D.HeightHolder) e.data).height, 0);
-                            e.scaled(150, e1 -> {
+                            e.scaled(25, e1 -> {
                                 DrawUtils.parallaxOffset(e.x, e.y, h, Tmp.v1);
                                 float ox = Tmp.v1.x, oy = Tmp.v1.y;
                                 Draw.z(visualHeightMax);
@@ -1111,16 +1037,16 @@ public class FrostBlocks {
         cryonis = new ItemTurret("cryonis"){{
             size = 3;
             health = 153 * size * size;
-            reload = 500;
-            range = 350;
+            reload = 420;
+            range = 315;
             shootY = -3.5f;
             recoil = 2.5f;
             minWarmup = 0.8f;
             shootWarmupSpeed = 0.045f;
             warmupMaintainTime = 30;
             rotateSpeed = 3.5f;
-            ammoPerShot = 35;
-            maxAmmo = 85;
+            ammoPerShot = 55;
+            maxAmmo = 135;
             cooldownTime = 75;
             coolant = consume(new ConsumeLiquid(Liquids.nitrogen, 0.015f));
             coolantMultiplier = 1.8f;
@@ -1146,10 +1072,10 @@ public class FrostBlocks {
                                         Fill.square(e.x + x, e.y + y, e.fout() * 3, 45);
                                     });
                                 }));
-                                speed = 4.6F;
+                                speed = 4.2F;
                                 drag = 0.05f;
                                 maxRange = 6;
-                                lifetime = 74;
+                                lifetime = 57;
                                 outlineColor = ModPal.darkBlue;
                                 engineSize = 2;
                                 engineOffset = 0;
@@ -1184,9 +1110,10 @@ public class FrostBlocks {
                                         shootCone = 360;
                                         mirror = false;
                                         reload = 1;
+                                        rotate = false;
                                         shootOnDeath = true;
                                         x = y = shootX = shootY = 0;
-                                        bullet = new ExplosionBulletType(470, 10){{
+                                        bullet = new ExplosionBulletType(470, 12){{
                                             fragLifeMin = 0.7f;
                                             fragLifeMax = 1f;
                                             hitEffect = Fx.none;
@@ -1195,7 +1122,7 @@ public class FrostBlocks {
                                             statusDuration = 165;
                                             fragBullets = 7;
                                             fragRandomSpread = 10;
-                                            fragSpread = 51;
+                                            fragSpread = 15;
                                             knockback = 12;
                                             fragBullet = new MissileBulletType(){{
                                                 spawnUnit = new MissileUnitType("cryonis-shard-frag"){{
@@ -1237,7 +1164,7 @@ public class FrostBlocks {
                                                         reload = 1;
                                                         shootOnDeath = true;
                                                         x = y = shootX = shootY = 0;
-                                                        bullet = new ExplosionBulletType(35, 5){{
+                                                        bullet = new ExplosionBulletType(75, 5){{
                                                             fragLifeMin = 0.7f;
                                                             fragLifeMax = 1f;
                                                             hitEffect = Fx.none;
@@ -1267,7 +1194,7 @@ public class FrostBlocks {
             drawer = new DrawTurret("elevated-") {{
                 parts.addAll(
                     new RegionPart("-shard") {{
-                        progress = PartProgress.reload.curve(Interp.pow2In).add(p -> Mathf.zero(PartProgress.charge.get(p)) ? 0 : -1).clamp();
+                        progress = PartProgress.smoothReload.curve(Interp.pow2In).add(p -> Mathf.zero(PartProgress.charge.get(p)) ? 0 : -1).clamp();
                         colorTo = new Color(1, 1, 1, 0);
                         color = Color.white;
                         mixColorTo = Pal.accent;
@@ -1286,6 +1213,20 @@ public class FrostBlocks {
                             under = true;
                             outline = false;
                             moves.addAll(shardMoves);
+                    }},
+                    new EffectPart(){{
+                        progress = PartProgress.smoothReload.curve(Interp.pow2In).add(p -> Mathf.zero(PartProgress.charge.get(p)) ? 0 : -1).clamp().mul(p -> Mathf.zero(PartProgress.reload.inv().add(-0.1f).clamp().get(p)) ? 0 : 1);
+                        moves.addAll(shardMoves);
+                        effectChance = 1;
+                        y = 3;
+                        effect = new Effect(35, (e) -> {
+                            Draw.color(ModPal.ice);
+                            Draw.alpha(e.fin());
+                            Angles.randLenVectors(e.id, 5, 3 + e.foutpow() * 2, e.rotation, 75, (x, y) -> {
+                                Fill.circle(e.x + x, e.y + y, e.fout() * 2);
+                            });
+                        });
+                        rotation = 0;
                     }},
                     new RegionPart("-barrel") {{
                             progress = PartProgress.warmup;
@@ -1318,6 +1259,13 @@ public class FrostBlocks {
             };
 
         }};
+
+        /*
+        ((DrawTurret) ((ItemTurret) Blocks.smite).drawer).parts.each(pe -> {
+            if(pe instanceof RegionPart part) part.moves.add(new DrawPart.PartMove(p -> Mathf.mod(Time.time / 45, 1), 0, 0, 360));
+        });
+
+         */
 
         //endregion
 
