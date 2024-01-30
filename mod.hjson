@@ -8,7 +8,7 @@ author: "Sh1penfire\nFractured\nRilyProductions"
 main: "main.Frostscape"
 
 #the mod description as seen in the mod dialog
-description: "A currently [red[]]indev[[]] colab mod with huge scope, being built one planet at a time.\n\nAims to add several cold planets with linked campaigns, along with mechanics that'll [accent[]]revolutionise[[]] the way you interact with the mod's different environments, while tryingg to stay enjoyable and even a lil silly at times.\n\n[dark[]gray]A voice lingers in the darkness, dancing around your ears. Will you join it?"
+description: "A currently [red[]]indev[[]] colab mod with huge scope, being built one planet at a time.\n\nAims to add several cold planets with linked campaigns, along with mechanics that'll [accent[]]revolutionise[[]] the way you interact with the mod's different environments, while trying to stay enjoyable and even a lil silly at times.\n\n[dark[]gray]A voice lingers in the darkness, dancing around your ears. Will you join it?"
 
 #the mod version
 version: 1.5-alpha
