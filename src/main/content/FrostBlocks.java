@@ -36,6 +36,7 @@ import main.world.blocks.drill.CoreSiphon;
 import main.world.blocks.environment.*;
 import main.world.blocks.light.ReflectiveWall;
 import main.world.blocks.light.SolarReflector;
+import main.world.blocks.power.ItemPlug;
 import main.world.blocks.power.PowerPlug;
 import main.world.systems.bank.ResourceBankHandler;
 import main.world.systems.light.LightBeams;
@@ -729,7 +730,7 @@ public class FrostBlocks {
         //endregion
 
         //region distribution
-        itemPlug = new PlugBlock("item-plug"){{
+        itemPlug = new ItemPlug("item-plug"){{
             requirements(Category.distribution, with(FrostItems.rust, 30));
             validFloors.add(itemSocket, itemSocketLarge);
         }};

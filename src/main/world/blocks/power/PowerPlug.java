@@ -9,6 +9,7 @@ import arc.struct.EnumSet;
 import arc.struct.Seq;
 import arc.util.Scaling;
 import arc.util.Strings;
+import arc.util.Time;
 import main.content.FrostBlocks;
 import main.content.Fxf;
 import main.world.blocks.PlugBlock;
@@ -65,10 +66,7 @@ public class PowerPlug extends PlugBlock {
         public float lastExchanged;
         public float lastStatus;
 
-        @Override
-        public void updateTile() {
-            super.updateTile();
-        }
+        public float time = 0;
 
         @Override
         public void exchange(){
@@ -93,11 +91,17 @@ public class PowerPlug extends PlugBlock {
                     return;
                 }
 
+                active = true;
+                if(time < exchangeDelay){
+                    state = BusState.startingExport;
+                    time += Time.delta;
+                    return;
+                }
+
                 power.graph.transferPower(-powerRemoved);
                 ResourceBankHandler.power.graph.transferPower(powerRemoved);
                 state = BusState.exporting;
                 lastExchanged = powerRemoved;
-                active = true;
                 return;
             }
             if(status < 0.4f){
@@ -110,15 +114,23 @@ public class PowerPlug extends PlugBlock {
                     state = BusState.empty;
                     return;
                 }
+
+                active = true;
+                if(time < exchangeDelay){
+                    state = BusState.startingImport;
+                    time += Time.delta;
+                    return;
+                }
+
                 power.graph.transferPower(powerRemoved);
                 ResourceBankHandler.power.graph.transferPower(-powerRemoved);
                 state = BusState.importing;
                 lastExchanged = powerRemoved;
-                active = true;
                 return;
             }
             state = BusState.stable;
             lastExchanged = 0;
+            time = 0;
         }
 
         @Override
@@ -148,8 +160,8 @@ public class PowerPlug extends PlugBlock {
                             i.setDrawable(
                                     switch (state){
                                         case stable -> Icon.cancel;
-                                        case exporting -> Icon.download;
-                                        case importing -> Icon.export;
+                                        case startingExport, exporting -> Icon.download;
+                                        case startingImport, importing -> Icon.export;
                                         case empty -> Icon.warning;
                                         case full -> Icon.downOpen;
                                         default -> Icon.exit;
@@ -177,27 +189,6 @@ public class PowerPlug extends PlugBlock {
             }
 
             table.marginBottom(-5.0F);
-        }
-    }
-
-    private enum BusState{
-        importing("bar.bank.importing"),
-        exporting("bar.bank.exporting"),
-        stable("bar.bank.stable"),
-
-        full("bar.bank.full"),
-        empty("bar.bank.empty"),
-        disabled("bar.bank.disabled");
-
-        final String name;
-
-        BusState(String name){
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
         }
     }
 }

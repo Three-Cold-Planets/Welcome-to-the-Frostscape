@@ -26,11 +26,15 @@ public class PlugBlock extends BaseBlock {
     public float effectChance = 0.13f;
     public float warmupSpeed = 0.029f;
 
+    //Time in ticks till importing/exporting starts.
+    public float exchangeDelay;
+
     public PlugBlock(String name) {
         super(name);
         validFloors = Seq.with();
         this.drawer = new DrawDefault();
         workEffectRange = 3;
+        exchangeDelay = 15;
     }
 
 
@@ -123,6 +127,29 @@ public class PlugBlock extends BaseBlock {
             super.onProximityAdded();
             countSockets(tile);
             this.sum = returnCount;
+        }
+    }
+
+    public enum BusState{
+        startingImport("bar.bank.starting.import"),
+        startingExport("bar.bank.starting.export"),
+        importing("bar.bank.importing"),
+        exporting("bar.bank.exporting"),
+        stable("bar.bank.stable"),
+
+        full("bar.bank.full"),
+        empty("bar.bank.empty"),
+        disabled("bar.bank.disabled");
+
+        public final String name;
+
+        BusState(String name){
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }
