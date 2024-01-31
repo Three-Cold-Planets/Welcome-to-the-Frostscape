@@ -13,11 +13,17 @@ public class ModPal {
     aluminium = Color.valueOf("#a0a3b4"),
 
     ferricPanel = Color.valueOf("#eee5f6"),
+    sodium = Color.valueOf("#96a1a6"),
+
+    boron = Color.valueOf("a89edd"),
+
     ice = Color.valueOf("#9ccaed"),
 
-    gel = Color.valueOf("#45283c"),
+    algae = Color.valueOf("#45283c"),
 
-    algae = Color.valueOf("#719537"),
+    enzimes = Color.valueOf("#6b2da8"),
+
+    gel = Color.valueOf("#719537"),
 
     sulphur = Color.valueOf("#beab77"),
 

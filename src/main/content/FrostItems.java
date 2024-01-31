@@ -7,7 +7,7 @@ import mindustry.type.Item;
 
 public class FrostItems {
     //Ferric/Aluminium tech for all biomes
-    public static Item stone, rust, magnetite, bauxite, ferricPanels, aluminium, thermite,
+    public static Item stone, rust, magnetite, bauxite, ferricPanels, aluminium, sodium, thermite,
     //Salts and clays
     hailite,
     //Meltables items
@@ -15,7 +15,7 @@ public class FrostItems {
     //Volcanic tech
     sulphur,
     //Gel tech
-    algaeMuffin, gel;
+    algaeMuffin, gel, enzymes, boron;
     public static void load(){
 
         stone = new Item("stone"){{
@@ -34,28 +34,43 @@ public class FrostItems {
             color = Color.valueOf("c77663");
         }};
 
-        sulphur = new Item("sulphur"){{
-            color = ModPal.sulphur;
-        }};
-
-        aluminium = new Item("aluminium"){{
-            color = ModPal.aluminium;
-        }};
-
-        ferricPanels = new Item("ferric-panels"){{
-            color = ModPal.ferricPanel;
-        }};
-
-        thermite = new Item("thermite"){{
-            color = Items.pyratite.color.cpy().shiftSaturation(0.1f);
+        ice = new Item("ice"){{
+            color = ModPal.ice;
         }};
 
         hailite = new Item("hailite"){{
             color = ModPal.salt;
         }};
 
-        ice = new Item("ice"){{
-            color = ModPal.ice;
+        sulphur = new Item("sulphur"){{
+            color = ModPal.sulphur;
+            flammability = 0.6f;
+            explosiveness = 0.25f;
+        }};
+
+        ferricPanels = new Item("ferric-panels"){{
+            color = ModPal.ferricPanel;
+        }};
+
+        aluminium = new Item("aluminium"){{
+            color = ModPal.aluminium;
+        }};
+
+        sodium = new Item("sodium"){{
+            color = ModPal.sodium;
+        }};
+
+        boron = new Item("boron"){{
+            color = ModPal.boron;
+        }};
+
+        thermite = new Item("thermite"){{
+            color = Items.pyratite.color.cpy().shiftSaturation(0.1f);
+            flammability = 2;
+        }};
+
+        enzymes = new Item("enzymes"){{
+            color = ModPal.enzimes;
         }};
 
         algaeMuffin = new Item("algae-muffin"){{

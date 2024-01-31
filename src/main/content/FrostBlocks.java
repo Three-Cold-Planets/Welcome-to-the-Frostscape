@@ -1280,6 +1280,7 @@ public class FrostBlocks {
             shootY = 3;
             shootEffect = Fx.shootLiquid;
             recoil = 0;
+            range = 105;
 
             ammo(Liquids.water, new RicochetBulletType(5, 5, "circle"){{
                 chargeEffect = new Effect(40, e -> {
@@ -1311,16 +1312,13 @@ public class FrostBlocks {
                 fragOnHit = true;
                 trailRotation = true;
                 bounceEffect = trailEffect = new Effect(45, e -> {
-                    color(Liquids.water.color);
-                    alpha(Mathf.clamp(e.fslope() * e.fslope() * 2f));
-                    Color color = Draw.getColor();
-
-                    randLenVectors(e.id, (int) (Mathf.randomSeed(e.id, 3) + 6), e.finpow() * 45, e.rotation, 5 + 25 * e.fin(), (x, y) -> {
+                    Tmp.c1.set(Liquids.water.color);
+                    Draw.color(Tmp.c1);
+                    randLenVectors(e.id, 3, e.finpow() * 45, e.rotation, 5 + 25 * e.fin(), (x, y) -> {
                         Building b = Vars.world.buildWorld(e.x + x, e.y + y);
-                        if (b != null)
-                            alpha(color.a * (b.dst2(e.x + x, e.y + y) / b.hitSize() / b.hitSize() / 2 + 0.5f));
+                        if (b != null) alpha(Tmp.c1.a * (b.dst2(e.x + x, e.y + y) / b.hitSize() / b.hitSize() / 2 + 0.5f));
                         Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
-                        Draw.color(color);
+                        Draw.alpha(Tmp.c1.a);
                     });
                 });
                 trailChance = 1;
@@ -1328,7 +1326,7 @@ public class FrostBlocks {
                 fragBullets = 3;
                 fragRandomSpread = 15;
                 fragBullet = intervalBullet = new LiquidBulletType(Liquids.water) {{
-                    speed = 3;
+                    speed = 3.5f;
                     lifetime = 25;
                     orbSize = 2;
                     drag = 0.05f;

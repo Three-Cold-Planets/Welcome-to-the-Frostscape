@@ -3,7 +3,6 @@ package main.entities.part;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.Vars;
