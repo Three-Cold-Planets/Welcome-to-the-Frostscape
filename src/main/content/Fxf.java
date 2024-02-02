@@ -11,7 +11,6 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
-import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
 import main.graphics.Layers;
@@ -128,12 +127,11 @@ public class Fxf {
         });
     }),
 
-    chainLightning = new Effect(25f, 300f, e -> {
+    chainLightning = new Effect(15f, 300f, e -> {
         if(!(e.data instanceof VisualLightningHolder)) return;
         VisualLightningHolder p = (VisualLightningHolder) e.data;
-        Log.info(p.width());
 
-        int seed = e.id + (int) e.time;
+        int seed = e.id;
         //get the start and ends of the lightning, then the distance between them
         float tx = Tmp.v1.set(p.start()).x, ty = Tmp.v1.y, dst = Mathf.dst(Tmp.v2.set(p.end()).x, Tmp.v2.y, tx, ty);
 
@@ -143,6 +141,8 @@ public class Fxf {
         rand.setSeed(seed);
 
         float arcWidth = rand.range(dst * p.arc());
+
+        seed = e.id - (int) e.time;
 
         float angle = Tmp.v1.angleTo(Tmp.v2);
 
@@ -154,7 +154,7 @@ public class Fxf {
         float spacing = dst / links;
 
         Lines.stroke(p.width() * e.fout());
-        Draw.color(Color.white, e.color, e.fin());
+        Draw.color(Color.white, e.color, e.finpow());
 
         //begin the line
         Lines.beginLine();
