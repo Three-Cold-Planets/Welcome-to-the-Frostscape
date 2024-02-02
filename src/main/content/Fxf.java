@@ -135,6 +135,7 @@ public class Fxf {
         //get the start and ends of the lightning, then the distance between them
         float tx = Tmp.v1.set(p.start()).x, ty = Tmp.v1.y, dst = Mathf.dst(Tmp.v2.set(p.end()).x, Tmp.v2.y, tx, ty);
 
+
         Tmp.v3.set(p.end()).sub(p.start()).nor();
         float normx = Tmp.v3.x, normy = Tmp.v3.y;
 
@@ -155,6 +156,7 @@ public class Fxf {
 
         Lines.stroke(p.width() * e.fout());
         Draw.color(Color.white, e.color, e.finpow());
+        Fill.circle(Tmp.v2.x, Tmp.v2.y, p.width() * e.fout()/2);
 
         //begin the line
         Lines.beginLine();

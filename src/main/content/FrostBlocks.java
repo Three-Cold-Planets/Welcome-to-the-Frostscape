@@ -14,6 +14,7 @@ import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
 import main.entities.bullet.BouncyBulletType;
+import main.entities.bullet.ChainLightningBulletType;
 import main.entities.bullet.RicochetBulletType;
 import main.entities.part.AccelPartProgress;
 import main.entities.part.EffectPart;
@@ -51,10 +52,12 @@ import mindustry.entities.bullet.MissileBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.RegionPart;
+import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Building;
 import mindustry.gen.Sounds;
 import mindustry.graphics.CacheLayer;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
@@ -141,7 +144,7 @@ public class FrostBlocks {
     coreBunker,
 
     //defense - hollus
-    pyroclast, cryonis, rivulet,
+    pyroclast, plume, cryonis, rivulet,
     thermalLandmine, lightningMine,
 
     //light - hollus
@@ -1043,6 +1046,87 @@ public class FrostBlocks {
             });
         }};
 
+        plume = new ItemTurret("plume"){{
+            requirements(Category.turret, with(FrostItems.ferricPanels, 120, FrostItems.aluminium, 270, FrostItems.gel, 60));
+            size = 4;
+            health = 153 * size * size;
+            reload = 22;
+            minWarmup = 0.85f;
+            moveWhileCharging = true;
+            rotateSpeed = 3;
+            range = 215;
+            shootY = 0;
+            shoot = new ShootBarrel(){{
+                barrels = new float[]{
+                        -19 / 4, 45 / 4, -15,
+                        19 / 4, 45 / 4, 15
+                };
+            }};
+
+            recoils = 2;
+            recoil = 0;
+            recoilTime = 42;
+            cooldownTime = 140;
+            drawer = new DrawTurret("elevated-"){{
+                for(int i = 0; i < 2; i ++){
+                    int f = i;
+                    int sign = (i -1) * 2 + 1;
+                    parts.addAll(new RegionPart("-barrel-" + (i == 0 ? "l" : "r")){{
+                                progress = PartProgress.recoil;
+                                recoilIndex = f;
+                                moveX = sign * 1.15f;
+                                moveY = -2.5f;
+                                moves.addAll(new DrawPart.PartMove(DrawPart.PartProgress.warmup.curve(Interp.pow2In), 0, -0.5f, sign * 15),
+                                    new DrawPart.PartMove(DrawPart.PartProgress.warmup.compress(0, 0.75f).curve(Interp.smoother),  sign * 2.5f, -1.5f, 0)
+                                );
+                         }}
+                    );
+                }
+
+                parts.addAll(
+                    new RegionPart("-back"){{
+                        progress = PartProgress.warmup;
+                        moveY = -0.5f;
+                        heatProgress = PartProgress.warmup.curve(Interp.pow2In).add(PartProgress.heat).clamp();
+                    }},
+                    new RegionPart("-plate"){{
+                        progress = PartProgress.warmup;
+                        mirror = true;
+                        moveY = 2.5f;
+                        moves.add(new PartMove(PartProgress.warmup.curve(Interp.pow2In), 0, -3f, 13));
+                    }}
+                );
+            }};
+            chargeSound = Sounds.lasercharge;
+            shootSound = Sounds.laser;
+            shootEffect = new MultiEffect(Fx.sparkShoot, new Effect(15, e -> {
+                color(Pal.surge);
+
+                for(int i : Mathf.signs){
+                    Drawf.tri(e.x, e.y, 6f * e.fout(), 12f, e.rotation + 90f * i);
+                }
+                Lines.stroke(e.foutpow() * 2.5f + 0.3f);
+                Lines.circle(e.x, e.y, e.fin() * 5.5f);
+                Fill.circle(e.x, e.y, e.foutpow() * 6);
+                color(Color.white);
+                Fill.circle(e.x, e.y, e.foutpow() * 2.5f);
+            }));
+
+            outlineColor = ModPal.quiteDarkOutline;
+            ammo(
+                    FrostItems.magnetite,
+                    new ChainLightningBulletType(){{
+                        lightningColor = Pal.surge;
+                        range = 215;
+                        targetRange = 50;
+                        damage = 160;
+                        distanceDamageFalloff = 4;
+                        chainLightning = 2;
+                        segmentLength = 6;
+                    }}
+            );
+        }};
+
         cryonis = new ItemTurret("cryonis"){{
             requirements(Category.turret, with(FrostItems.stone, 50, FrostItems.rust, 80, FrostItems.aluminium, 120));
             size = 3;
@@ -1283,7 +1367,7 @@ public class FrostBlocks {
             recoil = 0;
             range = 105;
 
-            ammo(Liquids.water, new RicochetBulletType(5, 5, "circle"){{
+            ammo(Liquids.water, new RicochetBulletType(4.5f, 5, "circle"){{
                 chargeEffect = new Effect(40, e -> {
                     color(Liquids.water.gasColor);
                     alpha(Mathf.clamp(e.foutpow() * 2f));
@@ -1327,13 +1411,13 @@ public class FrostBlocks {
                 fragBullets = 3;
                 fragRandomSpread = 15;
                 fragBullet = intervalBullet = new LiquidBulletType(Liquids.water) {{
-                    speed = 3.5f;
-                    lifetime = 25;
+                    speed = 4.2f;
+                    lifetime = 32;
                     orbSize = 2;
                     drag = 0.05f;
                 }};
                 intervalBullets = 1;
-                intervalDelay = 1;
+                //intervalDelay = 1;
                 intervalRandomSpread = 15;
             }});
 

@@ -216,7 +216,6 @@ public class FrostUnits {
                                 under = true;
                                 outline = false;
                                 heatLayerOffset = 0;
-                                heatLight = true;
                             }},
                             new RegionPart("-cover"){{
                                 moves.add(mover);
@@ -227,7 +226,6 @@ public class FrostUnits {
                             new RegionPart("-body"){{
                                 moves.add(mover);
                                 under = true;
-                                heatLight = true;
                             }},
                             new RegionPart("-glow"){{
                                 moves.add(mover);
@@ -627,7 +625,7 @@ public class FrostUnits {
                                 drag = 0.05f;
                             }};
                             intervalBullets = 1;
-                            intervalDelay = 5;
+                            //intervalDelay = 5;
                         }};
 
                         parts.addAll(new RegionPart("-cartridge"){{

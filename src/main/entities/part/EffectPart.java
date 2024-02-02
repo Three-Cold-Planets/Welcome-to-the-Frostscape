@@ -32,14 +32,14 @@ public class EffectPart extends DrawPart {
             float prog = move.progress.get(partParams);
             px += move.x * prog;
             py += move.y * prog;
-            pRanX *= move.gx;
-            pRanY *= move.gy;
+            pRanX += move.gx;
+            pRanY += move.gy;
             prot += move.rot * prog;
         }
 
         Tmp.v1.set(px, py).add(Tmp.v2.set(Mathf.random(-pRanX, pRanX), Mathf.random(-pRanY, pRanY)).rotate(rangeRotation));
         Tmp.v2.set(Tmp.v1).rotate(partParams.rotation - 90);
-        effect.at(partParams.x + Tmp.v2.x, partParams.y + Tmp.v2.y, rotation + partParams.rotation);
+        effect.at(partParams.x + Tmp.v2.x, partParams.y + Tmp.v2.y, prot + partParams.rotation);
 
         if(!mirror) return;
 

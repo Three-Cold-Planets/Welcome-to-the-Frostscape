@@ -6,9 +6,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
-import main.entities.ChainLightningBulletType;
 import main.entities.bullet.BouncyBulletType;
-import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
@@ -19,7 +17,6 @@ import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.entities.bullet.RailBulletType;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.graphics.Pal;
-import mindustry.world.blocks.defense.turrets.PowerTurret;
 
 public class FrostBullets {
     //placeholder used in MoveDamageLineAbility, do not modify!
@@ -173,20 +170,5 @@ public class FrostBullets {
             //Todo: fix calcMinLife
             //calcMinLife();
         }};
-
-        BulletType bullet = ((PowerTurret) Blocks.afflict).shootType;
-        bullet.lightning = 0;
-        bullet.intervalBullet = new ChainLightningBulletType(){{
-            lightningColor = Pal.surge;
-            range = 75;
-            damage = 10;
-            distanceDamageFalloff = 0.05f;
-        }};
-        bullet.intervalDelay = 8;
-        bullet.intervalBullets = 1;
-        bullet.collides = false;
-        bullet.speed /= 1.5f;
-        bullet.lifetime *= 1.5f;
-        ((PowerTurret) Blocks.afflict).reload *= 3;
     }
 }
