@@ -90,50 +90,49 @@ public class FrostBlocks {
 
     public static Block
 
-        //Serpulo Tech
-        unitCargoLoader, unitCargoUnloadPoint,
+    //Serpulo Tech
+    unitCargoLoader, unitCargoUnloadPoint,
 
-        //environment
+    //environment
 
-        //floors - complex
-        grating, plating, platingCross, socket, powerSocket, powerSocketLarge, itemSocket, itemSocketLarge, liquidSocket, liquidSocketLarge,
+    //floors - complex
+    grating, plating, platingCross, socket, powerSocket, powerSocketLarge, itemSocket, itemSocketLarge, liquidSocket, liquidSocketLarge,
 
-        //floors - hollus
-        sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
-        sulphuricIce,
-        frostStone, frostSnow,
-        andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
-        crackedAndesiteFloor, fracturedAndesiteFloor,
-        graystoneFloor, graystoneSlatedFloor,
-        volcanicDaciteFloor, roughVolcanicDaciteFloor,
-        tephra,
+    //floors - hollus
+    sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
+    sulphuricIce,
+    frostStone, frostSnow,
+    andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
+    crackedAndesiteFloor, fracturedAndesiteFloor,
+    graystoneFloor, graystoneSlatedFloor,
+    volcanicDaciteFloor, roughVolcanicDaciteFloor,
+    tephra,
 
-        //floors - volcanic moon
-        maficFloor,
+    //floors - volcanic moon
+    maficFloor,
 
-        //props - hollus
-        algae, frostCluster, wornBoulderLarge, wornBoulderHuge, frostVent,
+    //props - hollus
+    algae, frostCluster, wornBoulderLarge, wornBoulderHuge, frostVent,
 
-        //props - complex
+    //props - complex
 
-        //props - volcanic moon
+    //props - volcanic moon
 
-        maficBoulder,
+    maficBoulder,
 
-        //walls - hollus
-        frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall, tephraWall,
+    //walls - hollus
+    frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall, tephraWall,
 
-        //walls - complex
-        enclosureWall,
+    //walls - complex
+    enclosureWall,
 
-        //walls - volcanic moon
-        maficStone,
+    //walls - volcanic moon
+    maficStone,
 
     //production - hollus
     coreSiphon,
 
     //distribution - complex
-
     itemPlug,
 
     //fluids - complex
@@ -151,6 +150,9 @@ public class FrostBlocks {
     solarReflector,
 
     reflectiveWall,
+
+    //spawn - hollus
+    teleporterFocus,
 
     //power - complex
     powerPlug, powerPlugLarge, conductiveWall,
@@ -556,6 +558,12 @@ public class FrostBlocks {
             requirements(Category.effect, with());
         }};
 
+        teleporterFocus= new Block("teleporter-focus"){{
+            requirements(Category.effect, with(FrostItems.stone, 1337));
+            size = 5;
+            destructible = true;
+        }};
+
         thermalLandmine = new ThermalMine("thermal-landmine"){{
             requirements(Category.effect, with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
             health = 55;
@@ -635,7 +643,7 @@ public class FrostBlocks {
         }};
 
         lightningMine = new LightningMine("lightning-mine"){{
-            requirements(Category.defense, with(Items.silicon, 25, Items.surgeAlloy, 5));
+            requirements(Category.effect, with(Items.silicon, 25, Items.surgeAlloy, 5));
 
             entries.addAll(
                     new UpgradeEntry(FrostUpgrades.improvedBase){{
@@ -1051,7 +1059,9 @@ public class FrostBlocks {
             size = 4;
             health = 153 * size * size;
             reload = 22;
+            shootWarmupSpeed = 0.045f;
             minWarmup = 0.85f;
+            warmupMaintainTime = 45;
             moveWhileCharging = true;
             rotateSpeed = 3;
             range = 215;

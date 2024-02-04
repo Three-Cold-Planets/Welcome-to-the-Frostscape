@@ -1,6 +1,5 @@
 package main.entities;
 
-import arc.Core;
 import arc.audio.Sound;
 import arc.graphics.Color;
 import arc.math.Mathf;
@@ -8,7 +7,6 @@ import arc.math.geom.Position;
 import arc.math.geom.Vec2;
 import arc.struct.IntSeq;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Nullable;
 import arc.util.Time;
 import main.content.Fxf;
@@ -82,7 +80,6 @@ public class ModDamage {
 
             list.each(u -> {
                 float newDamage = power - distanceDamageFalloff * current.dst(u);
-                Log.info(Core.bundle.format("Old power was: {0}, while new one is {1}", power, newPower));
                 if(newPower < 0) return;
                 chain(current, u, collided, hitSound, hitEffect, newDamage * numberMultiplier, initialPower, width, distanceDamageFalloff, pierceDamageFactor, branches, segmentLength, arc, color);
             });
