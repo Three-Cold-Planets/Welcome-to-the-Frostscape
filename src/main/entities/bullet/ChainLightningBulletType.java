@@ -112,6 +112,8 @@ public class ChainLightningBulletType extends BulletType {
             return;
         }
 
+        buildings.sort(build -> build.dst2(aimPos));
+
         int builds = Math.min(charges, buildings.size);
 
         for (int i = 0; i < builds; i++) {

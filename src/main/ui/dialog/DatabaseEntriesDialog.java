@@ -3,8 +3,10 @@ package main.ui.dialog;
 import arc.Core;
 import arc.math.Mathf;
 import arc.scene.style.Drawable;
+import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import main.ui.ModTex;
+import main.ui.dialog.database.FamiliesTable;
 import main.ui.dialog.database.ScannedBlocksTable;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
@@ -19,6 +21,8 @@ public class DatabaseEntriesDialog extends BaseDialog {
     public float padding = 150;
 
     public ScannedBlocksTable scan;
+    public FamiliesTable families;
+
     public DatabaseEntriesDialog(String name){
         super(name);
         this.buttons.defaults().size(210.0F, 64.0F);
@@ -31,11 +35,14 @@ public class DatabaseEntriesDialog extends BaseDialog {
 
         scan = new ScannedBlocksTable();
         scan.rebuild();
+        families = new FamiliesTable();
+        families.rebuild();
 
         addButton("@about.button", Icon.info, this::defaultSetup);
 
         addButton("@category.family", ModTex.hunter, () -> {
             contents.clear();
+            contents.add(families).fill();
         });
 
         addButton("@category.scanning", Icon.zoom, () -> {
@@ -53,10 +60,10 @@ public class DatabaseEntriesDialog extends BaseDialog {
         addCloseButton();
 
         contents.background(Tex.button);
-        cont.add(contents).center().size(Core.graphics.getWidth() - 30, Core.graphics.getHeight() - buttons.getHeight() - padding);
+        cont.add(contents).center().size(Core.graphics.getWidth() - Scl.scl(30), Core.graphics.getHeight() - buttons.getHeight() - Scl.scl(padding));
         buttons.background(Tex.button);
         buttons.image().fillY().color(Pal.darkerGray).width(5);
-        buttons.pane(buttonList).width(Core.graphics.getWidth() - 240).style(Styles.horizontalPane).left();
+        buttons.pane(buttonList).width(Core.graphics.getWidth() - 240).style(Styles.horizontalPane).left().scrollY(false);
         buttonList.fill().left();
         defaultSetup();
     }

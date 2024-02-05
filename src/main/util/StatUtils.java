@@ -25,15 +25,12 @@ public class StatUtils {
         offset = 0;
         stats.add(FrostStats.familyLink, table -> {
             table.row();
+
             families.each(family -> {
                 offset += Mathf.pi/4;
                 table.table(t -> {
                     t.setBackground(Tex.whiteui);
                     Color color = Pal.darkestGray.cpy();
-
-                    ClickListener listener = new ClickListener();
-                    t.addListener(listener);
-                    t.addListener(new HandCursorListener());
 
                     Label label = new Label("More info");
 
@@ -41,6 +38,10 @@ public class StatUtils {
                         tlabel.image(family.icon);
                         tlabel.add(label).size(160, 80);
                     }).left();
+
+                    ClickListener listener = new ClickListener();
+                    t.addListener(listener);
+                    t.addListener(new HandCursorListener());
 
                     t.update(() -> {
                         t.setColor(color.lerp(listener.isOver() ? Pal.lightishGray : Pal.darkestGray, Time.delta));

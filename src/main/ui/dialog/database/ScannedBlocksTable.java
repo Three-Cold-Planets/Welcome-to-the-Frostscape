@@ -35,26 +35,27 @@ import static mindustry.Vars.ui;
 public class ScannedBlocksTable extends Table {
     private TextField search;
     private boolean showLocked = true;
-    private Table all = new Table(), cont = new Table(), mock = new Table();
+    private Table all = new Table(), cont = new Table();
     public ScannedBlocksTable(){
-        super();
         add(cont);
-        this.all.margin(20.0F).marginTop(0.0F);
-        this.cont.table((s) -> {
-            s.image(Icon.zoom).padRight(8.0F);
-            this.search = s.field(null, (text) -> {
-                this.rebuild();
+        all.margin(20).marginTop(0);
+        cont.table((s) -> {
+            s.image(Icon.zoom).padRight(8);
+            search = s.field(null, (text) -> {
+                rebuild();
             }).growX().get();
-            this.search.setMessageText("@players.search");
-        }).fillX().padBottom(4.0F).row();
-        this.cont.pane(this.all).scrollX(false);
+            search.setMessageText("@players.search");
+        }).fillX().padBottom(4).row();
+        cont.pane(all).scrollX(false);
+        cont.top();
         Events.run(EventType.UnlockEvent.class, this::rebuild);
     }
 
 
     public void rebuild(){
-        this.all.clear();
-        String text = this.search.getText();
+
+        all.clear();
+        String text = search.getText();
         ObjectMap<String, Seq<Content>> map = new ObjectMap<>();
         Vars.content.blocks().each(b -> {
             if(b.synthetic() || !(showLocked || b.unlocked())) return;
@@ -83,7 +84,7 @@ public class ScannedBlocksTable extends Table {
             if (array.size != 0) {
                 addHeader(category);
 
-                this.all.table((list) -> {
+                all.table((list) -> {
                     list.left();
                     int cols = (int) Mathf.clamp(((float) Core.graphics.getWidth() - Scl.scl(30.0F)) / Scl.scl(44.0F), 1.0F, 22.0F);
                     int count = 0;
@@ -119,7 +120,7 @@ public class ScannedBlocksTable extends Table {
                     }
 
                 }).growX().left().padBottom(10.0F);
-                this.all.row();
+                all.row();
             }
         });
 
@@ -128,7 +129,7 @@ public class ScannedBlocksTable extends Table {
 
         if(notes.size > 0){
             addHeader("@content.notes.name");
-            this.all.table((list) -> {
+            all.table((list) -> {
                 list.left();
                 int cols = (int) Mathf.clamp(((float) Core.graphics.getWidth() - Scl.scl(30.0F)) / Scl.scl(44.0F), 1.0F, 22.0F);
                 int count = 0;
@@ -164,21 +165,19 @@ public class ScannedBlocksTable extends Table {
                 }
 
             }).growX().left().padBottom(10.0F);
-            this.all.row();
+            all.row();
         }
 
-
-
-        if (this.all.getChildren().isEmpty()) {
-            this.all.add("@none.found");
+        if (all.getChildren().isEmpty()) {
+            all.add("@none.found");
         }
     }
 
     public void addHeader(String category){
-        this.all.add(category).growX().left().color(Pal.accent);
-        this.all.row();
-        this.all.image().growX().pad(5.0F).padLeft(0.0F).padRight(0.0F).height(3.0F).color(Pal.accent);
-        this.all.row();
+        all.add(category).growX().left().color(Pal.accent);
+        all.row();
+        all.image().growX().pad(5.0F).padLeft(0.0F).padRight(0.0F).height(3.0F).color(Pal.accent);
+        all.row();
     }
 
     boolean unlocked(UnlockableContent content) {

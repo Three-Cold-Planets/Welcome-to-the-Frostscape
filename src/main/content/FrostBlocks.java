@@ -96,7 +96,7 @@ public class FrostBlocks {
     //environment
 
     //floors - complex
-    grating, plating, platingCross, socket, powerSocket, powerSocketLarge, itemSocket, itemSocketLarge, liquidSocket, liquidSocketLarge,
+    grating, plating1, plating2, plating3, platingCross, platingVent, platingUnfinished, socket, powerSocket, powerSocketLarge, itemSocket, itemSocketLarge, liquidSocket, liquidSocketLarge, markerX,
 
     //floors - hollus
     sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
@@ -170,7 +170,7 @@ public class FrostBlocks {
             consumesPower = true;
             hasPower = true;
             outputsPower = true;
-
+            inEditor = false;
             consumePowerBuffered(0);
         }};
 
@@ -206,18 +206,35 @@ public class FrostBlocks {
 
         grating = new Floor("grating"){{
             variants = 0;
-            solid = false;
         }};
 
-        plating = new Floor("plating"){{
+        plating1 = new Floor("plating"){{
             variants = 0;
-            solid = false;
+            blendGroup = grating;
+        }};
+
+        plating2 = new Floor("plating2"){{
+            variants = 0;
+            blendGroup = grating;
+        }};
+
+        plating3 = new Floor("plating3"){{
+            variants = 0;
             blendGroup = grating;
         }};
 
         platingCross = new Floor("plating-cross"){{
             variants = 0;
-            solid = false;
+            blendGroup = grating;
+        }};
+
+        platingVent = new Floor("plating-vent"){{
+            variants = 0;
+            blendGroup = grating;
+        }};
+
+        platingUnfinished = new Floor("plating-unfinished"){{
+            variants = 0;
             blendGroup = grating;
         }};
 
@@ -290,6 +307,11 @@ public class FrostBlocks {
             chance = 0.006f;
             blendGroup = socket;
             overrideMapColor = ModPal.glowCyan;
+        }};
+
+        markerX = new Floor("marker-x"){{
+            variants = 0;
+            blendGroup = grating;
         }};
 
         maficFloor = new Floor("mafic-floor");
@@ -462,9 +484,9 @@ public class FrostBlocks {
             variants = 3;
         }};
 
-        sulphurGraystone = new StaticWall("sulphur-graystone"){{
+        sulphurGraystone = new StaticWall("sulfur-graystone"){{
             variants = 3;
-            itemDrop = FrostItems.sulphur;
+            itemDrop = FrostItems.sulfur;
         }};
 
         wornWall = new StaticWall("worn-wall"){{

@@ -13,7 +13,7 @@ public class FrostItems {
     //Meltables items
     ice,
     //Volcanic tech
-    sulphur,
+    sulfur,
     //Gel tech
     algaeMuffin, gel, enzymes, boron;
     public static void load(){
@@ -42,7 +42,7 @@ public class FrostItems {
             color = ModPal.salt;
         }};
 
-        sulphur = new Item("sulphur"){{
+        sulfur = new Item("sulfur"){{
             color = ModPal.sulphur;
             flammability = 0.6f;
             explosiveness = 0.25f;

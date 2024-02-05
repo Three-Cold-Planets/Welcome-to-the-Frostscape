@@ -36,6 +36,7 @@ public class FamilyDescriptionDialog extends BaseDialog {
     public FamilyDescriptionDialog(String name){
         super(name);
         addCloseButton();
+        onResize(() -> build(current));
     }
 
     public void build(Family family){
