@@ -21,9 +21,9 @@ public class ResourceBankHandler implements SaveFileReader.CustomChunk {
         return instance;
     }
 
-    public static PowerModule power = new PowerModule();
-    public static ItemModule items = new ItemModule();
-    public static LiquidModule liquids = new LiquidModule();
+    public static PowerModule power;
+    public static ItemModule items;
+    public static LiquidModule liquids;
 
     //Theese two handle all the logic involved with the graphs
     public static Block block;
@@ -32,7 +32,6 @@ public class ResourceBankHandler implements SaveFileReader.CustomChunk {
 
     public ResourceBankHandler(){
 
-
     }
 
     public static void init(){
@@ -40,10 +39,14 @@ public class ResourceBankHandler implements SaveFileReader.CustomChunk {
         building.block = block;
         block.load();
 
+        power = new PowerModule();
         building.power = power;
         power.graph.add(building);
 
+        liquids = new LiquidModule();
         building.liquids = liquids;
+
+        items = new ItemModule();
         building.items = items;
     }
 
