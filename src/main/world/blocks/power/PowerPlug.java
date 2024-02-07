@@ -52,7 +52,7 @@ public class PowerPlug extends PlugBlock {
         this.addBar("batteries", makeBatteryBalance());
         this.addBar("bank-power", (entity) -> {
             return new Bar(() -> {
-                return Core.bundle.format("bar.bank.poweramount", Float.isNaN(ResourceBankHandler.power.status * ResourceBankHandler.powerCap) ? "<ERROR>" : UI.formatAmount((long)((int)(ResourceBankHandler.power.status * ResourceBankHandler.powerCap))));
+                return Float.isNaN(ResourceBankHandler.power.status * ResourceBankHandler.powerCap) ? "<ERROR>" : Core.bundle.format("bar.bank.poweramount", UI.formatAmount((long) ResourceBankHandler.power.status * ResourceBankHandler.powerCap), UI.formatAmount(ResourceBankHandler.powerCap));
             }, () -> {
                 return Pal.powerBar;
             }, () -> {

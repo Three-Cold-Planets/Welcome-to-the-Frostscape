@@ -10,6 +10,8 @@ import arc.scene.ui.layout.Table;
 import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import main.world.blocks.PlugBlock;
 import main.world.systems.bank.ResourceBankHandler;
 import mindustry.Vars;
@@ -35,6 +37,7 @@ public class ItemPlug extends PlugBlock {
         group = BlockGroup.transportation;
         configurable = true;
         saveConfig = true;
+        copyConfig = true;
         clearOnDoubleTap = true;
         hasItems = true;
         itemCapacity = 50;
@@ -52,7 +55,7 @@ public class ItemPlug extends PlugBlock {
         this.addBar("bank-items", (entity) -> {
             ItemPlugBuild plug = (ItemPlugBuild) entity;
             return new Bar(() -> {
-                return Core.bundle.format("bar.bank.itemamount", plug.stockItem == null || Float.isNaN(ResourceBankHandler.items.get(plug.stockItem)) ? "<ERROR>" : UI.formatAmount((long)((int)(ResourceBankHandler.items.get(plug.stockItem)))));
+                return plug.stockItem == null || Float.isNaN(ResourceBankHandler.items.get(plug.stockItem)) ? "<ERROR>" : Core.bundle.format("bar.bank.itemamount", UI.formatAmount(ResourceBankHandler.items.get(plug.stockItem)), UI.formatAmount(ResourceBankHandler.itemCap));
             }, () -> {
                 return plug.stockItem == null ? Color.red : plug.stockItem.color;
             }, () -> {
@@ -79,24 +82,34 @@ public class ItemPlug extends PlugBlock {
         public float percent = 0;
 
         @Override
+        public Item config(){
+            return stockItem;
+        }
+
+        @Override
         public void updateTile() {
             super.updateTile();
+            stockpile();
             if(timer(timerDump, dumpTime / timeScale)){
                 dump();
                 dump(stockItem);
             }
+        }
+
+        public void stockpile(){
             exchangeTime = Mathf.approach(exchangeTime, pullTime, edelta());
-            if(exchangeTime >= pullTime){
-                exchangeTime = Mathf.mod(exchangeTime, pullTime);
-                if(state == BusState.exporting){
-                    ResourceBankHandler.items.add(stockItem, maxExchanged);
-                    items.remove(stockItem, maxExchanged);
-                }
-                if(state == BusState.importing){
-                    items.add(stockItem, maxExchanged);
-                    ResourceBankHandler.items.remove(stockItem, maxExchanged);
-                }
+            if(exchangeTime >= pullTime) return;
+            exchangeTime = Mathf.mod(exchangeTime, pullTime);
+
+            if(state == BusState.exporting){
+                int taken = ResourceBankHandler.building.acceptStack(stockItem, maxExchanged, ResourceBankHandler.building);
+                items.remove(stockItem, taken);
+                return;
             }
+
+            if(!(state == BusState.importing)) return;
+            int taken = ResourceBankHandler.building.removeStack(stockItem, maxExchanged);
+            acceptStack(stockItem, taken, this);
         }
 
         @Override
@@ -240,6 +253,20 @@ public class ItemPlug extends PlugBlock {
             }
 
             table.marginBottom(-5.0F);
+        }
+
+        @Override
+        public void read(Reads read, byte revision) {
+            super.read(read, revision);
+            int iid = read.s();
+            if(iid != -1) stockItem = Vars.content.item(iid);
+        }
+
+        @Override
+        public void write(Writes write) {
+            super.write(write);
+            if(stockItem == null) write.s(-1);
+            else write.s(stockItem.id);
         }
     }
 }
