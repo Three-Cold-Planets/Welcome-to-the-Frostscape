@@ -133,12 +133,6 @@ public class ItemPlug extends PlugBlock {
                 return;
             }
 
-            if(ResourceBankHandler.building.items.get(stockItem) >= ResourceBankHandler.itemCap){
-                state = BusState.full;
-                time = 0;
-                return;
-            }
-
             percent = ((float) items.get(stockItem)) / itemCapacity;
             if(Mathf.within(percent, target, margin)){
                 state = BusState.stable;
@@ -146,6 +140,12 @@ public class ItemPlug extends PlugBlock {
             }
 
             if(percent > target + margin){
+                if(ResourceBankHandler.building.items.get(stockItem) >= ResourceBankHandler.itemCap){
+                    state = BusState.full;
+                    time = 0;
+                    return;
+                }
+
                 active = true;
 
                 if(time < exchangeDelay){
