@@ -1,23 +1,27 @@
-package main.world.blocks.power;
+package main.world.blocks.plug;
 
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.ui.Image;
 import arc.scene.ui.layout.Table;
+import arc.util.Log;
 import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import main.world.blocks.PlugBlock;
+import main.content.Fxf;
+import main.graphics.ModPal;
 import main.world.systems.bank.ResourceBankHandler;
 import mindustry.Vars;
 import mindustry.core.UI;
 import mindustry.gen.Building;
 import mindustry.gen.Icon;
+import mindustry.graphics.Pal;
 import mindustry.type.Item;
 import mindustry.ui.Bar;
 import mindustry.world.blocks.ItemSelection;
@@ -47,6 +51,10 @@ public class ItemPlug extends PlugBlock {
         this.configClear((build) -> {
             ((ItemPlugBuild) build).stockItem = null;
         });
+        lightColor = Pal.powerLight;
+        lightRadius = 34;
+        workEffect = Fxf.glowSpark;
+        workColor = ModPal.glowCyanTame;
     }
 
     @Override
@@ -98,18 +106,19 @@ public class ItemPlug extends PlugBlock {
 
         public void stockpile(){
             exchangeTime = Mathf.approach(exchangeTime, pullTime, edelta());
-            if(exchangeTime >= pullTime) return;
+            if(exchangeTime < pullTime) return;
             exchangeTime = Mathf.mod(exchangeTime, pullTime);
 
             if(state == BusState.exporting){
-                int taken = ResourceBankHandler.building.acceptStack(stockItem, maxExchanged, ResourceBankHandler.building);
+                int taken = ResourceBankHandler.building.acceptStack(stockItem, Math.min(maxExchanged, items.get(stockItem)), ResourceBankHandler.building);
                 items.remove(stockItem, taken);
+                ResourceBankHandler.building.items.add(stockItem, taken);
                 return;
             }
 
             if(!(state == BusState.importing)) return;
             int taken = ResourceBankHandler.building.removeStack(stockItem, maxExchanged);
-            acceptStack(stockItem, taken, this);
+            items.add(stockItem, taken);
         }
 
         @Override
@@ -182,8 +191,6 @@ public class ItemPlug extends PlugBlock {
         @Override
         public void draw() {
             super.draw();
-            Lines.stroke(2);
-            Draw.color(Color.white);
         }
 
         @Override

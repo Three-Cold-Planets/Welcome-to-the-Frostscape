@@ -1,6 +1,7 @@
-package main.world.blocks;
+package main.world.blocks.plug;
 
 import arc.Core;
+import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.struct.Seq;
@@ -22,6 +23,7 @@ public class PlugBlock extends BaseBlock {
     public DrawBlock drawer;
 
     public Effect workEffect = Fx.none;
+    public Color workColor;
     public float workEffectRange;
     public float effectChance = 0.13f;
     public float warmupSpeed = 0.029f;
@@ -102,7 +104,7 @@ public class PlugBlock extends BaseBlock {
             active = false;
             exchange();
             warmup = Mathf.lerpDelta(this.warmup, active ? 1 : 0, warmupSpeed * this.timeScale);
-            if(Mathf.chance(warmup * effectChance * delta())) workEffect.at(this.x + Mathf.range(workEffectRange), this.y + Mathf.range(workEffectRange));
+            if(Mathf.chance(warmup * effectChance * delta())) workEffect.at(this.x + Mathf.range(workEffectRange), this.y + Mathf.range(workEffectRange), workColor);
         }
 
         public void exchange(){

@@ -45,6 +45,7 @@ public class ModPal {
     darkBlue = Color.valueOf("#4066a9"),
 
     glowCyan = Color.valueOf("1baef8"),
+    glowCyanTame = Color.valueOf("#d0f0eb"),
     glowYellow = Color.valueOf("f8b50d"),
 
     glowMagenta = Color.valueOf("bf08f7"),

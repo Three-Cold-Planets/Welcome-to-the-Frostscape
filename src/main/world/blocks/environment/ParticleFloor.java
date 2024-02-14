@@ -1,5 +1,6 @@
 package main.world.blocks.environment;
 
+import arc.graphics.Color;
 import arc.math.Mathf;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
@@ -11,6 +12,8 @@ public class ParticleFloor extends Floor {
 
     public Effect effect;
 
+    public Color effectColor;
+
     public float chance;
 
     public boolean emitBlocked;
@@ -18,7 +21,8 @@ public class ParticleFloor extends Floor {
     public ParticleFloor(String name) {
         super(name);
         effect = Fx.smoke;
-        chance = 0.05f;
+        effectColor = Color.white;
+        chance = 1;
         emitBlocked = false;
     }
 
@@ -35,7 +39,7 @@ public class ParticleFloor extends Floor {
     public void renderUpdate(UpdateRenderState tile) {
         //gota check twice cause stuff can block the floor
         if(Mathf.chanceDelta(chance) && (emitBlocked || tile.tile.block() == Blocks.air)) {
-            effect.at(tile.tile.worldx(), tile.tile.worldy());
+            effect.at(tile.tile.worldx(), tile.tile.worldy(), effectColor);
         }
     }
 }

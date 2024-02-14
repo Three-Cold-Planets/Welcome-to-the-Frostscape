@@ -82,8 +82,8 @@ public class Fxf {
         Draw.blend();
     }),
 
-    powerSpark = new Effect(16, e -> {
-        Draw.color(Color.white, Pal.powerLight, e.fin());
+    glowSpark = new Effect(16, e -> {
+        Draw.color(Color.white, e.color, e.fin());
         Lines.stroke(e.fout() * 2 + 0.2f);
         Angles.randLenVectors(e.id, 3, 3 + 16 * e.fin(), e.rotation, 180, (x,y) -> {
             Tmp.v1.trns(Mathf.angle(x,y), e.fslope() * 3.6f + 0.7f).add(e.x + x, e.y + y);

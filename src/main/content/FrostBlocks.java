@@ -23,22 +23,20 @@ import main.graphics.ModPal;
 import main.math.Interps;
 import main.math.Math3D;
 import main.util.DrawUtils;
-import main.world.blocks.PlugBlock;
+import main.world.blocks.BankBlock;
+import main.world.blocks.drawers.*;
+import main.world.blocks.plug.PlugBlock;
 import main.world.blocks.core.CoreBunker;
 import main.world.blocks.defense.CrumblingWall;
 import main.world.blocks.defense.LightningMine;
 import main.world.blocks.defense.MinRangeTurret;
 import main.world.blocks.defense.ThermalMine;
-import main.world.blocks.drawers.DrawConstantLight;
-import main.world.blocks.drawers.DrawGenerateLight;
-import main.world.blocks.drawers.DrawUpgradePart;
-import main.world.blocks.drawers.ReflectorDrawer;
 import main.world.blocks.drill.CoreSiphon;
 import main.world.blocks.environment.*;
 import main.world.blocks.light.ReflectiveWall;
 import main.world.blocks.light.SolarReflector;
-import main.world.blocks.power.ItemPlug;
-import main.world.blocks.power.PowerPlug;
+import main.world.blocks.plug.ItemPlug;
+import main.world.blocks.plug.PowerPlug;
 import main.world.systems.bank.ResourceBankHandler;
 import main.world.systems.light.LightBeams;
 import main.world.systems.upgrades.UpgradeEntry;
@@ -164,14 +162,8 @@ public class FrostBlocks {
         //region internal
         //you REALLY don't want to mess with theese
 
-        ResourceBankHandler.block = new Block("resource-bank-handler"){{
-            update = false;
-            destructible = false;
-            consumesPower = true;
-            hasPower = true;
-            outputsPower = true;
-            inEditor = false;
-            consumePowerBuffered(0);
+        ResourceBankHandler.block = new BankBlock("resource-bank-handler"){{
+
         }};
 
         //endregion
@@ -228,9 +220,19 @@ public class FrostBlocks {
             blendGroup = grating;
         }};
 
-        platingVent = new Floor("plating-vent"){{
+        platingVent = new ParticleFloor("plating-vent"){{
             variants = 0;
             blendGroup = grating;
+            effect = new Effect(130, e -> {
+                color(Color.gray);
+                Draw.alpha(e.fin());
+
+                randLenVectors(e.id, 6, 4f + 15f * e.finpow(), (x, y) -> {
+                    Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
+                    Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
+                });
+            });
+            chance = 0.0015f;
         }};
 
         platingUnfinished = new Floor("plating-unfinished"){{
@@ -246,67 +248,63 @@ public class FrostBlocks {
         powerSocket = new PowerPlugFloor("power-socket"){{
             lightColor = ModPal.glowYellow.cpy().a(0.06f);
             secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
-            glowColor = ModPal.glowYellow;
-            effect = Fxf.powerSpark;
+            effect = Fxf.glowSpark;
+            glowColor = overrideMapColor = effectColor = ModPal.glowYellow;
             chance = 0.006f;
             blendGroup = socket;
-            overrideMapColor = ModPal.glowYellow;
         }};
 
         powerSocketLarge = new PowerPlugFloor("power-socket-large"){{
             lightColor = ModPal.glowYellow.cpy().a(0.11f);
             secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
-            glowColor = ModPal.glowYellow;
+            effect = Fxf.glowSpark;
+            glowColor = overrideMapColor = effectColor = ModPal.glowYellow;
             lightRadius = 52;
             secondaryLightRadius = 21;
-            effect = Fxf.powerSpark;
             chance = 0.006f;
             blendGroup = socket;
-            overrideMapColor = ModPal.glowYellow;
         }};
 
         liquidSocket = new GlowingFloor("liquid-socket"){{
             lightColor = ModPal.glowMagenta.cpy().a(0.06f);
             secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
-            glowColor = ModPal.glowMagenta;
-            effect = Fxf.powerSpark;
+            effect = Fxf.glowSpark;
+            glowColor = overrideMapColor = effectColor = ModPal.glowMagenta;
             chance = 0.006f;
             blendGroup = socket;
-            overrideMapColor = ModPal.glowMagenta;
         }};
 
         liquidSocketLarge = new GlowingFloor("liquid-socket-large"){{
             lightColor = ModPal.glowMagenta.cpy().a(0.11f);
             secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
-            glowColor = ModPal.glowMagenta;
+            effect = Fxf.glowSpark;
+            glowColor = overrideMapColor = effectColor = ModPal.glowMagenta;
             lightRadius = 52;
             secondaryLightRadius = 21;
-            effect = Fxf.powerSpark;
             chance = 0.006f;
             blendGroup = socket;
-            overrideMapColor = ModPal.glowMagenta;
         }};
 
         itemSocket = new GlowingFloor("item-socket"){{
             lightColor = ModPal.glowCyan.cpy().a(0.06f);
             secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
-            glowColor = ModPal.glowCyan;
-            effect = Fxf.powerSpark;
+            effect = Fxf.glowSpark;
+            glowColor = overrideMapColor = ModPal.glowCyan;
+            effectColor = ModPal.glowCyanTame;
             chance = 0.006f;
             blendGroup = socket;
-            overrideMapColor = ModPal.glowCyan;
         }};
 
         itemSocketLarge = new GlowingFloor("item-socket-large"){{
             lightColor = ModPal.glowCyan.cpy().a(0.11f);
             secondaryLightColor = lightColor.cpy().lerp(Color.white, 0.15f).a(0.35f);
-            glowColor = ModPal.glowCyan;
+            effect = Fxf.glowSpark;
+            glowColor = overrideMapColor = ModPal.glowCyan;
+            effectColor = ModPal.glowCyanTame;
             lightRadius = 52;
             secondaryLightRadius = 21;
-            effect = Fxf.powerSpark;
             chance = 0.006f;
             blendGroup = socket;
-            overrideMapColor = ModPal.glowCyan;
         }};
 
         markerX = new Floor("marker-x"){{
@@ -766,6 +764,23 @@ public class FrostBlocks {
         itemPlug = new ItemPlug("item-plug"){{
             requirements(Category.distribution, with(FrostItems.rust, 30));
             validFloors.add(itemSocket, itemSocketLarge);
+            drawer = new DrawMulti(new DrawBlock[]{
+                    new DrawDefault(),
+                    new DrawConfigItem(),
+                    new DrawItemGlowRegion(){{
+                        color = Pal.powerLight;
+                    }},
+                    new DrawItemGlowRegion("-glow"){{
+                        color = Color.white;
+                        glowScale = 25;
+                        glowIntensity = 0.25f;
+                        alpha = 0.35f;
+                    }},
+                    new DrawGenerateLight(){{
+                        baseRadius = 84;
+                    }},
+                    new DrawConstantLight()
+            });
         }};
         //endregion
 

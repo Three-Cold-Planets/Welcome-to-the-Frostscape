@@ -1,4 +1,4 @@
-package main.world.blocks.power;
+package main.world.blocks.plug;
 
 import arc.Core;
 import arc.graphics.Color;
@@ -12,7 +12,6 @@ import arc.util.Strings;
 import arc.util.Time;
 import main.content.FrostBlocks;
 import main.content.Fxf;
-import main.world.blocks.PlugBlock;
 import main.world.systems.bank.ResourceBankHandler;
 import mindustry.Vars;
 import mindustry.core.UI;
@@ -22,12 +21,15 @@ import mindustry.ui.Bar;
 import mindustry.world.meta.BlockFlag;
 import mindustry.world.meta.BlockGroup;
 
+import java.awt.*;
+
 import static mindustry.world.blocks.power.PowerNode.makeBatteryBalance;
 
 //Basically a battery which adjusts its own power level
 public class PowerPlug extends PlugBlock {
 
     public float maxExchanged = 4;
+
     public PowerPlug(String name) {
         super(name);
         solid = true;
@@ -41,9 +43,9 @@ public class PowerPlug extends PlugBlock {
         destructible = true;
         update = true;
         validFloors = Seq.with(FrostBlocks.powerSocket, FrostBlocks.powerSocketLarge);
-        lightColor = Color.white.cpy().a(0.25f);
+        lightColor = workColor = Pal.powerLight;
         lightRadius = 34;
-        workEffect = Fxf.powerSpark;
+        workEffect = Fxf.glowSpark;
     }
 
     @Override
