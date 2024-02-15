@@ -13,19 +13,19 @@ import arc.util.Tmp;
 import main.ai.types.FixedFlyingAI;
 import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
+import main.entities.bullet.ChainLightningBulletType;
 import main.entities.bullet.FrostBulletType;
 import main.entities.bullet.RicochetBulletType;
 import main.entities.part.LightPart;
 import main.graphics.ModPal;
+import main.type.HollusTankUnitType;
 import main.type.HollusUnitType;
 import main.type.weapon.ThrustSwingWeapon;
 import main.type.weapon.VelocityWeapon;
+import main.world.meta.Family;
 import mindustry.Vars;
 import mindustry.ai.types.CargoAI;
-import mindustry.content.Fx;
-import mindustry.content.Liquids;
-import mindustry.content.StatusEffects;
-import mindustry.content.UnitTypes;
+import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
 import mindustry.entities.part.DrawPart;
@@ -38,6 +38,8 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
+import mindustry.type.unit.TankUnitType;
+import mindustry.world.meta.Env;
 
 import static arc.graphics.g2d.Draw.alpha;
 import static arc.graphics.g2d.Draw.color;
@@ -52,7 +54,7 @@ public class FrostUnits {
     public static UnitType serpieDrone;
 
     public static HollusUnitType
-    sunspot, javelin, stalagmite, cord, hearth, hearthDefend, hearthAttack;
+    sunspot, javelin, stalagmite, cord, ghoul;
 
     public static HollusUnitType
     upgradeDrone;
@@ -160,148 +162,286 @@ public class FrostUnits {
             });
 
             weapons.add(
-                    new Weapon(){{
-                        shootOnDeath = true;
-                        shootCone = 180;
-                        reload = 60;
-                        ejectEffect = Fx.none;
-                        shootSound = Sounds.none;
-                        x = y = shootY = 0.0f;
-                        mirror = false;
-                        noAttack = true;
-                        controllable = false;
-                        rotate = false;
+                new Weapon(){{
+                    shootOnDeath = true;
+                    shootCone = 180;
+                    reload = 60;
+                    ejectEffect = Fx.none;
+                    shootSound = Sounds.none;
+                    x = y = shootY = 0.0f;
+                    mirror = false;
+                    noAttack = true;
+                    controllable = false;
+                    rotate = false;
 
-                        shoot = new ShootSpread(){{
-                               shots = 4;
-                        }};
-                        inaccuracy = 30;
-                        bullet = new BombBulletType(){{
-                            //Separate shoot effect to help angle the sparks
-                            shootEffect = new Effect(15, e -> {
-                                color(Color.white, Pal.lightOrange, e.fin());
-                                stroke(0.5f + e.fout());
+                    shoot = new ShootSpread(){{
+                           shots = 4;
+                    }};
+                    inaccuracy = 30;
+                    bullet = new BombBulletType(){{
+                        //Separate shoot effect to help angle the sparks
+                        shootEffect = new Effect(15, e -> {
+                            color(Color.white, Pal.lightOrange, e.fin());
+                            stroke(0.5f + e.fout());
 
-                                randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 15, (x, y) -> {
-                                    float ang = Mathf.angle(x, y);
-                                    lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
-                                });
+                            randLenVectors(e.id, 5, e.fin() * 15f, e.rotation, 15, (x, y) -> {
+                                float ang = Mathf.angle(x, y);
+                                lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
                             });
-                            instantDisappear = true;
-                            speed = 5;
-                            fragBullets = 3;
-                            fragRandomSpread = 30;
-                            fragBullet = bouncy;
-                            despawnEffect = hitEffect = Fx.none;
-                        }};
-                    }},
-                    new Weapon(NAME + "-cord-weapon"){{
-                        //I hate how hacky this is, but it's easier for me to do this since im in the IDE already
-                        load = () -> region = outlineRegion = Core.atlas.find("clear");
-                        x = 6.325f;
-                        y = 1.125f;
-                        minWarmup = 0.95f;
-                        shootWarmupSpeed = 0.05f;
-                        shootSound = Sounds.artillery;
-                        reload = 65;
-                        alternate = true;
-                        top = false;
-                        cooldownTime = 75;
-                        shake = 1.75f;
-                        DrawPart.PartMove mover = new DrawPart.PartMove(DrawPart.PartProgress.recoil, 0.2f, -0.12f, 20);
+                        });
+                        instantDisappear = true;
+                        speed = 5;
+                        fragBullets = 3;
+                        fragRandomSpread = 30;
+                        fragBullet = bouncy;
+                        despawnEffect = hitEffect = Fx.none;
+                    }};
+                }},
+                new Weapon(NAME + "-cord-weapon"){{
+                    x = 6.325f;
+                    y = 1.125f;
+                    minWarmup = 0.95f;
+                    shootWarmupSpeed = 0.05f;
+                    shootSound = Sounds.artillery;
+                    reload = 65;
+                    alternate = true;
+                    top = false;
+                    cooldownTime = 75;
+                    shake = 1.75f;
+                    DrawPart.PartMove mover = new DrawPart.PartMove(DrawPart.PartProgress.recoil, 0.2f, -0.12f, 20);
 
-                        parts.addAll(
-                            new RegionPart("-bottom"){{
-                                moves.add(mover);
-                                under = true;
-                                outline = false;
-                                heatLayerOffset = 0;
-                            }},
-                            new RegionPart("-cover"){{
-                                moves.add(mover);
-                                moves.add(new PartMove(PartProgress.warmup, 1.15f, 1f, -40));
-                                under = true;
-                                outline = false;
-                            }},
-                            new RegionPart("-body"){{
-                                moves.add(mover);
-                                under = true;
-                            }},
-                            new RegionPart("-glow"){{
-                                moves.add(mover);
-                                outline = false;
-                                progress = PartProgress.warmup.add(-0.5f).mul(2).clamp();
-                                color = Color.clear;
-                                colorTo = ModPal.specialist;
-                                blending = Blending.additive;
-                            }},
-                            new LightPart(){{
-                                x = 1;
-                                y = 1;
-                                progress = growProgress = PartProgress.warmup.mul(1.25f).clamp().curve(Interp.smoother);
+                    parts.addAll(
+                        new RegionPart("-bottom"){{
+                            moves.add(mover);
+                            under = true;
+                            outline = false;
+                            heatLayerOffset = 0;
+                        }},
+                        new RegionPart("-cover"){{
+                            moves.add(mover);
+                            moves.add(new PartMove(PartProgress.warmup, 1.15f, 1f, -40));
+                            under = true;
+                            outline = false;
+                        }},
+                        new RegionPart("-body"){{
+                            moves.add(mover);
+                            under = true;
+                        }},
+                        new RegionPart("-glow"){{
+                            moves.add(mover);
+                            outline = false;
+                            progress = PartProgress.warmup.add(-0.5f).mul(2).clamp();
+                            color = Color.clear;
+                            colorTo = ModPal.specialist;
+                            blending = Blending.additive;
+                        }},
+                        new LightPart(){{
+                            x = 1;
+                            y = 1;
+                            progress = growProgress = PartProgress.warmup.mul(1.25f).clamp().curve(Interp.smoother);
 
-                                moves.add(mover);
-                                radius = 15;
-                                length = 25;
-                                stroke = 10;
-                                ocapacity = 0.4f;
-                            }}
-                        );
+                            moves.add(mover);
+                            radius = 15;
+                            length = 25;
+                            stroke = 10;
+                            ocapacity = 0.4f;
+                        }}
+                    );
 
 
-                        bullet = new BasicBulletType(5.75f, 15){
-                            @Override
-                            public void init(){
-                                super.init();
-                                range = 16 * 8;
-                            }
+                    bullet = new BasicBulletType(5.75f, 15){
+                        @Override
+                        public void init(){
+                            super.init();
+                            range = 16 * 8;
+                        }
 
-                            {
-                            collidesGround = true;
-                            drag = 0.06f;
-                            shootEffect = Fx.explosion;
-                            hitSound = despawnSound = Sounds.dullExplosion;
-                            hitEffect = despawnEffect = new Effect(25, e -> {
-                                color(Pal.sapBullet);
+                        {
+                        collidesGround = true;
+                        drag = 0.06f;
+                        shootEffect = Fx.explosion;
+                        hitSound = despawnSound = Sounds.dullExplosion;
+                        hitEffect = despawnEffect = new Effect(25, e -> {
+                            color(Pal.sapBullet);
 
-                                e.scaled(6, i -> {
-                                    stroke(3f * i.fout());
-                                    Lines.circle(e.x, e.y, 3f + i.fin() * 15);
-                                });
-
-                                color(Color.gray);
-
-                                randLenVectors(e.id, 5, 2f + 25 * e.finpow(), (x, y) -> {
-                                    Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
-                                });
-
-                                color(Pal.sapBulletBack);
-                                stroke(e.fout());
-
-                                randLenVectors(e.id + 1, 3, 1f + 15 * e.finpow(), (x, y) -> {
-                                    lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
-                                });
-
-                                Drawf.light(e.x, e.y, 45, Pal.sapBulletBack, 0.8f * e.fout());
+                            e.scaled(6, i -> {
+                                stroke(3f * i.fout());
+                                Lines.circle(e.x, e.y, 3f + i.fin() * 15);
                             });
-                            width = 14;
-                            height = 12;
-                            lifetime = 15;
-                            fragBullet = bouncy;
-                            fragLifeMin = 0.5f;
-                            fragLifeMax = 1;
-                            fragVelocityMax = 1;
-                            fragVelocityMin = 0.5f;
-                            fragBullets = 5;
-                            fragRandomSpread = 15;
-                            fragSpread = 2.5f;
-                            status = FrostStatusEffects.conflexInternal;
-                            statusDuration = 75;
-                            frontColor = Color.white;
-                            backColor = Pal.suppress;
-                        }};
-                    }}
+
+                            color(Color.gray);
+
+                            randLenVectors(e.id, 5, 2f + 25 * e.finpow(), (x, y) -> {
+                                Fill.circle(e.x + x, e.y + y, e.fout() * 4f + 0.5f);
+                            });
+
+                            color(Pal.sapBulletBack);
+                            stroke(e.fout());
+
+                            randLenVectors(e.id + 1, 3, 1f + 15 * e.finpow(), (x, y) -> {
+                                lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
+                            });
+
+                            Drawf.light(e.x, e.y, 45, Pal.sapBulletBack, 0.8f * e.fout());
+                        });
+                        width = 14;
+                        height = 12;
+                        lifetime = 15;
+                        fragBullet = bouncy;
+                        fragLifeMin = 0.5f;
+                        fragLifeMax = 1;
+                        fragVelocityMax = 1;
+                        fragVelocityMin = 0.5f;
+                        fragBullets = 5;
+                        fragRandomSpread = 15;
+                        fragSpread = 2.5f;
+                        status = FrostStatusEffects.conflexInternal;
+                        statusDuration = 75;
+                        frontColor = Color.white;
+                        backColor = Pal.suppress;
+                    }};
+                }}
             );
+        }};
+
+        ghoul = new HollusTankUnitType("ghoul"){{
+            families.add(Families.swarm);
+            health = 930;
+            armor = 9;
+            rotateSpeed = 1.6f;
+            speed = 1.2f;
+            constructor = TankUnit::create;
+            hitSize = 14;
+            deathExplosionEffect = new Effect(26, e -> {
+
+                Draw.color(ModPal.swarm, Color.white, e.fin());
+
+                e.scaled(12, e1 -> {
+                    Lines.stroke(e1.fout() * 4.2f);
+                    Lines.circle(e.x, e.y, e.finpow() * 44);
+                });
+
+
+                stroke(1.5f * e.fout());
+
+                randLenVectors(e.id, 9, e.fin() * 38, e.rotation, 360, (x, y) -> {
+                    float ang = Mathf.angle(x, y);
+                    lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
+                });
+
+                randLenVectors(e.id + 1, 5, e.fin() * 20 + 4, e.rotation, 360, (x, y) -> {
+                    Fill.square(e.x + x, e.y + y, e.fout() * 3, 45 + e.fin() * (x + y));
+                });
+
+                Drawf.light(e.x, e.y, 65, ModPal.swarm, 0.8f * e.fout());
+            });
+            weapons.addAll(new Weapon(NAME + "-ghoul-shotgun"){{
+                x = y = 0;
+                mirror = false;
+                reload = 50;
+                shootCone = 15;
+                rotate = true;
+                rotateSpeed = 8;
+                shootSound = Sounds.shootAltLong;
+                shoot = new ShootSpread(){{
+                    shots = 7;
+                    spread = 3;
+                }};
+                velocityRnd = 0.37f;
+                bullet = new BasicBulletType(5.4f, 35, "bullet"){{
+                    width = height = 12;
+                    frontColor = Color.gray;
+                    hitColor = backColor = trailColor = Color.valueOf("ea8878");
+                    frontColor = Pal.redLight;
+                    trailWidth = 3;
+                    trailLength = 3;
+                    hitEffect = despawnEffect = Fx.hitSquaresColor;
+                    drag = 0.05f;
+                    lifetime = 23;
+                    recoil = 0.05f;
+                    knockback = 1.15f;
+                    splashDamage = 15;
+                    splashDamageRadius = 8;
+                }};
+            }},
+            new Weapon(){{
+                shootOnDeath = true;
+                shootCone = 180;
+                reload = 60;
+                ejectEffect = Fx.none;
+                shootSound = Sounds.none;
+                x = y = shootY = 0.0f;
+                mirror = false;
+                noAttack = true;
+                controllable = false;
+                rotate = false;
+
+                inaccuracy = 30;
+
+                bullet = new BulletType() {
+                    int radius = 50;
+                    @Override
+                    public void draw(Bullet b) {
+                        Draw.z(Layer.effect);
+                        Draw.alpha(b.fin());
+                        Draw.color(Color.white);
+                        Fill.circle(b.x, b.y, 4 * b.fout());
+                        Draw.color(ModPal.swarm, Color.white, b.fin() * 0.5f);
+                        Fill.circle(b.x, b.y, 8 * b.foutpow());
+
+                        stroke((0.7f + Mathf.absin(10, 0.7f)) * b.fin() * 1.6f, ModPal.swarm);
+
+                        float progress = b.fin(Interp.smooth);
+
+                        for (int i = 0; i < 6; i++) {
+                            float rot = i * 360f / 6 - 360 * progress;
+                            Lines.arc(b.x, b.y, radius * progress + 3f, 0.08f + b.fin() * 0.06f, rot);
+                        }
+
+                        float fastProgress = Mathf.clamp(progress * 3 - 2);
+
+                        Draw.blend(Blending.additive);
+                        Fill.light(b.x, b.y, 20, radius, Tmp.c1.set(Color.white).lerp(ModPal.swarm, fastProgress).a(fastProgress * 0.2f), Tmp.c2.set(ModPal.swarm).a(0));
+                        Draw.blend();
+                    }
+                    {
+                    lifetime = 75;
+                    speed = 0;
+                    splashDamage = 450;
+                    splashDamageRadius = 30;
+                    shootEffect = despawnEffect = Fx.none;
+                    hitEffect = new Effect(50f, 100f, e -> {
+                        e.scaled(7f, b -> {
+                            color(ModPal.swarm, b.fout());
+                            Draw.blend(Blending.additive);
+                            Fill.light(b.x, b.y, 20, radius, Tmp.c1.set(ModPal.swarm).a(b.fout()), Tmp.c2.set(Tmp.c1).a(b.fin() * b.fslope()));
+                            Draw.blend();
+                        });
+
+                        color(ModPal.swarm);
+                        stroke(e.fout() * 3f);
+                        Lines.circle(e.x, e.y, radius);
+
+                        Fill.circle(e.x, e.y, 12f * e.fout());
+                        color();
+                        Fill.circle(e.x, e.y, 6f * e.fout());
+                        Drawf.light(e.x, e.y, radius * 1.6f, ModPal.swarm, e.fout());
+                    });
+                    hitSound = Sounds.spark;
+                    fragBullet = new ChainLightningBulletType(){{
+                        range = 50;
+                        collidesTeam = true;
+                        lightningColor = ModPal.swarm;
+                        chainLightning = 2;
+                        damage = 150;
+                        distanceDamageFalloff = 2.3f;
+                        pierceDamageFactor = 0.85f;
+                    }};
+                    fragBullets = 3;
+                }};
+            }});
+
+            //treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
         }};
 
         sunspot = new HollusUnitType("sunspot"){{
