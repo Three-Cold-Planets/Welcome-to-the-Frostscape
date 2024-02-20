@@ -453,6 +453,8 @@ public class FrostUnits {
         }};
 
         manta = new HollusTankUnitType("manta"){{
+            lightOpacity = 0.15f;
+            lightRadius = 65;
             constructor = TankUnit::create;
             rotateMoveFirst = false;
             health = 650;
@@ -468,8 +470,8 @@ public class FrostUnits {
                     new Rect(4-36, 54-45, 12, 28)
             };
             weapons.add(new Weapon(NAME + "-manta-weapon"){{
-                bullet = new BaseBulletType(7, 12, "bullet"){{
-                    lifetime = 20;
+                bullet = new BaseBulletType(7, 10, "bullet"){{
+                    lifetime = 30;
                     width = 7;
                     height = 12;
                     pierce = pierceBuilding = true;
@@ -487,7 +489,7 @@ public class FrostUnits {
                 y = -13/4;
                 recoil = 0;
                 recoils = 2;
-                reload = 45;
+                reload = 40;
                 smoothReloadSpeed = 0.25f;
                 inaccuracy = 6;
                 velocityRnd = 0.3f;
@@ -500,8 +502,8 @@ public class FrostUnits {
                     }};
                     dest = new ShootPattern[]{
                         new ShootSpread() {{
-                            shots = 5;
-                            shotDelay = 3;
+                            shots = 7;
+                            shotDelay = 2;
                             spread = 0;
                         }}
                     };
@@ -522,6 +524,14 @@ public class FrostUnits {
                         moveY = -0.5f;
                         recoilIndex = j;
                         moves.add(new PartMove(PartProgress.warmup.compress(0, minWarmup).clamp().curve(Interp.smoother), 1 * sign, -0.5f, 0));
+                        heatProgress = PartProgress.warmup;
+                        children.add(new LightPart(){{
+                            progress = PartProgress.warmup.mul(1.25f).clamp().curve(Interp.smoother);
+                            length = 35;
+                            radius = 5;
+                            stroke = 10;
+                            ocapacity = 0.4f;
+                        }});
                     }});
                     parts.add(new RegionPart("-side-" + (i == 0 ? "l" : "r")){{
                         progress = PartProgress.recoil;

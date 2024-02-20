@@ -94,7 +94,11 @@ public class FrostBlocks {
     //environment
 
     //floors - complex
-    grating, plating1, plating2, plating3, platingCross, platingVent, platingUnfinished, socket, powerSocket, powerSocketLarge, itemSocket, itemSocketLarge, liquidSocket, liquidSocketLarge, markerX,
+    grating,
+    plating1, plating2, plating3, platingCross, platingVent, platingUnfinished,
+    socket, powerSocket, powerSocketLarge, itemSocket, itemSocketLarge, liquidSocket, liquidSocketLarge, markerX,
+    platedRoad, platedRoadHorizontal, platedRoadVertical,
+    metalRoad, metalRoadHorizontal, metalRoadVertical, metalRoadSpikeLeft, metalRoadSpikeRight, metalRoadSpikeBottom, metalRoadSpikeTop,
 
     //floors - hollus
     sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
@@ -311,6 +315,66 @@ public class FrostBlocks {
             variants = 0;
             blendGroup = grating;
         }};
+
+        float roadSpeedMulti = 1.45f;
+
+        platedRoad = new Floor("road-plated"){{
+            variants = 0;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
+        platedRoadHorizontal = new Floor("road-plated-horizontal"){{
+            variants = 0;
+            blendGroup = platedRoad;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
+        platedRoadVertical = new Floor("road-plated-vertical"){{
+            variants = 0;
+            blendGroup = platedRoad;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
+        metalRoad = new Floor("road-metal"){{
+            variants = 0;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
+        metalRoadHorizontal = new Floor("road-metal-horizontal"){{
+            variants = 0;
+            blendGroup = metalRoad;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
+        metalRoadVertical = new Floor("road-metal-vertical"){{
+            variants = 0;
+            blendGroup = metalRoad;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
+        metalRoadSpikeBottom = new Floor("road-metal-spike-bottom"){{
+            variants = 0;
+            blendGroup = metalRoad;
+            speedMultiplier = roadSpeedMulti;
+        }};
+        metalRoadSpikeTop = new Floor("road-metal-spike-top"){{
+            variants = 0;
+            blendGroup = metalRoad;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
+        metalRoadSpikeLeft = new Floor("road-metal-spike-left"){{
+            variants = 0;
+            blendGroup = metalRoad;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
+        metalRoadSpikeRight = new Floor("road-metal-spike-right"){{
+            variants = 0;
+            blendGroup = metalRoad;
+            speedMultiplier = roadSpeedMulti;
+        }};
+
 
         maficFloor = new Floor("mafic-floor");
 
