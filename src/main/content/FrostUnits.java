@@ -8,11 +8,14 @@ import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.geom.Rect;
 import arc.struct.Seq;
 import arc.util.Tmp;
 import main.ai.types.FixedFlyingAI;
+import main.entities.BaseBulletType;
 import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
+import main.entities.bullet.BouncyBulletType;
 import main.entities.bullet.ChainLightningBulletType;
 import main.entities.bullet.FrostBulletType;
 import main.entities.bullet.RicochetBulletType;
@@ -30,8 +33,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.bullet.*;
 import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.RegionPart;
-import mindustry.entities.pattern.ShootBarrel;
-import mindustry.entities.pattern.ShootSpread;
+import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -54,7 +56,7 @@ public class FrostUnits {
     public static UnitType serpieDrone;
 
     public static HollusUnitType
-    sunspot, javelin, stalagmite, cord, ghoul;
+    sunspot, javelin, stalagmite, cord, ghoul, manta;
 
     public static HollusUnitType
     upgradeDrone;
@@ -94,6 +96,7 @@ public class FrostUnits {
                 payloadCapacity = 0.0F;
                 lowAltitude = false;
                 flying = true;
+                outlineColor = ModPal.quiteDarkOutline;
                 drag = 0.06F;
                 speed = 3.5F;
                 rotateSpeed = 9.0F;
@@ -306,12 +309,16 @@ public class FrostUnits {
 
         ghoul = new HollusTankUnitType("ghoul"){{
             families.add(Families.swarm);
-            health = 930;
+            health = 1220;
             armor = 9;
             rotateSpeed = 1.6f;
-            speed = 1.2f;
+            speed = 0.9f;
             constructor = TankUnit::create;
-            hitSize = 14;
+            hitSize = 16;
+
+            treadPullOffset = 2;
+            treadRects = new Rect[]{new Rect(11 - 43, 14 - 43, 14, 65)};
+
             deathExplosionEffect = new Effect(26, e -> {
 
                 Draw.color(ModPal.swarm, Color.white, e.fin());
@@ -345,10 +352,11 @@ public class FrostUnits {
                 shootSound = Sounds.shootAltLong;
                 shoot = new ShootSpread(){{
                     shots = 7;
-                    spread = 3;
+                    spread = 5;
                 }};
+                inaccuracy = 2;
                 velocityRnd = 0.37f;
-                bullet = new BasicBulletType(5.4f, 35, "bullet"){{
+                bullet = new BasicBulletType(9.4f, 35, "bullet"){{
                     width = height = 12;
                     frontColor = Color.gray;
                     hitColor = backColor = trailColor = Color.valueOf("ea8878");
@@ -356,8 +364,8 @@ public class FrostUnits {
                     trailWidth = 3;
                     trailLength = 3;
                     hitEffect = despawnEffect = Fx.hitSquaresColor;
-                    drag = 0.05f;
-                    lifetime = 23;
+                    drag = 0.12f;
+                    lifetime = 13;
                     recoil = 0.05f;
                     knockback = 1.15f;
                     splashDamage = 15;
@@ -435,13 +443,107 @@ public class FrostUnits {
                         chainLightning = 2;
                         damage = 150;
                         distanceDamageFalloff = 2.3f;
-                        pierceDamageFactor = 0.85f;
+                        jumpDamageFactor = 0.85f;
                     }};
                     fragBullets = 3;
                 }};
             }});
 
             //treadRects = new Rect[]{new Rect(12 - 32f, 7 - 32f, 14, 51)};
+        }};
+
+        manta = new HollusTankUnitType("manta"){{
+            constructor = TankUnit::create;
+            rotateMoveFirst = false;
+            health = 650;
+            armor = 2;
+            drag = 0.085f;
+            rotateSpeed = 5.5f;
+            accel = 0.1f;
+            speed = 2.1f;
+            treadFrames = 14;
+            hitSize = 15;
+            treadRects = new Rect[]{
+                    new Rect(6 - 36, 25 - 45, 11, 16),
+                    new Rect(4-36, 54-45, 12, 28)
+            };
+            weapons.add(new Weapon(NAME + "-manta-weapon"){{
+                bullet = new BaseBulletType(7, 12, "bullet"){{
+                    lifetime = 20;
+                    width = 7;
+                    height = 12;
+                    pierce = pierceBuilding = true;
+                    hitEffect = Fx.hitBulletSmall;
+                    pierceCap = 2;
+                    shrinkX = 0;
+                    homingPower = 0.055f;
+                    homingDelay = 3;
+                }};
+                top = true;
+                mirror = false;
+                rotate = true;
+                rotateSpeed = 7.85f;
+                x = 0;
+                y = -13/4;
+                recoil = 0;
+                recoils = 2;
+                reload = 45;
+                smoothReloadSpeed = 0.25f;
+                inaccuracy = 6;
+                velocityRnd = 0.3f;
+                shootWarmupSpeed = 0.025f;
+                linearWarmup = true;
+                minWarmup = 0.85f;
+                shoot = new ShootMulti(){{
+                    source = new ShootAlternate(){{
+
+                    }};
+                    dest = new ShootPattern[]{
+                        new ShootSpread() {{
+                            shots = 5;
+                            shotDelay = 3;
+                            spread = 0;
+                        }}
+                    };
+                }};
+                parts.addAll(
+                    new RegionPart("-base"){{
+                        progress = PartProgress.warmup.compress(0, minWarmup/2).clamp().curve(Interp.smoother);
+                        mirror = true;
+                        moveX = 2;
+                        moveY = -1.5f;
+                    }}
+                );
+                for (int i = 0; i < 2; i++) {
+                    int j = i;
+                    int sign = i == 0 ? -1 : 1;
+                    parts.add(new RegionPart("-barrel-" + (i == 0 ? "l" : "r")){{
+                        progress = PartProgress.recoil;
+                        moveY = -0.5f;
+                        recoilIndex = j;
+                        moves.add(new PartMove(PartProgress.warmup.compress(0, minWarmup).clamp().curve(Interp.smoother), 1 * sign, -0.5f, 0));
+                    }});
+                    parts.add(new RegionPart("-side-" + (i == 0 ? "l" : "r")){{
+                        progress = PartProgress.recoil;
+                        moveY = -0.25f;
+                        recoilIndex = j;
+                        moves.add(new PartMove(PartProgress.warmup.compress(0, minWarmup).clamp().curve(Interp.smoother), 1 * sign, -0.5f, 0));
+                    }});
+                }
+
+                parts.add(new RegionPart("-connector"){{
+                    progress = PartProgress.warmup.compress(minWarmup/2, minWarmup).clamp().curve(Interp.smoother);
+                    color = Color.clear;
+                    colorTo = Color.white;
+                    mixColor = Pal.accent;
+                    mixColorTo = Color.clear;
+                }});
+
+                parts.each(p -> {
+                    RegionPart reg = (RegionPart) p;
+                    reg.layerOffset = 0.01f;
+                });
+            }});
         }};
 
         sunspot = new HollusUnitType("sunspot"){{

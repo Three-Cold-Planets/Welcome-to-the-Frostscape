@@ -36,19 +36,6 @@ public class BaseBulletType extends BasicBulletType {
     }
 
     @Override
-    public void updateTrail(Bullet b) {
-        if (!Vars.headless && this.trailLength > 0) {
-            if (b.trail == null) {
-                b.trail = trailProv.get();
-            }
-
-            b.trail.length = this.trailLength;
-            b.trail.update(b.x, b.y, this.trailInterp.apply(b.fin()) * (1.0F + (this.trailSinMag > 0.0F ? Mathf.absin(Time.time, this.trailSinScl, this.trailSinMag) : 0.0F)));
-        }
-
-    }
-
-    @Override
     public void updateHoming(Bullet b) {
         homing.update(b);
     }
