@@ -15,6 +15,7 @@ import main.ai.types.FixedFlyingAI;
 import main.entities.BaseBulletType;
 import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
+import main.entities.ability.RamDamageAbility;
 import main.entities.bullet.BouncyBulletType;
 import main.entities.bullet.ChainLightningBulletType;
 import main.entities.bullet.FrostBulletType;
@@ -126,7 +127,7 @@ public class FrostUnits {
             lightOpacity = 0.15f;
             lightRadius = 45;
             health = 560;
-            armor = 5;
+            armor = 8;
             speed = 0.85f;
             constructor = MechUnit::create;
             hitSize = 11;
@@ -252,7 +253,7 @@ public class FrostUnits {
                     );
 
 
-                    bullet = new BasicBulletType(5.75f, 15){
+                    bullet = new BasicBulletType(5.75f, 45){
                         @Override
                         public void init(){
                             super.init();
@@ -310,7 +311,7 @@ public class FrostUnits {
         ghoul = new HollusTankUnitType("ghoul"){{
             families.add(Families.swarm);
             health = 1220;
-            armor = 9;
+            armor = 11;
             rotateSpeed = 1.6f;
             speed = 0.9f;
             constructor = TankUnit::create;
@@ -458,11 +459,11 @@ public class FrostUnits {
             constructor = TankUnit::create;
             rotateMoveFirst = false;
             health = 650;
-            armor = 2;
+            armor = 4;
             drag = 0.085f;
             rotateSpeed = 5.5f;
-            accel = 0.1f;
-            speed = 2.1f;
+            accel = 0.075f;
+            speed = 2.7f;
             treadFrames = 14;
             hitSize = 15;
             treadRects = new Rect[]{
@@ -470,16 +471,18 @@ public class FrostUnits {
                     new Rect(4-36, 54-45, 12, 28)
             };
             weapons.add(new Weapon(NAME + "-manta-weapon"){{
-                bullet = new BaseBulletType(7, 10, "bullet"){{
-                    lifetime = 30;
-                    width = 7;
-                    height = 12;
+                bullet = new BaseBulletType(9, 7, "bullet"){{
+                    lifetime = 20;
+                    width = 5;
+                    height = 9;
                     pierce = pierceBuilding = true;
-                    hitEffect = Fx.hitBulletSmall;
                     pierceCap = 2;
+                    hitEffect = Fx.hitBulletSmall;
                     shrinkX = 0;
-                    homingPower = 0.055f;
+                    homingPower = 0.015f;
                     homingDelay = 3;
+                    trailLength = 4;
+                    trailWidth = 1f;
                 }};
                 top = true;
                 mirror = false;
@@ -489,24 +492,15 @@ public class FrostUnits {
                 y = -13/4;
                 recoil = 0;
                 recoils = 2;
-                reload = 40;
+                reload = 7;
                 smoothReloadSpeed = 0.25f;
                 inaccuracy = 6;
                 velocityRnd = 0.3f;
                 shootWarmupSpeed = 0.025f;
                 linearWarmup = true;
                 minWarmup = 0.85f;
-                shoot = new ShootMulti(){{
-                    source = new ShootAlternate(){{
+                shoot = new ShootAlternate(){{
 
-                    }};
-                    dest = new ShootPattern[]{
-                        new ShootSpread() {{
-                            shots = 7;
-                            shotDelay = 2;
-                            spread = 0;
-                        }}
-                    };
                 }};
                 parts.addAll(
                     new RegionPart("-base"){{
@@ -526,11 +520,11 @@ public class FrostUnits {
                         moves.add(new PartMove(PartProgress.warmup.compress(0, minWarmup).clamp().curve(Interp.smoother), 1 * sign, -0.5f, 0));
                         heatProgress = PartProgress.warmup;
                         children.add(new LightPart(){{
-                            progress = PartProgress.warmup.mul(1.25f).clamp().curve(Interp.smoother);
-                            length = 35;
-                            radius = 5;
-                            stroke = 10;
-                            ocapacity = 0.4f;
+                            progress = growProgress = PartProgress.warmup.mul(1.25f).clamp().curve(Interp.smoother);
+                            length = 85;
+                            radius = 35;
+                            stroke = 25;
+                            ocapacity = 0.35f;
                         }});
                     }});
                     parts.add(new RegionPart("-side-" + (i == 0 ? "l" : "r")){{
@@ -553,6 +547,20 @@ public class FrostUnits {
                     RegionPart reg = (RegionPart) p;
                     reg.layerOffset = 0.01f;
                 });
+            }});
+
+            abilities.add(new RamDamageAbility(60, 8, 0, 33/4, 0.75f, 4.1f, 0, 0.75f, 30, true, false, Fx.none, Fx.hitBulletSmall));
+            parts.add(new LightPart(){{
+                x = 1.5f;
+                y = 4;
+                mirror = true;
+                radius = 1;
+                length = 55;
+                stroke = 35;
+                rotation = -10;
+                ocapacity = 0.35f;
+                progress = growProgress = PartProgress.constant(1);
+                moves.add(new PartMove(p -> Mathf.sin(60, 0.5f) + 0.5f, 0, 0, 20));
             }});
         }};
 
@@ -577,7 +585,7 @@ public class FrostUnits {
                         new ActivationEngine(24/4, -30/4, 3.5f, 15 - 90, 0.25f, 1, 1, 7.5f)
             );
             abilities.add(
-                    new MoveDamageLineAbility(9, 40/4, 0.85f, 6/4, 1, 4.5f, 0, true, true, Fx.colorSpark, Fx.hitLancer),
+                    new MoveDamageLineAbility(9, 40/4, 0.85f, 0, 6/4, 1, 4.5f, 0, true, true, Fx.colorSpark, Fx.hitLancer),
                     new MoveArmorAbility(1.2f, 5, 0.6f, true, name + "-glow",Layer.flyingUnit + 0.1f)
             );
 
@@ -731,7 +739,7 @@ public class FrostUnits {
             trailScl = 3;
             engines.add(new ActivationEngine(0, -56/4, 5.5f, -90, 0.45f, 1, 0.6f, 2.25f));
             abilities.add(
-                    new MoveDamageLineAbility(65, 40/4, 0.45f, 20/4, 0.6f, 2.25f, 0, false, true, Fx.generatespark, Fx.sparkShoot),
+                    new MoveDamageLineAbility(65, 40/4, 0.45f, 0, 20/4, 0.6f, 2.25f, 0, false, true, Fx.generatespark, Fx.sparkShoot),
                     new MoveArmorAbility(0.6f, 2.25f, 2.3f, false, name + "-glow", Layer.flyingUnit + 0.1f)
             );
 

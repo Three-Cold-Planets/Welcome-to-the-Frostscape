@@ -2,16 +2,20 @@ package main.content;
 
 import arc.graphics.Color;
 import main.graphics.ModPal;
+import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.type.Item;
 
 public class FrostItems {
+    public static Item
+    //Stones
+    stone, limestone, cryolite,
     //Ferric/Aluminium tech for all biomes
-    public static Item stone, rust, magnetite, bauxite, ferricPanels, aluminium, sodium, thermite,
+    rust, magnetite, bauxite, ferricPanels, aluminium, sodium, calcium, drainCleaner, thermite, infernum,
     //Salts and clays
-    hailite,
+    hailite, lime,
     //Meltables items
-    ice,
+    ice, snow,
     //Volcanic tech
     sulfur,
     //Gel tech
@@ -22,8 +26,16 @@ public class FrostItems {
             color = Color.valueOf("8f8f94");
         }};
 
+        limestone = new Item("limestone"){{
+            color = ModPal.limestone;
+        }};
+
+        cryolite = new Item("cryolite"){{
+            color = ModPal.cryolite;
+        }};
+
         rust = new Item("rust"){{
-            color = Color.valueOf("d0997a");
+            color = ModPal.rust;
         }};
 
         magnetite = new Item("magnetite-shards"){{
@@ -38,8 +50,20 @@ public class FrostItems {
             color = ModPal.ice;
         }};
 
+        snow = new Item("snow"){{
+            color = Blocks.snow.mapColor;
+        }};
+
         hailite = new Item("hailite"){{
             color = ModPal.salt;
+        }};
+
+        lime = new Item("lime"){{
+            color = ModPal.lime;
+        }};
+
+        drainCleaner = new Item("soda-lye"){{
+            color = ModPal.soda;
         }};
 
         sulfur = new Item("sulfur"){{
@@ -60,8 +84,16 @@ public class FrostItems {
             color = ModPal.sodium;
         }};
 
+        calcium = new Item("calcium"){{
+            color = ModPal.calcium;
+        }};
+
         boron = new Item("boron"){{
             color = ModPal.boron;
+        }};
+
+        infernum = new Item("infernum"){{
+            color = ModPal.infernum;
         }};
 
         thermite = new Item("thermite"){{

@@ -14,8 +14,10 @@ public class ModPal {
 
     ferricPanel = Color.valueOf("#eee5f6"),
     sodium = Color.valueOf("#96a1a6"),
+    calcium = Color.valueOf("453230"),
 
     boron = Color.valueOf("a89edd"),
+    infernum = Color.valueOf("e9bfaa"),
 
     ice = Color.valueOf("#9ccaed"),
 
@@ -28,6 +30,13 @@ public class ModPal {
     sulphur = Color.valueOf("#beab77"),
 
     salt = Color.valueOf("e8e4e3"),
+    lime = Color.valueOf("c4cdd4"),
+
+    limestone = Color.valueOf("93938a"),
+    cryolite = Color.valueOf("b0a082"),
+    rust = Color.valueOf("d0997a"),
+
+    soda = Color.valueOf("857260"),
 
     quiteDarkOutline = Color.valueOf("#39343c"),
     specialist = Color.valueOf("#c49ff4"),

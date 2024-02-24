@@ -28,6 +28,7 @@ public class FrostBullets {
 
         placeholder1 = new RailBulletType(){{
             trailEffect = Fx.none;
+            lightRadius = 0;
         }};
 
         pyraGel = new BouncyBulletType(2f, 10, "shell"){{

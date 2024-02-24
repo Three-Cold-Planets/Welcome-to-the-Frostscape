@@ -96,7 +96,10 @@ public class FrostBlocks {
     //floors - complex
     grating,
     plating1, plating2, plating3, platingCross, platingVent, platingUnfinished,
+    gratingRusty,
+    platingRusty, platingRusty2, platingRusty3, platingCrossRusty, platingVentRusty,
     socket, powerSocket, powerSocketLarge, itemSocket, itemSocketLarge, liquidSocket, liquidSocketLarge, markerX,
+    socketRusty,
     platedRoad, platedRoadHorizontal, platedRoadVertical,
     metalRoad, metalRoadHorizontal, metalRoadVertical, metalRoadSpikeLeft, metalRoadSpikeRight, metalRoadSpikeBottom, metalRoadSpikeTop,
 
@@ -126,7 +129,7 @@ public class FrostBlocks {
     frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall, tephraWall,
 
     //walls - complex
-    enclosureWall,
+    enclosureWall, rustyWall, agedWall,
 
     //walls - volcanic moon
     maficStone,
@@ -227,12 +230,12 @@ public class FrostBlocks {
         platingVent = new ParticleFloor("plating-vent"){{
             variants = 0;
             blendGroup = grating;
-            effect = new Effect(130, e -> {
+            effect = new Effect(85, e -> {
                 color(Color.gray);
                 Draw.alpha(e.fin());
 
-                randLenVectors(e.id, 6, 4f + 15f * e.finpow(), (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
+                randLenVectors(e.id, 6, 1f + 3f * e.finpow(), (x, y) -> {
+                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.5f);
                     Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
                 });
             });
@@ -242,6 +245,45 @@ public class FrostBlocks {
         platingUnfinished = new Floor("plating-unfinished"){{
             variants = 0;
             blendGroup = grating;
+        }};
+
+        gratingRusty = new Floor("grating-rusty"){{
+            variants = 2;
+        }};
+        platingRusty = new Floor("plating-rusty"){{
+            variants = 0;
+            blendGroup = gratingRusty;
+        }};
+        platingRusty2 = new Floor("plating-rusty2"){{
+            variants = 0;
+            blendGroup = gratingRusty;
+        }};
+        platingRusty3 = new Floor("plating-rusty3"){{
+            variants = 0;
+            blendGroup = gratingRusty;
+        }};
+        platingCrossRusty = new Floor("plating-cross-rusty"){{
+            variants = 0;
+            blendGroup = gratingRusty;
+        }};
+        platingVentRusty = new ParticleFloor("plating-vent-rusty"){{
+            variants = 0;
+            blendGroup = gratingRusty;
+            chance = 0.15f;
+            effect = new Effect(130, e -> {
+                color(Color.gray, ModPal.rust, e.fin());
+                Draw.alpha(e.fin());
+
+                randLenVectors(e.id, 6, 4f + 15f * e.finpow(), (x, y) -> {
+                    Fill.circle(e.x + x, e.y + y, e.fout() * 5f);
+                    Fill.circle(e.x + x / 2f, e.y + y / 2f, e.fout());
+                });
+            });
+        }};
+
+        socketRusty = new Floor("socket-rusty"){{
+            variants = 0;
+            blendGroup = gratingRusty;
         }};
 
         socket = new Floor("socket"){{
@@ -525,6 +567,10 @@ public class FrostBlocks {
         }};
 
         enclosureWall = new StaticWall("enclosure-wall");
+
+        rustyWall = new StaticWall("rusty-wall");
+
+        agedWall = new StaticWall("aged-wall");
 
 
         maficStone = new StaticWall("mafic-stone");
