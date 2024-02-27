@@ -27,7 +27,9 @@ import main.util.WeatherUtils;
 import main.world.meta.Family;
 import main.world.meta.LoreNote;
 import main.world.systems.bank.ResourceBankHandler;
+import main.world.systems.heat.ExampleHeatSetup;
 import main.world.systems.heat.TileHeatControl;
+import main.world.systems.heat.TileHeatOverlay;
 import main.world.systems.light.LightBeams;
 import main.world.systems.research.ResearchHandler;
 import main.world.systems.upgrades.Upgrade;
@@ -64,6 +66,8 @@ public class Frostscape extends Mod{
     public static ScriptedSectorHandler sectors = new ScriptedSectorHandler();
     public static SelectOverlay selection = new SelectOverlay();
     public static ScanningOverlay scan = new ScanningOverlay();
+
+    public static TileHeatOverlay heatOverlay;
 
     public Frostscape(){
 
@@ -125,13 +129,25 @@ public class Frostscape extends Mod{
 
         Events.run(WinEvent.class, this::loadSplash);
 
+        TileHeatControl heat = TileHeatControl.get();
+
         //Most of theese are singletons for the sake of being able to port these over to the Arctic-Insurrection mod more easly.
         SaveVersion.addCustomChunk("upgrade-handler", UpgradeHandler.get());
-
         SaveVersion.addCustomChunk("research-handler", ResearchHandler.get());
-        SaveVersion.addCustomChunk("tile-heat-control", TileHeatControl.get());
+        //Note: Do NOT change the name to tile-heat-control. Please.
+        //SaveVersion.addCustomChunk("tile-heat", heat);
         SaveVersion.addCustomChunk("light-beams", LightBeams.get());
         SaveVersion.addCustomChunk("resource-bank", ResourceBankHandler.get());
+
+        heat.setup = new ExampleHeatSetup();
+
+        heat.setup.initialize(heat);
+
+        heatOverlay = new TileHeatOverlay();
+
+        Events.run(EventType.WorldLoadEvent.class, () -> {
+            if(!Vars.state.isEditor()) heat.start(Vars.world.width(), Vars.world.height());
+        });
 
         Events.on(StateChangeEvent.class, e -> {
             if(e.from == GameState.State.playing && e.to == GameState.State.menu) LightBeams.get().lights.clear();
@@ -225,6 +241,7 @@ public class Frostscape extends Mod{
     }
 
     void loadSettings(){
+        heatOverlay.enabled = Core.settings.getBool("settings.frostscape-heat-overlay", false);
         ui.settings.addCategory(Core.bundle.get("settings.frostscape-title"), NAME + "-hunter", t -> {
             t.sliderPref(Core.bundle.get("settings.frostscape-parallax"), 100, 1, 100, 1, s -> s + "%");
             t.sliderPref(Core.bundle.get("settings.frostscape-wind-visual-force"), 1, 0, 8, 1, s -> s * 100 + "%");
@@ -233,6 +250,9 @@ public class Frostscape extends Mod{
             });
             t.row();
             t.add(Core.bundle.get("settings.frostscape.flashingwarning")).wrap().left().growX().padTop(3);
+            t.checkPref(Core.bundle.get("settings.frostscape-heat-overlay"), false, b -> {
+                heatOverlay.enabled = b;
+            });
         });
     }
 

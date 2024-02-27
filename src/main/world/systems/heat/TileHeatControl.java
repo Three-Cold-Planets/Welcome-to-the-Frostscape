@@ -2,9 +2,9 @@ package main.world.systems.heat;
 
 import arc.Core;
 import arc.math.Mathf;
-import arc.math.geom.Geometry;
-import arc.struct.IntMap;
+import arc.struct.*;
 import arc.util.Log;
+import main.world.systems.heat.TileHeatSetup;
 import mindustry.gen.Call;
 import mindustry.io.SaveFileReader;
 
@@ -17,56 +17,368 @@ import java.util.Arrays;
 //Class which stores and controls the heat in both blocks and floors and their flow.
 public class TileHeatControl implements SaveFileReader.CustomChunk {
 
-    public static TileHeatControl instance;
+    static TileHeatControl instance;
 
-    public static TileHeatControl get(){
-        if(instance == null) return instance = new TileHeatControl();
+    public static TileHeatControl get() {
+        if (instance == null) instance = new TileHeatControl();
         return instance;
     }
-    public TileHeatSetup setup;
+
+    public TileHeatControl(){
+
+    }
+
+    public static TileHeatSetup setup;
+
+    static HeatState tmpS1, tmpS2;
+
+    static GridTile tmpT1, tmpT2, tmpT3;
 
     //Ambient Temperature in celsius
-    public float ambientTemperature = 303.15f,
-    //Rate at which non-shielded block's energy changes toward the ambient temp in kelvins
-    envTempChange = 0.01f;
-    private static MaterialPreset tmpMP1 = new MaterialPreset(), tmpMP2 = new MaterialPreset();
+    public static float ambientTemperature = 303.15f,
+    //How conductive the atmosphere is
+    envTempChange = 0.3f;
 
-    //
+    public static MaterialPreset tmpMP1 = new MaterialPreset(), tmpMP2 = new MaterialPreset();
+
     public static MaterialPreset defaultFloor = new MaterialPreset(0.12f, 1),
             defaultBlock = new MaterialPreset(0.07f, 3),
-            defaultAir = new MaterialPreset(0.4f, 0.6f);
-    public float simulationSpeed = 1;
+            defaultAir = new MaterialPreset(0.4f, 0.6f),
+            vacuum = new MaterialPreset(0, 0);
+
+    public static float simulationSpeed = 1;
     public static boolean enabled;
 
     public boolean gridLoaded = false;
 
     private static final ArrayList<MaterialPreset> presetList = new ArrayList<>();
 
-    //Used to match up tile indexes with their correct properties. Reinitialized every time the world is loaded.
-        public final IntMap<MaterialPreset> tilePropertyAssociations = new IntMap<>();
 
-    //The array is separated into two parts. The first bit is the floor tiles, and second bit is the block tiles. A floor tile occupies the same tile as a block tile when the index for the floor + s gets to the block
-    public float[] energyValues, massValues;
+    //List storing all grid state chunks
+    public static Seq<Chunk> gridChunks;
 
-    //I wanted to use a single array for this and the realized how painful that might be/itterating through it all, just want to get it working rn ;~:
-    //The arrays of the array in the flowmap store data about a tile's neighbours and the flow of heat between them.
-    public float[][] neighbourFlowmap;
+    //List of all grid states
+    public static Seq<GridTile> gridTiles;
+
+    //Sequence storing all non-grid tile states.
+    public static Seq<HeatState> entityStates;
 
     public HeatRunnerThread heatThread;
-    public int w, h, s;
+
+    //Width, height and size of the world
+    public int w, h, s,
+    //Width and height of the chunk sections
+    chunkW, chunkH;
+
+    //Chunk size. DO NOT CHANGE UNLESS YOU KNOW WHAT YOU'RE DOING
+    public int chunkSize = 16;
 
     public void setupThread(){
         heatThread = new TileHeatControl.HeatRunnerThread();
         heatThread.setPriority(Thread.NORM_PRIORITY - 1);
         heatThread.setDaemon(true);
         heatThread.start();
+        Log.info("Started Heat Threat");
     }
-    public void setTileValues(int index, float energy, float mass, MaterialPreset preset){
-        energyValues[index] = energy;
-        massValues[index] = mass;
-        tilePropertyAssociations.put(index, preset);
+
+    public void start(int width, int height){
+        Log.info("Starting Heat!");
+        initializeValues();
+        createGrid(width, height);
+        setup.setupGrid(this);
+        gridLoaded = true;
     }
+
+    public GridTile getTile(int x, int y){
+        if(x < 0 || y < 0 || x >= w || y >= h) return null;
+        return gridTiles.get(x + y * w);
+    }
+
+    @Deprecated
+    public GridTile getTile(int index){
+        return gridTiles.get(index);
+    }
+    public void createGrid(int w, int h){
+        this.w = w;
+        this.h = h;
+
+        s = w * h;
+        gridChunks = new Seq<>(true, s);
+        gridTiles = new Seq<>(true);
+        entityStates = new Seq<>(false);
+
+        //How many chunks can be fit horizontally and vertically
+        chunkW = Mathf.ceil(((float) w)/chunkSize);
+        chunkH = Mathf.ceil(((float) h)/chunkSize);
+
+        //Set up chunks. Some will bee less than optimally sized, due to hitting the map border.
+        for (int y = 0; y < chunkH; y++) {
+            for (int x = 0; x < chunkW; x++) {
+
+                int width = x == chunkW - 1 ? chunkSize - Mathf.mod(w, chunkSize) : chunkSize;
+                int height = y == chunkH - 1 ? chunkSize - Mathf.mod(w, chunkSize) : chunkSize;
+
+                Chunk current = new Chunk(x * chunkSize, y * chunkSize, width, height, true);
+                gridChunks.add(current);
+            }
+        }
+        Log.info("Chunks created!");
+
+        //Setup chunks + neighbours.
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                //Get current chunk
+                int index = x/chunkSize + y/chunkSize * chunkW;
+                Chunk current = gridChunks.get(index);
+                tmpT1 = new GridTile(current, x, y);
+                gridTiles.add(tmpT1);
+                current.tiles.add(tmpT1);
+            }
+        }
+
+        //Setup neighbours
+        for (int i = 0; i < s; i++) {
+            GridTile current = gridTiles.get(i);
+
+            tmpT1 = getTile(current.x - 1, current.y);
+            if(tmpT1 != null) {
+                current.adjacent.add(tmpT1);
+                tmpT1.adjacent.add(current);
+            }
+
+            tmpT1 = getTile(current.x, current.y - 1);
+            if(tmpT1 == null) continue;
+            current.adjacent.add(tmpT1);
+            tmpT1.adjacent.add(current);
+        }
+        Log.info("Grid created!");
+    }
+
+    public void tick(){
+        //Log.info("Ticking");
+        updateFlow();
+        setup.update(this);
+        finalizeEnergy();
+    }
+
+    //Note that ambient heat is factored in after flow calculations
+    public void updateFlow()
+    {
+        gridChunks.each(Chunk::update);
+        //entityStates.each(GridHeatState::updateState);
+    }
+
+    public void finalizeEnergy()
+    {
+        gridTiles.each(GridTile::finalizeEnergy);
+        //entityStates.each(GridHeatState::finalizeEnergy);
+    }
+
+    //Note that this ignores surface area. That logic should be implemented in the object calling this
+    public static float calculateFlow(float mass1, float mass2, float temp1, float temp2, MaterialPreset preset1, MaterialPreset preset2){
+
+        //Debug.Log("Going from tile: " + tile1 + " to " + tile2);
+
+        //Don't transfer heat if either masses are below 1 g. Obviously this should never happen but eh
+        if (mass1 + mass2 < 2) {
+            return 0;
+        }
+
+        float tempretureDif = temp2 - temp1;
+
+        //Don't bother calculating if tempreture difference is less than 1 celcius
+        if (Math.abs(tempretureDif) < 1f) {
+            return 0;
+        }
+
+        float geomThermalConductivity = Mathf.sqrt(preset1.thermalConductivity * preset2.thermalConductivity);
+        float flowAmount = geomThermalConductivity * tempretureDif * simulationSpeed;
+
+        //Don't bother using if energy flow is less than 0.1 units
+        if (Math.abs(flowAmount) < 0.1f) return 0;
+
+        //Cap change of energy to 1/5 of the temp difference changed per tick
+        float maxTempDif = Math.min(Math.abs(tempretureDif * mass1 * preset1.specificHeatCapacity),
+                Math.abs(tempretureDif * mass2 * preset2.specificHeatCapacity))/5;
+
+        return Mathf.clamp(flowAmount, -maxTempDif, maxTempDif);
+    }
+
+    //Note that this assumes all blocks of air are uniformly sized and in constant contact with the atmosphere for the full duration between heat ticks.
+    // Accounting for this would add unnecessary bloat to this relatively simple method.
+    public static float calculateFlowAtmosphere(float mass, float temp, MaterialPreset preset){
+        
+        float tempretureDif = ambientTemperature - temp;
+        float geomThermalConductivity = Mathf.sqrt(preset.thermalConductivity * envTempChange);
+        float flowAmount = geomThermalConductivity * tempretureDif * simulationSpeed;
+        
+        //Cap change of energy to 1/5 of the temp difference changed per tick based only on the mass interacting with the atmosphere.
+        float maxTempDif = Math.abs(tempretureDif/5 * mass * preset.specificHeatCapacity);
+
+        
+        return Mathf.clamp(flowAmount, -maxTempDif, maxTempDif);
+    }
+    
+    public void initializeValues(){
+
+    }
+    public static float kelvins(HeatState state){
+        return kelvins(state.energy, state.mass, state.material.specificHeatCapacity);
+    }
+
+    public static float celsius(HeatState state){
+        return kelvins(state) - 273.15f;
+    }
+    public static float kelvins(float energy, float mass, float SPH){
+        return energy/(mass*SPH);
+    }
+
+    public static float celsius(float energy, float mass, float SPH){
+        return kelvins(energy, mass, SPH) - 273.15f;
+    }
+
+    /**
+     * Handles an exchange of heat between two grid tiles, of which the first parameter is the origin.
+     */
+    public static void handleExchange(HeatState state1, HeatState state2){
+        float flow = calculateFlow(state1.mass, state2.mass, kelvins(state1), kelvins(state2), state1.material, state2.material);
+
+        //Flow calculations are reused for both tiles, keeping with conservation of energy, and avoiding double ups on calculation.
+        state1.flow += flow;
+        state2.flow -= flow;
+    }
+
+    @Override
+    public void write(DataOutput stream) throws IOException {
+        /*
+        stream.writeBoolean(enabled);
+        if(!enabled) return;
+        for (int i = 0; i < s; i++) {
+            tmpS1 = gridStates.get(s);
+            stream.writeFloat(tmpS1.energy);
+            stream.writeFloat(tmpS1.mass);
+        }
+         */
+    }
+
+    public void writeState(DataOutput stream, GridHeatState state){
+    }
+
+    @Override
+    public void read(DataInput stream) throws IOException {
+        /*
+        enabled = stream.readBoolean();
+        if(!enabled) return;
+        for (int i = 0; i < s * 2; i++) {
+            tmpS1.energy = stream.readFloat();
+            tmpS1.mass = stream.readFloat();
+        }
+         */
+    }
+
+    public static abstract class HeatState{
+        public HeatState(){
+            enabled = false;
+            material = vacuum;
+        }
+        public float energy, mass, flow, lastFlow;
+
+        public MaterialPreset material;
+
+        public abstract void finalizeEnergy();
+
+        public void setStats(float energy, float mass, MaterialPreset material){
+            this.energy = energy;
+            this.mass = mass;
+            this.material = material;
+        }
+    }
+
+    public static class GridHeatState extends HeatState {
+
+        public GridHeatState(){
+            super();
+        }
+
+        //If false, flow going from and to this state will not be calculated, however other functionality is untouched.
+        public boolean enabled;
+        public Chunk chunk;
+
+        @Override
+        public void finalizeEnergy(){
+            energy += flow;
+            chunk.totalFlow += flow;
+            //For debugging purposes
+            lastFlow = flow;
+            flow = 0;
+        }
+    }
+
+    /**
+     * A class that stores energy, mass and energy. Position data + size handled by the chunk indexes
+     * NOTE THAT WHEN ADDING TO THE STATE'S ENERGY, USE FLOW INSTEAD OF ENERGY.
+     */
+
+    public static class GridTile {
+
+        public int x, y;
+        /**
+         * Having enabled be on both GridTile and GridHeatState allows more flexible arrangements of tiles
+         */
+        public boolean enabled;
+
+        public boolean shielded;
+
+        /**
+         * If the tile has a solid block on it. If false, the floor exchanges temperature directly with the air
+         * Note that having a disabled block will prevent floor and air states from exchanging
+         */
+        public boolean solid;
+
+        public GridHeatState floor;
+        public GridHeatState block;
+        public GridHeatState air;
+        public Chunk owner;
+
+        //All cardinally adjacent tiles.
+        public Seq<GridTile> adjacent,
+
+        //Updates queued to happen. Removed when another tile on the list updates this. No updates are queued for tiles in disabled chunks.
+        updates;
+
+        public GridTile(Chunk owner, int x, int y){
+            this.x = x;
+            this.y = y;
+            enabled = true;
+            adjacent = new Seq();
+            updates = new Seq();
+
+            floor = new GridHeatState();
+            block = new GridHeatState();
+            air = new GridHeatState();
+            this.owner = floor.chunk = block.chunk = air.chunk = owner;
+        }
+
+        public GridHeatState top(){
+            return solid ? block : floor;
+        }
+        public void finalizeEnergy(){
+            floor.finalizeEnergy();
+            block.finalizeEnergy();
+            air.finalizeEnergy();
+            updates.set(adjacent);
+        }
+    }
+
     public static class MaterialPreset{
+        public float
+        //How conductive the material is. More Thermal Conductivity means more flow of heat between the tile and it's neighbours.
+        // Conductivity works on averages, so something with almost no conductivity next to something with high conductivity will still conduct heat.
+        thermalConductivity,
+
+        //How much energy it takes to raise one unit of mass by one kelvin. This one is self-explanatory.
+        specificHeatCapacity;
+
         public MaterialPreset(){
 
         }
@@ -75,193 +387,71 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
             this.thermalConductivity = thermalConductivity;
             this.specificHeatCapacity = specificHeatCapacity;
         }
-        public float
-                //How conductive the material is. More Thermal Conductivity means more flow of heat between the tile and it's neighbours.
-                // Conductivity works on averages, so something with almost no conductivity next to something with high conductivity will still conduct heat.
-                thermalConductivity,
-                //How much energy it takes to raise one unit of mass one kelvin. This one is self-explanatory.
-                specificHeatCapacity;
     }
 
-    public void start(int width, int height){
-        initializeValues();
-        createGrid(width, height);
-        setup.setupGrid(this);
-        gridLoaded = true;
-    }
+    /**
+     * An area of the grid which can be disabled/enabled, and updated.
+     */
+    public static class Chunk{
 
-    public float getEnergy(int x, int y, boolean floor){
-        return getEnergy(x + y * w + (floor ? s : 0));
-    }
+        public int x, y, width, height;
+        public Seq<GridTile> tiles;
 
-    public float getEnergy(int index){
-        return energyValues[index];
-    }
+        public int size;
+        public boolean enabled;
+        public int disabledCounter;
 
-    public float getMass(int x, int y, boolean floor){
-        return getMass(x + y * w + (floor ? s : 0));
-    }
+        public float totalFlow;
 
-    public float getMass(int index){
-        return massValues[index];
-    }
 
-    public float[] neighbours(int tile){
-        return neighbourFlowmap[tile];
-    }
-    public void createGrid(int w, int h){
-        this.w = w;
-        this.h = h;
-        //How large a single grid is on the array
-        s = w * h;
-        energyValues = new float[s];
-        massValues = new float[s];
-        neighbourFlowmap = new float[s][8];
+        public Chunk(int x, int y, int width, int height, boolean enabled){
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            tiles = new Seq<>();
+            this.enabled = enabled;
+            disabledCounter = 0;
+        }
 
-        //Set up neighbours
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                int index = x + y * w;
-                for (int i = 0; i < 4; i++) {
-                    int sideIndex = index + Geometry.d4x(i) + Geometry.d4y(i) * w;
-                    if(sideIndex < 0 || sideIndex >= s) {
-                        neighbourFlowmap[index][i * 2] = -1;
-                        continue;
-                    }
-                    //Set up both floor and block tiles with their respective neighbours
-                    int side = i * 2;
-                    int otherSide = (side + 4) % 8;
+        /**
+         * Updates grid state flows for their right and top neighbours, going from bottom left to top right.
+         */
+        public void update(){
 
-                    neighbourFlowmap[index][side] = sideIndex;
-                    neighbourFlowmap[sideIndex][otherSide] = index;
+            //If chunk is disabled, blocks inside won't update neighbours, but neighbours can still update them
+            if(!enabled) return;
+
+            for (GridTile tile: tiles) {
+                //In cases where no exchange should be possible - especially in space - skip all flow calculations
+                //This lets tiles outside disabled chunks handle neighbours properly
+                if(!tile.enabled) continue;
+
+                //Do adjacency calculation for each layer of the tile
+                GridHeatState floor = tile.floor;
+                GridHeatState block = tile.block;
+                GridHeatState air = tile.air;
+
+                GridHeatState top = tile.solid ? block : floor;
+
+                tile.updates.each(target -> {
+                    if(!target.enabled) return;
+
+                    //It's either this check, or queueing updates in *all* GridTiles
+                    if(target.updates.contains(tile)) target.updates.remove(tile);
+
+                    if(floor.enabled && target.floor.enabled) handleExchange(floor, target.floor);
+                    if(block.enabled && target.block.enabled) handleExchange(block, target.block);
+                    if(air.enabled && target.air.enabled) handleExchange(air, target.air);
+                });
+                tile.updates.clear();
+
+                if(air.enabled) air.flow += calculateFlowAtmosphere(air.mass, kelvins(air), air.material);
+
+                if(top.enabled && air.enabled && !tile.shielded){
+                    handleExchange(top, air);
                 }
             }
-        }
-    }
-
-    public void tick(){
-        setup.update(this);
-        updateFlow();
-        updateEnergy();
-    }
-
-    //Note that ambient heat is factored in after flow calculations
-    public void updateFlow()
-    {
-        //Got to loop through every tile here...
-        for (int i = 0; i < s; i++) {
-            //Flow values associated with the tile index are stored every second entry in the array, and start halfway through
-
-                MaterialPreset preset = tilePropertyAssociations.get(i);
-                float kelvins = kelvins(i);
-                float mass = massValues[i];
-                for (int j = 5; j < 9; j += 2) {
-                    int side = j - 1;
-                    int neighbourIndex = (int) neighbourFlowmap[i][side];
-                    if(neighbourIndex == -1) continue;
-                    int otherSide = (side + 4) % 8;
-                    float flow = calculateFlow(mass, massValues[neighbourIndex], kelvins, kelvins(neighbourIndex), preset, tilePropertyAssociations.get(neighbourIndex));
-
-                    neighbourFlowmap[i][side + 1] = flow;
-                    neighbourFlowmap[neighbourIndex][otherSide + 1] = -flow;
-                }
-            }
-    }
-
-    public void updateEnergy(){
-        for (int i = 0; i < s; i++) {
-            for (int j = 0; j < 8; j += 2) {
-
-                int otherSide = (j + 4) % 8;
-                //Add 1 to get the associated flow values
-                energyValues[i] += neighbourFlowmap[i][j + 1];
-            }
-        }
-    }
-
-    public float calculateFlow(float mass1, float mass2, float temp1, float temp2, MaterialPreset preset1, MaterialPreset preset2){
-
-        //Debug.Log("Going from tile: " + tile1 + " to " + tile2);
-
-        //Don't transfer heat if either masses are below 1 g. Obviously this should never happen but eh
-        if (mass1 + mass2 < 2) return 0;
-
-        float tempretureDif = temp2 - temp1;
-
-        //Debug.Log("Starting tempretures are " + tile1.energy + " and " + tile2.energy);
-
-        //Debug.Log("Tempreture difference is: " + tempretureDif);
-
-        //Don't bother calculating if tempreture difference is less than 1 celcius
-        if (Math.abs(tempretureDif) < 1f) return 0;
-
-        float geomThermalConductivity = Mathf.sqrt(preset1.thermalConductivity * preset2.thermalConductivity);
-
-
-        float flowAmount = geomThermalConductivity * tempretureDif * simulationSpeed;
-
-        //Debug.Log(flowAmount);
-
-        //Don't bother using if energy flow is less than 0.1 units
-        if (Math.abs(flowAmount) < 0.1f) return 0;
-
-
-        //Cap change of energy to 1/5 of the temp difference changed per tick
-        float maxTempDif = Math.min(Math.abs(tempretureDif/5 * mass1 * preset1.specificHeatCapacity),
-                Math.abs(tempretureDif / 5 * mass2 * preset2.specificHeatCapacity));
-
-        //Debug.Log("Flow amount is " + flowAmount + " with max of " + maxTempDif);
-        //Debug.Log("Flow is " + Mathf.Clamp(flowAmount, -maxTempDif, maxTempDif));
-
-        return Mathf.clamp(flowAmount, -maxTempDif, maxTempDif);
-    }
-    public void initializeValues(){
-
-    }
-    public float kelvins(int index){
-        tmpMP1 = tilePropertyAssociations.get(index);
-        if(tmpMP1 == null) {
-            return 0;
-        }
-        return kelvins(energyValues[index], massValues[index], tmpMP1.specificHeatCapacity);
-    }
-
-    public float celsius(int index){
-        return kelvins(index) - 273.15f;
-    }
-    public float kelvins(float energy, float mass, float SPH){
-        return energy/(mass*SPH);
-    }
-
-    public float celsius(float energy, float mass, float SPH){
-        return kelvins(energy, mass, SPH) - 273.15f;
-    }
-
-    public float totalFlow(int index){
-        float total = 0;
-        for(int i = 1; i < 8; i += 2){
-            total += Math.abs(neighbourFlowmap[index][i]);
-        }
-        return total;
-    }
-
-    @Override
-    public void write(DataOutput stream) throws IOException {
-        stream.writeBoolean(enabled);
-        if(!enabled) return;
-        for (int i = 0; i < s; i++) {
-            stream.writeFloat(energyValues[i]);
-            stream.writeFloat(massValues[i]);
-        }
-    }
-
-    @Override
-    public void read(DataInput stream) throws IOException {
-        enabled = stream.readBoolean();
-        if(!enabled) return;
-        for (int i = 0; i < s * 2; i++) {
-            energyValues[i] = stream.readFloat();
-            massValues[i] = stream.readFloat();
         }
     }
 
