@@ -11,6 +11,7 @@ import arc.math.Mathf;
 import arc.math.geom.Rect;
 import arc.struct.Seq;
 import arc.util.Tmp;
+import ent.anno.Annotations;
 import main.ai.types.FixedFlyingAI;
 import main.entities.BaseBulletType;
 import main.entities.ability.MoveArmorAbility;
@@ -21,6 +22,9 @@ import main.entities.bullet.ChainLightningBulletType;
 import main.entities.bullet.FrostBulletType;
 import main.entities.bullet.RicochetBulletType;
 import main.entities.part.LightPart;
+import main.gen.EntityRegistry;
+import main.gen.PortaLaserUnit;
+import main.gen.PortaLaserc;
 import main.graphics.ModPal;
 import main.type.HollusTankUnitType;
 import main.type.HollusUnitType;
@@ -54,15 +58,14 @@ import static mindustry.content.Fx.circleColorSpark;
 
 public class FrostUnits {
 
-    public static UnitType serpieDrone;
-
-    public static HollusUnitType
+    public static UnitType serpieDrone,
     sunspot, javelin, stalagmite, cord, ghoul, manta;
 
-    public static HollusUnitType
-    upgradeDrone;
+    public static @Annotations.EntityDef({Unitc.class, PortaLaserc.class}) UnitType upgradeDrone;
+
 
     public static void load(){
+        EntityRegistry.register();
 
         RicochetBulletType bouncy = new RicochetBulletType(6, 8, "bullet"){{
             drag = 0.015f;
@@ -85,6 +88,10 @@ public class FrostUnits {
             frontColor = Color.white;
             backColor = Pal.suppress;
         }};
+
+        upgradeDrone = EntityRegistry.content("upgrade-drone", PortaLaserUnit.class, name -> new UnitType(name){{
+
+        }});
 
         serpieDrone = new UnitType("serpie-drone") {
             {

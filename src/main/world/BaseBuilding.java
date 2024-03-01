@@ -2,6 +2,8 @@ package main.world;
 
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import main.entities.comp.HeatComp;
+import main.gen.Heatc;
 import main.type.upgrade.UpgradeableBuilding;
 import main.world.systems.upgrades.UpgradeEntry;
 import main.world.systems.upgrades.UpgradeModule;
@@ -12,8 +14,7 @@ import mindustry.gen.Building;
 public abstract class BaseBuilding extends Building implements UpgradeableBuilding {
 
     public UpgradeModule upgrades = new UpgradeModule(this);
-    public float
-            damageMultiplier = 1,
+    public float damageMultiplier = 1,
             healthMultiplier = 1,
             armorMultiplier = 1,
             speedMultiplier = 1,
