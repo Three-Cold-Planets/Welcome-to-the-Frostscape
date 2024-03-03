@@ -1,5 +1,7 @@
 package main.content;
 
+import arc.Core;
+import arc.Graphics;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -13,11 +15,15 @@ import arc.math.geom.Vec2;
 import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
+import ent.anno.Annotations;
 import main.entities.bullet.BouncyBulletType;
 import main.entities.bullet.ChainLightningBulletType;
 import main.entities.bullet.RicochetBulletType;
+import main.entities.comp.HeatComp;
 import main.entities.part.AccelPartProgress;
 import main.entities.part.EffectPart;
+import main.gen.Heatc;
+import main.gen.PortaLaserc;
 import main.graphics.Layers;
 import main.graphics.ModPal;
 import main.math.Interps;
@@ -53,20 +59,22 @@ import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Building;
+import mindustry.gen.Buildingc;
 import mindustry.gen.Sounds;
+import mindustry.gen.Unitc;
 import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.type.Category;
-import mindustry.type.ItemStack;
-import mindustry.type.LiquidStack;
-import mindustry.type.Weapon;
+import mindustry.io.TypeIO;
+import mindustry.type.*;
 import mindustry.type.unit.MissileUnitType;
+import mindustry.ui.dialogs.DatabaseDialog;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.environment.*;
+import mindustry.world.blocks.production.AttributeCrafter;
 import mindustry.world.blocks.units.UnitCargoLoader;
 import mindustry.world.blocks.units.UnitCargoUnloadPoint;
 import mindustry.world.consumers.ConsumeLiquid;
@@ -165,7 +173,10 @@ public class FrostBlocks {
     //defense - complex
     stoneWall;
 
+    @Annotations.EntityDef({Buildingc.class, Heatc.class}) Blocks heat;
+
     public static void load(){
+
         //region internal
         //you REALLY don't want to mess with theese
 
