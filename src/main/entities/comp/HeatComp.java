@@ -12,8 +12,5 @@ import mindustry.gen.Healthc;
 public abstract class HeatComp implements Entityc {
     public Seq<TileHeatControl.EntityHeatState> heats;
 
-    @Override
-    public void update() {
-        Log.info("hi!");
-    }
+
 }

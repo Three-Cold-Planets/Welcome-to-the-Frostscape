@@ -10,14 +10,14 @@ import mindustry.gen.Healthc;
 @Annotations.TypeIOHandler
 public class ModTypeIO {
 
-    public TileHeatControl.EntityHeatState readHeat(Reads read){
+    public static TileHeatControl.EntityHeatState readHeat(Reads read){
         TileHeatControl.EntityHeatState state = new TileHeatControl.EntityHeatState();
         state.energy = read.f();
         state.mass = read.f();
         return state;
     }
 
-    public void writeHeat(Writes write, TileHeatControl.EntityHeatState state){
+    public static void writeHeat(Writes write, TileHeatControl.EntityHeatState state){
         write.f(state.energy);
         write.f(state.mass);
     }
