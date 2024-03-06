@@ -3,6 +3,7 @@ package main.world;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import main.entities.comp.HeatComp;
+import main.gen.HeatBuilding;
 import main.gen.Heatc;
 import main.type.upgrade.UpgradeableBuilding;
 import main.world.systems.upgrades.UpgradeEntry;
@@ -11,7 +12,7 @@ import main.world.systems.upgrades.UpgradeState;
 import mindustry.gen.Building;
 
 /** Base building entity for upgradeable blocks in Frostscape. Use as example/boilerplate for implementing upgrades in vanilla buildings */
-public abstract class BaseBuilding extends Building implements UpgradeableBuilding {
+public abstract class BaseBuilding extends HeatBuilding implements UpgradeableBuilding {
 
     public UpgradeModule upgrades = new UpgradeModule(this);
     public float damageMultiplier = 1,

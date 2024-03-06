@@ -103,7 +103,7 @@ public class PlugBlock extends BaseBlock {
             super.updateTile();
             active = false;
             exchange();
-            warmup = Mathf.lerpDelta(this.warmup, active ? 1 : 0, warmupSpeed * this.timeScale);
+            warmup = Mathf.lerpDelta(this.warmup, active ? 1 : 0, warmupSpeed * timeScale());
             if(Mathf.chance(warmup * effectChance * delta())) workEffect.at(this.x + Mathf.range(workEffectRange), this.y + Mathf.range(workEffectRange), workColor);
         }
 

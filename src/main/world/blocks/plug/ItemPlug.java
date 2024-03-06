@@ -98,7 +98,7 @@ public class ItemPlug extends PlugBlock {
         public void updateTile() {
             super.updateTile();
             stockpile();
-            if(timer(timerDump, dumpTime / timeScale)){
+            if(timer(timerDump, dumpTime / timeScale())){
                 dump();
                 dump(stockItem);
             }

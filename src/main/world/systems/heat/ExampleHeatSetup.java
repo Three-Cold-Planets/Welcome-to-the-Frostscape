@@ -43,13 +43,7 @@ public class ExampleHeatSetup extends TileHeatSetup{
 
     @Override
     public void update(TileHeatControl heat) {
-        Tile current = Vars.player.tileOn();
-        if(current == null) return;
-        GridTile tile = heat.getTile(current.x, current.y);
-        if(tile != null) {
-            tile.top().flow += 750;
-        }
-        Log.info("Engine go ", current.x, current.y);
+
     }
 
     @Override

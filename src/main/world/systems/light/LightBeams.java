@@ -1,6 +1,7 @@
 package main.world.systems.light;
 
 import arc.Core;
+import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -390,7 +391,7 @@ public class LightBeams implements SaveFileReader.CustomChunk {
         FrostShaders.effectBuffer.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
         Draw.draw(Layer.light + 5, () -> {
             FrostShaders.effectBuffer.begin(Color.clear);
-            //Draw.blend(Blending.additive);
+            Draw.blend(Blending.additive);
             lights.each(l -> {
                 out.clear();
                 l.getSources(out);

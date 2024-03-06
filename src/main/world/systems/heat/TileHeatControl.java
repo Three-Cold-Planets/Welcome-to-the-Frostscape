@@ -6,6 +6,7 @@ import arc.struct.*;
 import arc.util.Log;
 import main.world.systems.heat.TileHeatSetup;
 import mindustry.gen.Call;
+import mindustry.gen.Icon;
 import mindustry.io.SaveFileReader;
 
 import java.io.DataInput;
@@ -13,6 +14,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 //Class which stores and controls the heat in both blocks and floors and their flow.
 public class TileHeatControl implements SaveFileReader.CustomChunk {
@@ -291,6 +293,17 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
             this.energy = energy;
             this.mass = mass;
             this.material = material;
+        }
+    }
+
+    public static class EntityHeatState extends HeatState{
+
+        @Override
+        public void finalizeEnergy() {
+            energy += flow;
+            //For debugging purposes
+            lastFlow = flow;
+            flow = 0;
         }
     }
 

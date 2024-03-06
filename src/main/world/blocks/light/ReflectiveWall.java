@@ -32,7 +32,7 @@ public class ReflectiveWall extends BaseBlock {
 
         @Override
         public boolean exists() {
-            return added;
+            return isAdded();
         }
 
         @Override
