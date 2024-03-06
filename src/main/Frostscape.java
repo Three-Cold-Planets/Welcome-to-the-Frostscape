@@ -154,22 +154,22 @@ public class Frostscape extends Mod{
         });
 
         Events.run(Trigger.update, () -> {
-            //scan.update();
-            //selection.update();
+            scan.update();
+            selection.update();
 
             if(!Vars.state.isPlaying()) return;
-            //LightBeams.get().updateBeams();
-            //ResourceBankHandler.power.graph.update();
-            //ResourceBankHandler.liquids.updateFlow();
+            LightBeams.get().updateBeams();
+            ResourceBankHandler.power.graph.update();
+            ResourceBankHandler.liquids.updateFlow();
 
             WeatherUtils.updateWind();
         });
 
         Events.run(Trigger.draw, () -> {
-            //Draw.draw(Layer.overlayUI, selection::drawSelect);
-            //Draw.draw(Layer.overlayUI, scan::draw);
-            //Draw.draw(Layer.buildBeam, scan::drawScan);
-            //Draw.draw(Layer.light + 1, LightBeams.get()::draw);
+            Draw.draw(Layer.overlayUI, selection::drawSelect);
+            Draw.draw(Layer.overlayUI, scan::draw);
+            Draw.draw(Layer.buildBeam, scan::drawScan);
+            Draw.draw(Layer.light + 1, LightBeams.get()::draw);
         });
 
         Events.run(EventType.WorldLoadEndEvent.class, () -> {
