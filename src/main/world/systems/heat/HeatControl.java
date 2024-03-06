@@ -2,11 +2,10 @@ package main.world.systems.heat;
 
 import arc.Core;
 import arc.math.Mathf;
+import arc.math.geom.Geometry;
 import arc.struct.*;
 import arc.util.Log;
-import main.world.systems.heat.TileHeatSetup;
 import mindustry.gen.Call;
-import mindustry.gen.Icon;
 import mindustry.io.SaveFileReader;
 
 import java.io.DataInput;
@@ -14,19 +13,18 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
 
 //Class which stores and controls the heat in both blocks and floors and their flow.
-public class TileHeatControl implements SaveFileReader.CustomChunk {
+public class HeatControl implements SaveFileReader.CustomChunk {
 
-    static TileHeatControl instance;
+    static HeatControl instance;
 
-    public static TileHeatControl get() {
-        if (instance == null) instance = new TileHeatControl();
+    public static HeatControl get() {
+        if (instance == null) instance = new HeatControl();
         return instance;
     }
 
-    public TileHeatControl(){
+    public HeatControl(){
 
     }
 
@@ -51,67 +49,71 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
     public static float simulationSpeed = 1;
     public static boolean enabled;
 
-    public boolean gridLoaded = false;
+    public static boolean gridLoaded = false;
 
     private static final ArrayList<MaterialPreset> presetList = new ArrayList<>();
 
 
     //List storing all grid state chunks
-    public static Seq<Chunk> gridChunks;
+    public static Chunk[] gridChunks;
 
     //List of all grid states
-    public static Seq<GridTile> gridTiles;
+    public static GridTile[] gridTiles;
 
     //Sequence storing all non-grid tile states.
     public static Seq<HeatState> entityStates;
 
-    public HeatRunnerThread heatThread;
+    public static HeatRunnerThread heatThread;
 
     //Width, height and size of the world
-    public int w, h, s,
+    public static int width, height, s,
     //Width and height of the chunk sections
     chunkW, chunkH;
 
     //Chunk size. DO NOT CHANGE UNLESS YOU KNOW WHAT YOU'RE DOING
-    public int chunkSize = 16;
+    public static int chunkSize = 16;
 
-    public void setupThread(){
-        heatThread = new TileHeatControl.HeatRunnerThread();
+    public static float minFlow = 0.1f;
+
+    public static int disabledTimer = 10;
+
+    public static void setupThread(){
+        heatThread = new HeatControl.HeatRunnerThread();
         heatThread.setPriority(Thread.NORM_PRIORITY - 1);
         heatThread.setDaemon(true);
         heatThread.start();
         Log.info("Started Heat Threat");
     }
 
-    public void start(int width, int height){
+    public static void start(int width, int height){
         Log.info("Starting Heat!");
-        initializeValues();
         createGrid(width, height);
-        setup.setupGrid(this);
+        setup.setupGrid(get());
         gridLoaded = true;
     }
 
-    public GridTile getTile(int x, int y){
-        if(x < 0 || y < 0 || x >= w || y >= h) return null;
-        return gridTiles.get(x + y * w);
+    public static GridTile getTile(int x, int y){
+        if(x < 0 || y < 0 || x >= width || y >= height) return null;
+        return gridTiles[x + y * width];
     }
 
     @Deprecated
-    public GridTile getTile(int index){
-        return gridTiles.get(index);
+    public static GridTile getTile(int index){
+        return gridTiles[index];
     }
-    public void createGrid(int w, int h){
-        this.w = w;
-        this.h = h;
+    public static void createGrid(int w, int h){
+        width = w;
+        height = h;
 
         s = w * h;
-        gridChunks = new Seq<>(true, s);
-        gridTiles = new Seq<>(true);
+        gridTiles = new GridTile[s];
         entityStates = new Seq<>(false);
 
         //How many chunks can be fit horizontally and vertically
         chunkW = Mathf.ceil(((float) w)/chunkSize);
         chunkH = Mathf.ceil(((float) h)/chunkSize);
+
+        gridChunks = new Chunk[chunkW * chunkH];
 
         //Set up chunks. Some will bee less than optimally sized, due to hitting the map border.
         for (int y = 0; y < chunkH; y++) {
@@ -120,8 +122,8 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
                 int width = x == chunkW - 1 ? chunkSize - Mathf.mod(w, chunkSize) : chunkSize;
                 int height = y == chunkH - 1 ? chunkSize - Mathf.mod(w, chunkSize) : chunkSize;
 
-                Chunk current = new Chunk(x * chunkSize, y * chunkSize, width, height, true);
-                gridChunks.add(current);
+                Chunk current = new Chunk(x * chunkSize, y * chunkSize, width, height, EnableState.ENABLED);
+                gridChunks[x + y * chunkW] = current;
             }
         }
         Log.info("Chunks created!");
@@ -130,50 +132,49 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 //Get current chunk
-                int index = x/chunkSize + y/chunkSize * chunkW;
-                Chunk current = gridChunks.get(index);
-                tmpT1 = new GridTile(current, x, y);
-                gridTiles.add(tmpT1);
+                int chunkIndex = x/chunkSize + y/chunkSize * chunkW;
+
+                Chunk current = gridChunks[chunkIndex];
+                gridTiles[x + y * w] = tmpT1 = new GridTile(current, x, y);
                 current.tiles.add(tmpT1);
             }
         }
 
         //Setup neighbours
         for (int i = 0; i < s; i++) {
-            GridTile current = gridTiles.get(i);
-
-            tmpT1 = getTile(current.x - 1, current.y);
-            if(tmpT1 != null) {
-                current.adjacent.add(tmpT1);
-                tmpT1.adjacent.add(current);
+            GridTile current = gridTiles[i];
+            for (int j = 0; j < 4; j++) {
+                GridTile tile = getTile(current.x + Geometry.d4(j).x, current.y + Geometry.d4(j).y);
+                if(tile != null) current.adjacent.add(tile);
             }
-
-            tmpT1 = getTile(current.x, current.y - 1);
-            if(tmpT1 == null) continue;
-            current.adjacent.add(tmpT1);
-            tmpT1.adjacent.add(current);
         }
         Log.info("Grid created!");
     }
 
-    public void tick(){
+    public static void tick(){
         //Log.info("Ticking");
         updateFlow();
-        setup.update(this);
+        setup.update(get());
         finalizeEnergy();
     }
 
     //Note that ambient heat is factored in after flow calculations
-    public void updateFlow()
+    public static void updateFlow()
     {
-        gridChunks.each(Chunk::update);
+        for (Chunk gridChunk : gridChunks) {
+            gridChunk.update();
+            gridChunk.tiles.each(t -> {
+                if(t.air.enabled) t.air.flow += calculateFlowAtmosphere(t.air.mass, kelvins(t.air), t.air.material);
+            });
+        }
         //entityStates.each(GridHeatState::updateState);
     }
 
-    public void finalizeEnergy()
+    public static void finalizeEnergy()
     {
-        gridTiles.each(GridTile::finalizeEnergy);
-        //entityStates.each(GridHeatState::finalizeEnergy);
+        for (Chunk chunk : gridChunks) {
+            chunk.finalizeEnergy();
+        }
     }
 
     //Note that this ignores surface area. That logic should be implemented in the object calling this
@@ -186,7 +187,8 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
             return 0;
         }
 
-        float tempretureDif = temp2 - temp1;
+        //Take the average temperature difference. This prevents flowback loops
+        float tempretureDif = (temp2 - temp1)/2;
 
         //Don't bother calculating if tempreture difference is less than 1 celcius
         if (Math.abs(tempretureDif) < 1f) {
@@ -194,10 +196,12 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
         }
 
         float geomThermalConductivity = Mathf.sqrt(preset1.thermalConductivity * preset2.thermalConductivity);
+
+        //Half the energy to prevent weird flowback loops
         float flowAmount = geomThermalConductivity * tempretureDif * simulationSpeed;
 
         //Don't bother using if energy flow is less than 0.1 units
-        if (Math.abs(flowAmount) < 0.1f) return 0;
+        if (Math.abs(flowAmount) < minFlow) return 0;
 
         //Cap change of energy to 1/5 of the temp difference changed per tick
         float maxTempDif = Math.min(Math.abs(tempretureDif * mass1 * preset1.specificHeatCapacity),
@@ -220,12 +224,8 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
         
         return Mathf.clamp(flowAmount, -maxTempDif, maxTempDif);
     }
-    
-    public void initializeValues(){
-
-    }
     public static float kelvins(HeatState state){
-        return kelvins(state.energy, state.mass, state.material.specificHeatCapacity);
+        return state.temperature;
     }
 
     public static float celsius(HeatState state){
@@ -283,27 +283,21 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
             enabled = false;
             material = vacuum;
         }
-        public float energy, mass, flow, lastFlow;
+        public float temperature, mass, flow, lastFlow;
 
         public MaterialPreset material;
 
-        public abstract void finalizeEnergy();
-
-        public void setStats(float energy, float mass, MaterialPreset material){
-            this.energy = energy;
+        public void setStats(float mass, MaterialPreset material){
             this.mass = mass;
             this.material = material;
         }
-    }
 
-    public static class EntityHeatState extends HeatState{
+        public void setEnergy(float energy){
+            temperature = kelvins(energy, mass, material.specificHeatCapacity);
+        }
 
-        @Override
-        public void finalizeEnergy() {
-            energy += flow;
-            //For debugging purposes
-            lastFlow = flow;
-            flow = 0;
+        public void addEnergy(float energy){
+            temperature += kelvins(energy, mass, material.specificHeatCapacity);
         }
     }
 
@@ -315,13 +309,9 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
 
         //If false, flow going from and to this state will not be calculated, however other functionality is untouched.
         public boolean enabled;
-        public Chunk chunk;
 
-        @Override
         public void finalizeEnergy(){
-            energy += flow;
-            chunk.totalFlow += flow;
-            //For debugging purposes
+            addEnergy(flow);
             lastFlow = flow;
             flow = 0;
         }
@@ -330,6 +320,7 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
     /**
      * A class that stores energy, mass and energy. Position data + size handled by the chunk indexes
      * NOTE THAT WHEN ADDING TO THE STATE'S ENERGY, USE FLOW INSTEAD OF ENERGY.
+     * Adjacent must be set externally
      */
 
     public static class GridTile {
@@ -354,32 +345,31 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
         public Chunk owner;
 
         //All cardinally adjacent tiles.
-        public Seq<GridTile> adjacent,
+        public transient Seq<GridTile> adjacent;
 
-        //Updates queued to happen. Removed when another tile on the list updates this. No updates are queued for tiles in disabled chunks.
-        updates;
-
+        //Updated this tick. Used to prevent doubleups on calculations of flow
+        public boolean updated;
         public GridTile(Chunk owner, int x, int y){
             this.x = x;
             this.y = y;
             enabled = true;
-            adjacent = new Seq();
-            updates = new Seq();
 
             floor = new GridHeatState();
             block = new GridHeatState();
             air = new GridHeatState();
-            this.owner = floor.chunk = block.chunk = air.chunk = owner;
+            this.owner = owner;
+            adjacent = new Seq<>();
         }
-
         public GridHeatState top(){
             return solid ? block : floor;
         }
+
         public void finalizeEnergy(){
             floor.finalizeEnergy();
             block.finalizeEnergy();
             air.finalizeEnergy();
-            updates.set(adjacent);
+
+            updated = false;
         }
     }
 
@@ -411,19 +401,18 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
         public Seq<GridTile> tiles;
 
         public int size;
-        public boolean enabled;
+        public EnableState state;
+
+        //If a chunk should force enable
         public int disabledCounter;
 
-        public float totalFlow;
-
-
-        public Chunk(int x, int y, int width, int height, boolean enabled){
+        public Chunk(int x, int y, int width, int height, EnableState enabled){
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
             tiles = new Seq<>();
-            this.enabled = enabled;
+            this.state = enabled;
             disabledCounter = 0;
         }
 
@@ -432,8 +421,10 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
          */
         public void update(){
 
+            if(!state.force) state = disabledCounter < disabledTimer ? EnableState.ENABLED : EnableState.DISABLED;
+
             //If chunk is disabled, blocks inside won't update neighbours, but neighbours can still update them
-            if(!enabled) return;
+            if(!state.enabled) return;
 
             for (GridTile tile: tiles) {
                 //In cases where no exchange should be possible - especially in space - skip all flow calculations
@@ -447,30 +438,41 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
 
                 GridHeatState top = tile.solid ? block : floor;
 
-                tile.updates.each(target -> {
-                    if(!target.enabled) return;
-
-                    //It's either this check, or queueing updates in *all* GridTiles
-                    if(target.updates.contains(tile)) target.updates.remove(tile);
+                tile.adjacent.each(target -> {
+                    if(!target.enabled || target.updated) return;
 
                     if(floor.enabled && target.floor.enabled) handleExchange(floor, target.floor);
                     if(block.enabled && target.block.enabled) handleExchange(block, target.block);
                     if(air.enabled && target.air.enabled) handleExchange(air, target.air);
                 });
-                tile.updates.clear();
 
-                if(air.enabled) air.flow += calculateFlowAtmosphere(air.mass, kelvins(air), air.material);
+                tile.updated = true;
 
                 if(top.enabled && air.enabled && !tile.shielded){
                     handleExchange(top, air);
                 }
             }
         }
+
+        //The logic of having to ping pong between state and chunk owner was too hard to follow
+        public void finalizeEnergy(){
+            float highestFlow = 0;
+            for(GridTile tile: tiles){
+                highestFlow = Math.max(Math.max(highestFlow, tile.floor.flow), Math.max(tile.block.flow, tile.air.flow));
+                tile.finalizeEnergy();
+            }
+
+            disabledCounter++;
+
+            if(highestFlow > minFlow) {
+                disabledCounter = 0;
+            }
+        }
     }
 
     //Coppied from Xelo, yoinky~
     //I swear I  half understand how it works
-    public class HeatRunnerThread extends Thread {
+    public static class HeatRunnerThread extends Thread {
         boolean terminate, doStep;
         public int currentTime;
         public float targetTime;
@@ -521,4 +523,15 @@ public class TileHeatControl implements SaveFileReader.CustomChunk {
             }
         }
     };
+
+    public enum EnableState{
+        FORCE_ENABLE(true, true), ENABLED(true, false), DISABLED(false, false), FORCE_DISABLE(false, true);
+        public final boolean enabled;
+        public final boolean force;
+
+        EnableState(boolean enabled, boolean force){
+            this.enabled = enabled;
+            this.force = force;
+        }
+    }
 }

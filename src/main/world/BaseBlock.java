@@ -1,13 +1,15 @@
 package main.world;
 
+import arc.math.geom.Point2;
 import arc.struct.Seq;
 import main.world.blocks.drawers.UpgradeDrawer;
+import main.world.systems.heat.HeatControl;
 import main.world.systems.upgrades.Upgrade;
 import main.world.systems.upgrades.UpgradeEntry;
 import mindustry.world.Block;
 
 /** Base building block for upgradeable blocks in Frostscape. Use as example/boilerplate for implementing upgrades in vanilla blocks */
-public class BaseBlock extends Block implements UpgradesBlock{
+public class BaseBlock extends Block implements BaseBlockType{
     public BaseBlock(String name) {
         super(name);
         this.update = true;
@@ -34,6 +36,7 @@ public class BaseBlock extends Block implements UpgradesBlock{
     }
 
 
+
     @Override
     public Seq<UpgradeEntry> entries() {
         return entries;
@@ -42,5 +45,17 @@ public class BaseBlock extends Block implements UpgradesBlock{
     @Override
     public Seq<UpgradeDrawer> drawers() {
         return null;
+    }
+
+    public class HeatPart{
+        //The material that this part is made from
+        public HeatControl.MaterialPreset preset;
+
+        //Mass of the part. Only affects newly constructed buildings.
+        public float mass;
+
+        //All the positions that this state will update.
+        public transient Point2[] envUpdates;
+        public transient int[] internalUpdates;
     }
 }

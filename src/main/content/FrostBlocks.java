@@ -75,6 +75,7 @@ import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.environment.*;
 import mindustry.world.blocks.production.AttributeCrafter;
+import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.blocks.units.UnitCargoLoader;
 import mindustry.world.blocks.units.UnitCargoUnloadPoint;
 import mindustry.world.consumers.ConsumeLiquid;
@@ -173,7 +174,7 @@ public class FrostBlocks {
     //defense - complex
     stoneWall;
 
-    @Annotations.EntityDef({Buildingc.class, Heatc.class}) Blocks heat;
+    @Annotations.EntityDef({Buildingc.class, Heatc.class}) Block heat;
 
     public static void load(){
 

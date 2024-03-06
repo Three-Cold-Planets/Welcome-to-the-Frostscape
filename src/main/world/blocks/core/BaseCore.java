@@ -4,7 +4,7 @@ import arc.struct.Seq;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import main.type.upgrade.UpgradeableBuilding;
-import main.world.UpgradesBlock;
+import main.world.BaseBlockType;
 import main.world.UpgradesType;
 import main.world.blocks.drawers.UpgradeDrawer;
 import main.world.systems.upgrades.UpgradeEntry;
@@ -13,7 +13,7 @@ import main.world.systems.upgrades.UpgradeState;
 import mindustry.gen.Building;
 import mindustry.world.blocks.storage.CoreBlock;
 
-public class BaseCore extends CoreBlock implements UpgradesBlock {
+public class BaseCore extends CoreBlock implements BaseBlockType {
     public BaseCore(String name) {
         super(name);
     }

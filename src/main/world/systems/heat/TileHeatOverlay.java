@@ -1,32 +1,36 @@
 package main.world.systems.heat;
 
 import arc.Core;
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.util.Log;
 import arc.util.Tmp;
-import main.Frostscape;
 import mindustry.Vars;
+import mindustry.graphics.Pal;
+import main.world.systems.heat.*;
 
-import static main.Frostscape.*;
-import static main.world.systems.heat.TileHeatControl.*;
 
 public class TileHeatOverlay {
 
     public boolean enabled;
 
     public void draw(){
-        if(!enabled) return;
-        TileHeatControl heat = TileHeatControl.get();
+        for (HeatControl.Chunk chunk: HeatControl.gridChunks) {
+            if (chunk.state.enabled) Draw.color(Color.white);
+            else Draw.color(Color.red, Pal.remove, Mathf.absin(30, 1));
+            Lines.stroke(0.5f + (enabled ? Mathf.absin(1.5f, 1) : 0.5f));
+            Lines.rect(chunk.x * Vars.tilesize, chunk.y * Vars.tilesize, HeatControl.chunkSize * Vars.tilesize, HeatControl.chunkSize * Vars.tilesize);
+        }
 
-        for (int i = 0; i < heat.s; i++) {
-            Tmp.v1.set((i % heat.w) * Vars.tilesize, (i / heat.w) * Vars.tilesize);
+        for (int i = 0; i < HeatControl.s; i++) {
+            Tmp.v1.set((i % HeatControl.width) * Vars.tilesize, (i / HeatControl.width) * Vars.tilesize);
             Core.camera.bounds(Tmp.r1);
             if(!Tmp.r2.setCentered(Tmp.v1.x, Tmp.v1.y, Vars.tilesize).overlaps(Tmp.r1)) continue;
 
-            float temp = kelvins(TileHeatControl.gridTiles.get(i).top());
+            float temp = HeatControl.gridTiles[i].top().temperature;
 
             /*
             Ranges for colors

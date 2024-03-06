@@ -1,6 +1,6 @@
 package main.world.blocks.drawers;
 
-import main.world.UpgradesBlock;
+import main.world.BaseBlockType;
 import main.world.systems.upgrades.Upgrade;
 import mindustry.world.Block;
 import mindustry.world.draw.DrawBlock;
@@ -9,8 +9,8 @@ import mindustry.world.draw.DrawBlock;
 public class UpgradeDrawer extends DrawBlock {
     public Upgrade upgrade;
 
-    public UpgradesBlock expectUpgradeable(Block block){
-        if(!(block instanceof UpgradesBlock upgradeable)) throw new ClassCastException("This drawer requires the block to implement UpgradeableBlock. Use a different drawer.");
+    public BaseBlockType expectUpgradeable(Block block){
+        if(!(block instanceof BaseBlockType upgradeable)) throw new ClassCastException("This drawer requires the block to implement UpgradeableBlock. Use a different drawer.");
         return upgradeable;
     }
 }

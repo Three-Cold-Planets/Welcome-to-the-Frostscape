@@ -27,8 +27,8 @@ import main.util.WeatherUtils;
 import main.world.meta.Family;
 import main.world.meta.LoreNote;
 import main.world.systems.bank.ResourceBankHandler;
-import main.world.systems.heat.ExampleHeatSetup;
-import main.world.systems.heat.TileHeatControl;
+import main.world.systems.heat.HeatSetup;
+import main.world.systems.heat.HeatControl;
 import main.world.systems.heat.TileHeatOverlay;
 import main.world.systems.light.LightBeams;
 import main.world.systems.research.ResearchHandler;
@@ -66,7 +66,6 @@ public class Frostscape extends Mod{
     public static ScriptedSectorHandler sectors = new ScriptedSectorHandler();
     public static SelectOverlay selection = new SelectOverlay();
     public static ScanningOverlay scan = new ScanningOverlay();
-
     public static TileHeatOverlay heatOverlay;
 
     public Frostscape(){
@@ -129,7 +128,7 @@ public class Frostscape extends Mod{
 
         Events.run(WinEvent.class, this::loadSplash);
 
-        TileHeatControl heat = TileHeatControl.get();
+        HeatControl heat = HeatControl.get();
 
         //Most of theese are singletons for the sake of being able to port these over to the Arctic-Insurrection mod more easly.
         SaveVersion.addCustomChunk("upgrade-handler", UpgradeHandler.get());
@@ -139,7 +138,7 @@ public class Frostscape extends Mod{
         SaveVersion.addCustomChunk("light-beams", LightBeams.get());
         SaveVersion.addCustomChunk("resource-bank", ResourceBankHandler.get());
 
-        heat.setup = new ExampleHeatSetup();
+        heat.setup = new HeatSetup();
 
         heat.setup.initialize(heat);
 

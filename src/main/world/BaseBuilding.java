@@ -89,6 +89,6 @@ public abstract class BaseBuilding extends HeatBuilding implements UpgradeableBu
 
     @Override
     public UpgradesType type() {
-        return (UpgradesBlock) block;
+        return (BaseBlockType) block;
     }
 }

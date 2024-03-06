@@ -2,55 +2,56 @@ package main.world.systems.heat;
 
 import arc.Events;
 import arc.graphics.g2d.Draw;
-import arc.math.Mathf;
 import arc.util.Log;
 import arc.util.Time;
-import arc.util.Tmp;
 import mindustry.Vars;
-import mindustry.content.Fx;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.world.Tile;
 
-
 import static main.Frostscape.heatOverlay;
-import static main.world.systems.heat.TileHeatControl.*;
 import static mindustry.Vars.state;
+import static main.world.systems.heat.HeatControl.*;
 
 //Example of a setup class
-public class ExampleHeatSetup extends TileHeatSetup{
-    TileHeatControl heat;
+public class HeatSetup implements TileHeatSetup{
+    HeatControl heat;
     @Override
-    public void setupGrid(TileHeatControl heat) {
+    public void setupGrid(HeatControl heat) {
         for (int i = 0; i < heat.s; i++) {
-            int x = i % heat.w,y = (int) Math.floor(i/heat.w);
-            TileHeatControl.GridTile tile = heat.getTile(x, y);
+            int x = i % heat.width,y = (int) Math.floor(i/heat.width);
+            GridTile tile = heat.getTile(x, y);
             boolean solid = Vars.world.tile(x, y).solid();
 
-            tile.floor.setStats(heat.ambientTemperature * defaultFloor.specificHeatCapacity, 4, defaultBlock);
+            tile.floor.setStats(4, defaultFloor);
             tile.floor.enabled = true;
-            tile.block.setStats(heat.ambientTemperature * defaultBlock.specificHeatCapacity, 20, defaultBlock);
+            tile.block.setStats(20, defaultBlock);
             if(solid){
                 tile.block.enabled = true;
                 tile.solid = true;
             }
-            tile.air.setStats(heat.ambientTemperature, 1, defaultAir);
+            tile.air.setStats(1, defaultAir);
             tile.air.enabled = true;
+            tile.floor.temperature = tile.block.temperature = tile.air.temperature = heat.ambientTemperature;
         }
         Log.info("Grid finalized!");
     }
 
     @Override
-    public void update(TileHeatControl heat) {
-
+    public void update(HeatControl heat) {
+        Tile current = Vars.player.tileOn();
+        if(current == null) return;
+        GridTile tile = heat.getTile(current.x, current.y);
+        if(tile != null) {
+            tile.top().flow += 750;
+        }
     }
 
     @Override
-    public void initialize(TileHeatControl heat) {
+    public void initialize(HeatControl heat) {
 
         this.heat = heat;
-
         Events.run(EventType.Trigger.update, () -> {
             if (state.isGame() && !state.isPaused()) {
                     if (heat.heatThread == null) {
@@ -82,7 +83,7 @@ public class ExampleHeatSetup extends TileHeatSetup{
         });
 
         Events.run(EventType.Trigger.draw, () -> {
-            if(state.isGame() && heat.gridLoaded) Draw.draw(Layer.power + 1, heatOverlay::draw);
+            if(state.isGame() && heat.gridLoaded) Draw.draw(Layer.darkness + 1, heatOverlay::draw);
         });
     }
 
