@@ -13,6 +13,7 @@ import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Structs;
 import arc.util.Time;
+import main.entities.comp.HeatComp;
 import main.game.ScriptedSectorHandler;
 import main.graphics.FrostShaders;
 import main.graphics.ModPal;
@@ -202,12 +203,14 @@ public class Frostscape extends Mod{
                 "main.util",
                 "main.world",
                 "main.world.systems.light",
+                "main.world.systems.heat",
                 "main.world.systems.upgrades",
                 "main.world.systems.research",
                 "main.world.systems.bank"
         );
 
         packages.each(name -> {
+
             p = new NativeJavaPackage(name, Vars.mods.mainLoader());
 
             p.setParentScope(scope);

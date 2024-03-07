@@ -4,7 +4,9 @@ import arc.Events;
 import arc.graphics.g2d.Draw;
 import arc.util.Log;
 import arc.util.Time;
+import main.world.BaseBlockType;
 import mindustry.Vars;
+import mindustry.content.Fx;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
@@ -87,21 +89,31 @@ public class HeatSetup implements TileHeatSetup{
         });
     }
 
+
     public void updateTerrain(int x, int y){
         boolean solid = Vars.world.tile(x, y).solid();
         GridTile tile = heat.getTile(x, y);
         tile.solid = solid;
         tile.block.enabled = solid;
-    };
+    }
 
+    public void updateBuildTerrain(Building b, GridTile tile){
+        tile.solid = true;
+        tile.block.enabled = true;
+        if(b.block instanceof BaseBlockType type){
+            tile.block.material = type.heat().material;
+            tile.block.mass = type.heat().mass;
+        }
+    }
     public void updateBuildTerrain(Building b){
         if(b.block.size == 1){
-            updateTerrain(b.tile.x, b.tile.y);
+            updateBuildTerrain(b, HeatControl.getTile(b.tile.x, b.tile.y));
         }else{
             int offset = (b.block.size - 1) / 2;
             for(int y = b.tile.y - offset; y < b.tile.y - offset + b.block.size; y++){
                 for(int x = b.tile.x - offset; x < b.tile.x - offset + b.block.size; x++){
-                    updateTerrain(x, y);
+                    updateBuildTerrain(b, HeatControl.getTile(x, y));
+                    Fx.smoke.at(x * Vars.tilesize, y * Vars.tilesize);
                 }
             }
         }

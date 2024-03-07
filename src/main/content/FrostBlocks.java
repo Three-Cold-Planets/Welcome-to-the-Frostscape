@@ -174,7 +174,7 @@ public class FrostBlocks {
     //defense - complex
     stoneWall;
 
-    @Annotations.EntityDef({Buildingc.class, Heatc.class}) Block heat;
+    @Annotations.EntityDef(value = {Buildingc.class, Heatc.class}) Block heat;
 
     public static void load(){
 
@@ -1003,7 +1003,7 @@ public class FrostBlocks {
                         under = true;
                     }},
                     new RegionPart("-barrel"){{
-                        progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.recoil.inv().mul(0.5f));
+                        progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.reload.inv().mul(0.5f));
                         moveY = -9;
                         heatColor = Color.valueOf("f03b0e");
                         mirror = false;

@@ -7,29 +7,47 @@ import main.type.upgrade.UpgradeableBuilding;
 import main.world.BaseBlockType;
 import main.world.UpgradesType;
 import main.world.blocks.drawers.UpgradeDrawer;
+import main.world.module.BlockHeatModule;
+import main.world.systems.heat.HeatControl;
+import main.world.systems.upgrades.Upgrade;
 import main.world.systems.upgrades.UpgradeEntry;
 import main.world.systems.upgrades.UpgradeModule;
 import main.world.systems.upgrades.UpgradeState;
 import mindustry.gen.Building;
 import mindustry.world.blocks.storage.CoreBlock;
 
+//TODO: Implement heat for the core
 public class BaseCore extends CoreBlock implements BaseBlockType {
     public BaseCore(String name) {
         super(name);
     }
-
+    public final Seq<Upgrade> upgrades = new Seq<>();
 
     public Seq<UpgradeEntry> entries = new Seq<>();
+
+    public BlockHeatModule heat = new BlockHeatModule();
+
+    @Override
+    public void load() {
+        super.load();
+        entries.each(entry -> {
+            entry.initialiseDeltas();
+            upgrades.add(entry.upgrade);
+        });
+    }
+    @Override
+    public void init() {
+        super.init();
+        entries.each(e -> e.initialiseDeltas());
+        if(heat.material == null) heat.material = HeatControl.defaultBlock;
+        if(heat.mass == -1) heat.mass = HeatControl.defaultMass;
+    }
+
+
 
     @Override
     public Seq<UpgradeEntry> entries() {
         return entries;
-    }
-
-
-    @Override
-    public boolean isVisible() {
-        return super.isVisible();
     }
 
     @Override
@@ -38,9 +56,8 @@ public class BaseCore extends CoreBlock implements BaseBlockType {
     }
 
     @Override
-    public void init() {
-        super.init();
-        entries.each(e -> e.initialiseDeltas());
+    public BlockHeatModule heat() {
+        return heat;
     }
 
     public class BaseCoreBuild extends CoreBuild implements UpgradeableBuilding {
