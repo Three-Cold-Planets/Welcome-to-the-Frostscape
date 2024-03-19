@@ -11,7 +11,7 @@ import main.world.module.BlockHeatModule;
 import main.world.systems.heat.HeatControl;
 import main.world.systems.upgrades.Upgrade;
 import main.world.systems.upgrades.UpgradeEntry;
-import main.world.systems.upgrades.UpgradeModule;
+import main.world.module.UpgradeModule;
 import main.world.systems.upgrades.UpgradeState;
 import mindustry.gen.Building;
 import mindustry.world.blocks.storage.CoreBlock;

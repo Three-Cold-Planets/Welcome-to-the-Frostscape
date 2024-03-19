@@ -382,7 +382,11 @@ public class HeatControl implements SaveFileReader.CustomChunk {
         thermalConductivity,
 
         //How much energy it takes to raise one unit of mass by one kelvin. This one is self-explanatory.
-        specificHeatCapacity;
+        specificHeatCapacity,
+
+        freezeEnergy,
+
+        vapourEnergy;
 
         public MaterialPreset(){
 

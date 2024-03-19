@@ -1,23 +1,55 @@
 package main.world.module;
 
 import arc.math.geom.Point2;
+import arc.struct.IntFloatMap;
+import arc.struct.ObjectFloatMap;
 import arc.struct.Seq;
+import main.world.BaseBuilding;
 import main.world.HeatPart;
 import main.world.systems.heat.HeatControl;
+import main.world.systems.heat.HeatControl.MaterialPreset;
+import mindustry.logic.TileLayer;
+import mindustry.world.meta.Env;
 
 public class BlockHeatModule {
+
+    public float overheatTemperature, overheatDamage;
+
     //Material and mass values for all hull tiles
-    public HeatControl.MaterialPreset material;
+    public MaterialPreset material;
     public float mass = -1;
 
-    //Heat parts to set up HeatState interactions in the building.
-    public Seq<HeatPart> parts;
+    public PartEntry[] entries = new PartEntry[]{};
 
-    //Note: For more dynamic interactions, do *NOT* use the index maps. Use a custom Building instead
+    public static class PartEntry{
+        public float mass;
+        public MaterialPreset material;
 
-    //Index map of how each HeatState interacts with the environment, relative to a building's bottom left corner
-    public transient Point2[][] envUpdates;
+        public IntFloatMap partFlowmap = new IntFloatMap();
 
-    //Index map of how each HeatState interacts.
-    public transient int[][] internalUpdates;
+        public Seq<ExchangeArea> tileFlowmap = new Seq<>();
+    };
+
+    public static class ExchangeArea{
+        //Offsets from the block's tile
+        public byte x, y,
+        //Offset to the
+        width, height;
+
+        public float rate;
+
+        public int layerBitmask;
+
+        public boolean floorEnabled(){
+            return (layerBitmask & 1) != 0;
+        }
+
+        public boolean blockEnabled(){
+            return ((layerBitmask >> 1) & 1) != 0;
+        }
+
+        public boolean airEnabled(){
+            return ((layerBitmask >> 2) & 1) != 0;
+        }
+    }
 }
