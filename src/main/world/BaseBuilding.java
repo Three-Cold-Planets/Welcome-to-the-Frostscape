@@ -1,18 +1,33 @@
 package main.world;
 
+import arc.math.geom.Point2;
+import arc.util.Log;
+import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import main.entities.comp.HeatComp;
 import main.gen.HeatBuilding;
-import main.gen.Heatc;
 import main.type.upgrade.UpgradeableBuilding;
+import main.world.module.BlockHeatModule;
+import main.world.module.HeatModule;
+import main.world.systems.heat.EntityHeatState;
+import main.world.systems.heat.HeatControl;
 import main.world.systems.upgrades.UpgradeEntry;
-import main.world.systems.upgrades.UpgradeModule;
+import main.world.module.UpgradeModule;
 import main.world.systems.upgrades.UpgradeState;
+import mindustry.Vars;
+import mindustry.content.Fx;
+import mindustry.game.Team;
 import mindustry.gen.Building;
+import mindustry.world.Block;
+import mindustry.world.Tile;
+
+import static main.world.module.BlockHeatModule.*;
+import static main.world.systems.heat.HeatControl.*;
 
 /** Base building entity for upgradeable blocks in Frostscape. Use as example/boilerplate for implementing upgrades in vanilla buildings */
 public abstract class BaseBuilding extends HeatBuilding implements UpgradeableBuilding {
+
+    public static BlockHeatModule blockHeat;
 
     public UpgradeModule upgrades = new UpgradeModule(this);
     public float damageMultiplier = 1,
@@ -35,6 +50,25 @@ public abstract class BaseBuilding extends HeatBuilding implements UpgradeableBu
         super.updateTile();
         resetDeltas();
         upgrades.update();
+
+        for (int i = 0; i < blockHeat.entries.length; i++) {
+            PartEntry entry = blockHeat.entries[i];
+            EntityHeatState state = heat.states[i];
+            entry.tileFlowmap.each(area -> {
+                Point2 refrencePos = Tmp.p1.set(tileX() + area.x, tileY() + area.y);
+
+                for (int y = 0; y < area.height; y++) {
+                    for (int x = 0; x < area.width; x++) {
+                        GridTile tile = getTile(refrencePos.x + x, refrencePos.y + y);
+                        if(area.floorEnabled()) HeatControl.handleExchange(state, tile.floor);
+                        if(area.blockEnabled()) HeatControl.handleExchange(state, tile.block);
+                        if(area.airEnabled()) HeatControl.handleExchange(state, tile.air);
+                    }
+                }
+            });
+        }
+
+        heat.finalizeEnergy();
     }
 
     @Override
@@ -51,12 +85,15 @@ public abstract class BaseBuilding extends HeatBuilding implements UpgradeableBu
     public void writeBase(Writes write) {
         super.writeBase(write);
         upgrades.write(write);
+        heat.write(write);
     }
 
     @Override
     public void readBase(Reads read) {
         super.readBase(read);
         upgrades.read(read);
+        Log.info("reading!");
+        heat.read(read, false);
     }
 
     @Override
@@ -88,7 +125,29 @@ public abstract class BaseBuilding extends HeatBuilding implements UpgradeableBu
     }
 
     @Override
-    public UpgradesType type() {
+    public BaseBlockType type() {
         return (BaseBlockType) block;
+    }
+
+
+
+    @Override
+    public Building create(Block block, Team team) {
+        Building returnBlock = super.create(block, team);
+        Log.info("creating!");
+
+        heat = new HeatModule();
+
+        blockHeat = type().heat();
+
+        HeatModule.setup(heat, blockHeat);
+
+        return returnBlock;
+    }
+
+    @Override
+    public Building init(Tile tile, Team team, boolean shouldAdd, int rotation) {
+
+        return super.init(tile, team, shouldAdd, rotation);
     }
 }

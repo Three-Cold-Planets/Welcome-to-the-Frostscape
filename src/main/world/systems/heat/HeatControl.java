@@ -46,6 +46,8 @@ public class HeatControl implements SaveFileReader.CustomChunk {
             defaultAir = new MaterialPreset(0.4f, 0.6f),
             vacuum = new MaterialPreset(0, 0);
 
+    public static float defaultMass = 20;
+
     public static float simulationSpeed = 1;
     public static boolean enabled;
 
@@ -82,7 +84,7 @@ public class HeatControl implements SaveFileReader.CustomChunk {
         heatThread.setPriority(Thread.NORM_PRIORITY - 1);
         heatThread.setDaemon(true);
         heatThread.start();
-        Log.info("Started Heat Threat");
+        Log.info("Started Heat Thread");
     }
 
     public static void start(int width, int height){
@@ -380,7 +382,11 @@ public class HeatControl implements SaveFileReader.CustomChunk {
         thermalConductivity,
 
         //How much energy it takes to raise one unit of mass by one kelvin. This one is self-explanatory.
-        specificHeatCapacity;
+        specificHeatCapacity,
+
+        freezeEnergy,
+
+        vapourEnergy;
 
         public MaterialPreset(){
 

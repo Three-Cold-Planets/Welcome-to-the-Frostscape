@@ -46,11 +46,6 @@ public class ReflectiveWall extends BaseBlock {
         }
 
         @Override
-        public UpgradesType type() {
-            return (UpgradesType) block;
-        }
-
-        @Override
         public float reflectivity(int shape, int side) {
             return 1;
         }

@@ -43,6 +43,7 @@ import main.world.blocks.light.ReflectiveWall;
 import main.world.blocks.light.SolarReflector;
 import main.world.blocks.plug.ItemPlug;
 import main.world.blocks.plug.PowerPlug;
+import main.world.module.BlockHeatModule;
 import main.world.systems.bank.ResourceBankHandler;
 import main.world.systems.light.LightBeams;
 import main.world.systems.upgrades.UpgradeEntry;
@@ -58,10 +59,7 @@ import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootSpread;
-import mindustry.gen.Building;
-import mindustry.gen.Buildingc;
-import mindustry.gen.Sounds;
-import mindustry.gen.Unitc;
+import mindustry.gen.*;
 import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -115,7 +113,7 @@ public class FrostBlocks {
     //floors - hollus
     sulphuricWater, deepSulphuricWater, sulphuricAndesiteWater, sulphuricGraystoneWater,
     sulphuricIce,
-    frostStone, frostSnow,
+    frostStone, frostSnow, loam,
     andesiteFloor, volcanicAndesiteFloor, volcanicPebbledAndesiteFloor, sulphanatedAndesite,
     crackedAndesiteFloor, fracturedAndesiteFloor,
     graystoneFloor, graystoneSlatedFloor,
@@ -174,12 +172,13 @@ public class FrostBlocks {
     //defense - complex
     stoneWall;
 
-    @Annotations.EntityDef({Buildingc.class, Heatc.class}) Block heat;
+    @Annotations.EntityDef(value = {Buildingc.class, Heatc.class}, serialize = false, genIO = false) Block heat;
 
     public static void load(){
 
         //region internal
         //you REALLY don't want to mess with theese
+
 
         ResourceBankHandler.block = new BankBlock("resource-bank-handler"){{
 
@@ -527,6 +526,8 @@ public class FrostBlocks {
             variants = 1;
         }};
 
+        loam= new Floor("loam");
+
         andesiteFloor = new Floor("andesite-floor"){{
             variants = 3;
         }};
@@ -655,6 +656,7 @@ public class FrostBlocks {
         //region defense
 
         stoneWall = new CrumblingWall("stone-wall"){{
+
             health = 280;
             requirements(Category.defense, with(FrostItems.stone, 6, FrostItems.rust, 4));
             variants = 4;
@@ -708,10 +710,31 @@ public class FrostBlocks {
 
         thermalLandmine = new ThermalMine("thermal-landmine"){{
             requirements(Category.effect, with(Items.graphite, 10, Items.silicon, 15, Items.pyratite, 15));
+
             health = 55;
             tileDamage = 0.75f;
             warmupSpeed = 0.04f;
             warmDownSpeed = 0.15f;
+
+            heat = new BlockHeatModule(){{
+                material = FrostMaterials.stone;
+                mass = 50;
+            }};
+
+            parts(
+                new BlockHeatModule.PartEntry() {{
+                    tileFlowmap.addAll(new BlockHeatModule.ExchangeArea(){{
+                        x = 0;
+                        y = 0;
+                        width = 1;
+                        height = 1;
+
+                        rate = 5;
+
+                        layerBitmask = 1;
+                    }});
+                }}
+            );
 
             entries.addAll(
                     new UpgradeEntry(FrostUpgrades.improvedBase){{
@@ -1003,7 +1026,7 @@ public class FrostBlocks {
                         under = true;
                     }},
                     new RegionPart("-barrel"){{
-                        progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.recoil.inv().mul(0.5f));
+                        progress = new AccelPartProgress(0,3.25f,-1.2f,0,6,11,PartProgress.reload.inv().mul(0.5f));
                         moveY = -9;
                         heatColor = Color.valueOf("f03b0e");
                         mirror = false;
