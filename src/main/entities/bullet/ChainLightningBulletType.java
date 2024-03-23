@@ -6,6 +6,7 @@ import arc.math.geom.Position;
 import arc.math.geom.Vec2;
 import arc.struct.IntSeq;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Tmp;
 import main.content.Fxf;
 import main.entities.ModDamage;
@@ -25,6 +26,8 @@ public class ChainLightningBulletType extends BulletType {
     public float width, segmentLength, arc, jumpDamageFactor, distanceDamageFalloff, targetRange;
     public int chainLightning, branches;
 
+    public boolean aimed;
+
     public ChainLightningBulletType() {
         super();
         speed = 0;
@@ -36,6 +39,7 @@ public class ChainLightningBulletType extends BulletType {
         hittable = false;
         collides = false;
         collidesTeam = false;
+        aimed = true;
         jumpDamageFactor = 0.85f;
         distanceDamageFalloff = 0.65f;
         targetRange = -1;
@@ -72,7 +76,7 @@ public class ChainLightningBulletType extends BulletType {
     @Override
     public void init(Bullet b) {
         super.init(b);
-        Position aimPos = b.aimTile == null ? b : b.aimTile;
+        Position aimPos = b.aimTile == null || !aimed ? b : b.aimTile;
 
         Seq<Unit> units = Groups.unit.intersect(b.x - range, b.y - range, range * 2, range * 2);
         list.clear();
@@ -83,11 +87,11 @@ public class ChainLightningBulletType extends BulletType {
 
         for (int i = 0; i < Math.min(chainLightning, units.size); i++) {
             Unit unit = units.get(i);
-            if(!unit.targetable(b.team) || !(collidesTeam || unit.team != b.team)) break;
+            if(!unit.targetable(b.team) || !(collidesTeam || unit.team != b.team)) continue;
             float dst = unit.dst(b);
-            if(dst > range) break;
+            if(dst > range) continue;
             float dst2 = unit.dst(aimPos);
-            if(dst2 > targetRange) break;
+            if(dst2 > targetRange) continue;
             list.add(unit);
             charges--;
         }

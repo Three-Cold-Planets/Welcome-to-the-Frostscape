@@ -13,6 +13,7 @@ import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import arc.util.Time;
 import arc.util.Tmp;
+import main.Frostscape;
 import main.graphics.Layers;
 import main.graphics.ModPal;
 import main.math.MultiInterp;
@@ -127,7 +128,7 @@ public class Fxf {
         });
     }),
 
-    chainLightning = new Effect(15f, 300f, e -> {
+    chainLightning = new Effect(15, 300f, e -> {
         if(!(e.data instanceof VisualLightningHolder)) return;
         VisualLightningHolder p = (VisualLightningHolder) e.data;
 
@@ -143,7 +144,7 @@ public class Fxf {
 
         float arcWidth = rand.range(dst * p.arc());
 
-        seed = e.id - (int) e.time;
+        seed = e.id - (int) (e.time);
 
         float angle = Tmp.v1.angleTo(Tmp.v2);
 
@@ -173,7 +174,7 @@ public class Fxf {
             }else{
                 float len = (i + 1) * spacing;
                 rand.setSeed(seed + i);
-                Tmp.v3.trns(rand.random(360), range/2);
+                Tmp.v3.trns(rand.random(360), Frostscape.simplifiedLightning ? 0 : range/2);
                 percent = ((float) (i + 1))/links;
 
                 nx = tx + normx * len + Tmp.v3.x + Tmp.v4.set(0, arcX.get()).rotate(angle).x;

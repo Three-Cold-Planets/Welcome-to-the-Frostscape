@@ -79,6 +79,7 @@ public class PlugBlock extends BaseBlock {
             }
         }
     }
+
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid) {
 

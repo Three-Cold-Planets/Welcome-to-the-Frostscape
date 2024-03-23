@@ -1,5 +1,10 @@
 package main.entities.ability;
 
+import arc.Core;
+import arc.graphics.Blending;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Time;
@@ -12,6 +17,9 @@ import mindustry.gen.Unit;
 import static main.content.FrostBullets.placeholder1;
 
 public class MoveDamageLineAbility extends Ability {
+    public Color color = Color.valueOf("d1efff");
+    public String heatRegion = "";
+
     /** Bullet damage */
     public float damage = 35f;
     /** Chance of firing every tick. Set >= 1 to always run every tick at max speed */
@@ -40,10 +48,11 @@ public class MoveDamageLineAbility extends Ability {
     hitEffect;
 
     protected float side = 1f;
+    protected float scl;
 
     MoveDamageLineAbility(){}
 
-    public MoveDamageLineAbility(float damage, int length, float chance, float x, float y, float minSpeed, float maxSpeed,  float angleOffset, boolean hitGround, boolean hitAir, Effect effect, Effect hitEffect){
+    public MoveDamageLineAbility(float damage, int length, float chance, float x, float y, float minSpeed, float maxSpeed, float angleOffset, boolean hitGround, boolean hitAir, Effect effect, Effect hitEffect){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
@@ -57,7 +66,7 @@ public class MoveDamageLineAbility extends Ability {
         this.effect = effect;
         this.hitEffect = hitEffect;
     }
-    public MoveDamageLineAbility(float damage, int length, float chance, float x, float y, float minSpeed, float maxSpeed,  float angleOffset, float recoil, boolean hitGround, boolean hitAir, Effect effect, Effect hitEffect){
+    public MoveDamageLineAbility(float damage, int length, float chance, float x, float y, float minSpeed, float maxSpeed, float angleOffset, float recoil, boolean hitGround, boolean hitAir, Effect effect, Effect hitEffect){
         this.damage = damage;
         this.length = length;
         this.chance = chance;
@@ -73,9 +82,26 @@ public class MoveDamageLineAbility extends Ability {
         this.hitEffect = hitEffect;
     }
 
+    public MoveDamageLineAbility(float damage, int length, float chance, float x, float y, float minSpeed, float maxSpeed, float angleOffset, float recoil, boolean hitGround, boolean hitAir, Effect effect, Effect hitEffect, String heatRegion) {
+        this.damage = damage;
+        this.length = length;
+        this.chance = chance;
+        this.x = x;
+        this.y = y;
+        this.minSpeed = minSpeed;
+        this.maxSpeed = maxSpeed;
+        this.angleOffset = angleOffset;
+        this.recoil = recoil;
+        this.hitGround = hitGround;
+        this.hitAir = hitAir;
+        this.effect = effect;
+        this.hitEffect = hitEffect;
+        this.heatRegion = heatRegion;
+    }
+
     @Override
     public void update(Unit unit){
-        float scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
+        scl = Mathf.clamp((unit.vel().len() - minSpeed) / (maxSpeed - minSpeed));
         if(chance > 1 || Mathf.chance(Time.delta * chance * scl)){
             float x = unit.x + Angles.trnsx(unit.rotation, this.y, this.x * side), y = unit.y + Angles.trnsy(unit.rotation, this.y, this.x * side);
 
@@ -91,6 +117,18 @@ public class MoveDamageLineAbility extends Ability {
             }
 
             if(alternate) side *= -1f;
+        }
+    }
+
+    @Override
+    public void draw(Unit unit) {
+        TextureRegion region = Core.atlas.find(this.heatRegion);
+        if (Core.atlas.isFound(region) && scl > 1.0E-5F) {
+            Draw.color(this.color);
+            Draw.alpha(scl / 2.0F);
+            Draw.blend(Blending.additive);
+            Draw.rect(region, unit.x + Mathf.range(scl / 2.0F), unit.y + Mathf.range(scl / 2.0F), unit.rotation - 90.0F);
+            Draw.blend();
         }
     }
 }

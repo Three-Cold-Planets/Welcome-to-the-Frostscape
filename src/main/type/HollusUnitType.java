@@ -13,6 +13,7 @@ import main.util.StatUtils;
 import main.world.meta.Family;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Unit;
+import mindustry.gen.UnitEntity;
 import mindustry.type.UnitType;
 
 public class HollusUnitType extends UnitType{
@@ -66,14 +67,29 @@ public class HollusUnitType extends UnitType{
             this.target = target;
         }
 
+        public float activation(Unit unit){
+            float dif = 1;
+
+            float turnRot = Mathf.mod(unit.rotation * 2 - unit.vel.angle(), 360);
+
+            float engineRot = Mathf.mod(unit.rotation + rotation - 90 + 180, 360);
+
+            float alignment = 1 - Mathf.mod(Math.min(Angles.forwardDistance(turnRot, engineRot), Angles.backwardDistance(turnRot, engineRot)), 360)/360;
+
+
+            float activation = Mathf.lerp(from, to, Mathf.clamp(Mathf.maxZero(unit.vel().len2() - threshold) / target, 0, 1)) * dif * alignment;
+
+            return activation;
+        }
+
         public void draw(Unit unit) {
             //take the smaller difference of the two
-            float diff = 1 - Math.min(Angles.forwardDistance(unit.vel.angle(), unit.rotation)
-                    , Angles.backwardDistance(unit.vel.angle(), unit.rotation))/360;
-            float activation = Mathf.lerp(from, to, Mathf.clamp(Mathf.maxZero(unit.vel().len2() - threshold) / target, 0, 1)) * diff;
+            //float dif = 1 - Math.min(Angles.forwardDistance(unit.vel.angle(), unit.rotation), Angles.backwardDistance(unit.vel.angle(), unit.rotation))/360;
+
+
             float iradius = radius;
 
-            radius *= activation;
+            radius *= activation(unit);
 
             UnitType type = unit.type;
             float scale = type.useEngineElevation ? unit.elevation : 1f;

@@ -40,7 +40,7 @@ public class ModPal {
 
     quiteDarkOutline = Color.valueOf("#39343c"),
     specialist = Color.valueOf("#c49ff4"),
-    hunter = Color.valueOf("#dde6f0"),
+    hunter = Color.valueOf("#cae4ec"),
     swarm = Color.valueOf("f0725c"),
     gelid = Color.valueOf("f4e888"),
 

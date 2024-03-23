@@ -1,9 +1,13 @@
-package main.world.systems.upgrades;
+package main.world.module;
 
 import arc.struct.Seq;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import main.type.upgrade.Upgradeable;
+import main.world.systems.upgrades.Upgrade;
+import main.world.systems.upgrades.UpgradeEntry;
+import main.world.systems.upgrades.UpgradeHandler;
+import main.world.systems.upgrades.UpgradeState;
 import mindustry.world.modules.BlockModule;
 
 public class UpgradeModule extends BlockModule {

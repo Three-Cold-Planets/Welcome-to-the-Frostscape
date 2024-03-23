@@ -12,7 +12,7 @@ import arc.math.geom.Rect;
 import arc.struct.Seq;
 import arc.util.Tmp;
 import ent.anno.Annotations;
-import main.ai.types.FixedFlyingAI;
+import main.ai.types.ChargeFlyingAI;
 import main.entities.BaseBulletType;
 import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
@@ -45,6 +45,7 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
+import mindustry.type.unit.MissileUnitType;
 import mindustry.type.unit.TankUnitType;
 import mindustry.world.meta.Env;
 
@@ -54,6 +55,7 @@ import static arc.graphics.g2d.Lines.lineAngle;
 import static arc.graphics.g2d.Lines.stroke;
 import static arc.math.Angles.randLenVectors;
 import static main.Frostscape.NAME;
+import static mindustry.content.Fx.attackCommand;
 import static mindustry.content.Fx.circleColorSpark;
 
 public class FrostUnits {
@@ -572,158 +574,68 @@ public class FrostUnits {
         }};
 
         sunspot = new HollusUnitType("sunspot"){{
+            health = 350;
             maxRange = 150;
-            range = 10;
+            range = 1;
             families.add(Families.hunter);
             hitSize = 70/8;
             constructor = UnitEntity::create;
             flying = true;
-            speed = 3;
+            targetGround = false;
+            speed = 4.5f;
             rotateSpeed = 3;
-            accel = 0.038f;
-            drag = 0.028f;
+            accel = 0.028f;
+            drag = 0.032f;
             engineSize = 0.0F;
             faceTarget = true;
-            circleTarget = true;
+            circleTarget = false;
             omniMovement = false;
             engines.clear();
-            aiController = () -> new FixedFlyingAI();
+            aiController = () -> new ChargeFlyingAI();
+
+            float rad = 40;
+
             setEnginesMirror(
-                        new ActivationEngine(24/4, -30/4, 3.5f, 15 - 90, 0.25f, 1, 1, 7.5f)
+                        new ActivationEngine(32/4, -30/4, 3f, 45 - 90, 0.25f, 1, 1.5f, 7.5f)
             );
             abilities.add(
-                    new MoveDamageLineAbility(9, 40/4, 0.85f, 0, 6/4, 1, 4.5f, 0, true, true, Fx.colorSpark, Fx.hitLancer),
-                    new MoveArmorAbility(1.2f, 5, 0.6f, true, name + "-glow",Layer.flyingUnit + 0.1f)
+                    new MoveDamageLineAbility(9, 40/4, 0.85f, 0, 6/4, 1, 4.5f, 0, 0, false, true, Fx.generatespark, Fx.hitLancer, name + "-glow"),
+                    new MoveArmorAbility(3.2f, 7, 1.6f, false, name + "-armor",Layer.flyingUnit + 0.1f)
             );
 
             deathExplosionEffect = new Effect(45, e -> {});
-            weapons.add(
+            weapons.addAll(
                 new Weapon("none"){{
-                    x = 24/4;
-                    y = -32/4;
-                    reload = 10;
+                    x = 32/4;
+                    y = -30/4;
+                    shootY = 0;
+                    reload = 3;
                     //Note: The range of this is effectively the targeting range of the unit
                     bullet = new FrostBulletType(){{
                         instantDisappear = true;
                         overrideRange = true;
                         speed = 1;
                         range = 150;
-                        recoil = 0.5f;
-                        shootEffect = new Effect(12, e -> {
+                        parentizeEffects = false;
+                        shootEffect = new Effect(10, e -> {
                             color(Color.white);
-                            randLenVectors(e.id, (int) (Mathf.randomSeed(e.id) * 8 + 2), e.fin(Interp.pow4) * 145, e.rotation, 15, (x1, y1) -> {
-                                Lines.lineAngle(e.x, e.y, Mathf.angle(x1, y1), e.fout(Interp.pow4) * 8);
+                            randLenVectors(e.id, (int) (Mathf.randomSeed(e.id) * 8 + 2), e.fin() * 15, e.rotation, 45, (x1, y1) -> {
+                                Lines.lineAngle(e.x + x1, e.y + y1, Mathf.angle(x1, y1), 4 * e.fout());
                             });
                         });
                         despawnEffect = Fx.none;
                     }};
-                    baseRotation = 180;
+                    baseRotation = 225;
+                    rotationLimit = 0;
                     shootSound = Sounds.none;
                     rotate = false;
                     alternate = false;
+                    alwaysShooting = true;
+                    controllable = false;
+                    minShootVelocity = 3.5f;
                     shootCone = 180;
                     shootStatus = FrostStatusEffects.engineBoost;
-                    shootStatusDuration = 35;
-                }},
-                new Weapon() {{
-                    shootOnDeath = true;
-                    shootCone = 180;
-                    reload = 60;
-                    ejectEffect = Fx.none;
-                    shootSound = Sounds.none;
-                    x = shootY = 0.0f;
-                    mirror = false;
-                    noAttack = true;
-                    controllable = false;
-                    rotate = false;
-                    inaccuracy = 180;
-                    bullet = new BulletType(){{
-                        instantDisappear = true;
-                        fragBullets = 1;
-                        float rad = 40;
-                        fragSpread = fragRandomSpread = 0;
-                        fragBullet = new BasicBulletType(5, 0, NAME + "-sunspot-tip") {
-                            @Override
-                            public void draw(Bullet b) {
-                                Draw.rect(this.frontRegion, b.x, b.y, width, height, b.fout() * b.fout() * 360 * 2.5f);
-                                Draw.z(Layer.effect);
-
-                                stroke((0.7f + Mathf.absin(10, 0.7f)) * b.fin() * 1.6f, ModPal.hunter);
-
-                                float progress = b.fin(Interp.smooth);
-
-                                for (int i = 0; i < 6; i++) {
-                                    float rot = i * 360f / 6 - 360 * progress;
-                                    Lines.arc(b.x, b.y, rad * progress + 3f, 0.08f + b.fin() * 0.06f, rot);
-                                }
-
-                                float fastProgress = Mathf.clamp(progress * 3 - 2);
-
-                                Draw.blend(Blending.additive);
-                                Fill.light(b.x, b.y, 20, rad, Tmp.c1.set(Color.white).lerp(ModPal.hunter, fastProgress).a(fastProgress * 0.2f), Tmp.c2.set(ModPal.hunter).a(0));
-                                Draw.blend();
-                            }
-
-                            public void createFrags(Bullet b, float x, float y) {
-                                if (this.fragBullet != null && (this.fragOnAbsorb || !b.absorbed)) {
-                                    for(int i = 0; i < this.fragBullets; ++i) {
-                                        float a = b.rotation();
-                                        this.fragBullet.create(b, x, y, a, Mathf.random(this.fragVelocityMin, this.fragVelocityMax), Mathf.random(this.fragLifeMin, this.fragLifeMax));
-                                    }
-                                }
-                            }
-
-                            {
-                                homingPower = 0.055f;
-                                homingRange = rad * 2;
-                                layer = Layer.groundUnit + 0.1f;
-                                drag = 0.045f;
-                                collideTerrain = true;
-                                collidesTiles = true;
-                                collides = true;
-                                collidesAir = false;
-                                hitSound = Sounds.spark;
-                                rangeOverride = 0.0F;
-                                shootEffect = Fx.none;
-                                lifetime = 95;
-                                shrinkX = shrinkY = 0;
-                                splashDamageRadius = 55.0F;
-                                splashDamage = 5.0F;
-                                spin = 0.85f;
-                                hittable = false;
-                                collidesAir = true;
-                                fragBullets = 1;
-                                fragBullet = new EmpBulletType() {
-                                    {
-                                    damage = 35;
-                                    instantDisappear = true;
-                                    despawnHit = true;
-                                    radius = rad;
-                                    hitPowerEffect = circleColorSpark;
-                                    hitEffect = new Effect(50f, 100f, e -> {
-                                        e.scaled(7f, b -> {
-                                            color(ModPal.hunter, b.fout());
-                                            Draw.blend(Blending.additive);
-                                            Fill.light(b.x, b.y, 20, rad, Tmp.c1.set(ModPal.hunter).a(b.fout()), Tmp.c2.set(Tmp.c1).a(b.fin() * b.fslope()));
-                                            Draw.blend();
-                                        });
-
-                                        color(ModPal.hunter);
-                                        stroke(e.fout() * 3f);
-                                        Lines.circle(e.x, e.y, radius);
-
-                                        Fill.circle(e.x, e.y, 12f * e.fout());
-                                        color();
-                                        Fill.circle(e.x, e.y, 6f * e.fout());
-                                        Drawf.light(e.x, e.y, radius * 1.6f, ModPal.hunter, e.fout());
-                                    });
-                                    hitColor = ModPal.hunter;
-                                    status = FrostStatusEffects.conflexInternal;
-                                    statusDuration = 6.5f * 60;
-                                }};
-                            }
-                        };
-                    }};
+                    shootStatusDuration = 75;
                 }}
             );
         }};
@@ -751,7 +663,7 @@ public class FrostUnits {
             );
 
             weapons.add(
-                new Weapon(NAME + "-javelin-mounts-under"){
+                new Weapon(NAME + "-flamethrower"){
                     {
                         reload = 135;
                         rotate = true;
@@ -760,6 +672,7 @@ public class FrostUnits {
                         shootSound = Sounds.minebeam;
                         layerOffset = -1;
                         x = 40 / 4;
+                        int asdf = Vars.tilesize;
                         y = 0;
                         recoil = 4.25f;
                         shootX = 0;

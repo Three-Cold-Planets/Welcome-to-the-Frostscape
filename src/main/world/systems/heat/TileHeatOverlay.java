@@ -18,7 +18,9 @@ public class TileHeatOverlay {
     public boolean enabled;
 
     public void draw(){
+        if(!enabled) return;
         for (HeatControl.Chunk chunk: HeatControl.gridChunks) {
+            boolean enabled = chunk.state.enabled;
             if (chunk.state.enabled) Draw.color(Color.white);
             else Draw.color(Color.red, Pal.remove, Mathf.absin(30, 1));
             Lines.stroke(0.5f + (enabled ? Mathf.absin(1.5f, 1) : 0.5f));

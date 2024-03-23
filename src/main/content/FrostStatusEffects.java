@@ -11,6 +11,7 @@ import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Unit;
+import mindustry.gen.UnitEntity;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 
@@ -61,10 +62,20 @@ public class FrostStatusEffects {
             damageMultiplier = 1.35f;
         }};
 
-        engineBoost = new StatusEffect("engine-boost"){{
-            speedMultiplier = 2.45f;
-            dragMultiplier = 0.75f;
-        }};
+        engineBoost = new StatusEffect("engine-boost"){
+
+            @Override
+            public void update(Unit u, float time){
+                super.update(u, time);
+                u.speedMultiplier /= speedMultiplier;
+                u.speedMultiplier *= Mathf.lerp(1, 2.75f, Math.min(time/60, 1));
+            }
+
+            {
+                speedMultiplier = 2.45f;
+                dragMultiplier = 0.75f;
+            }
+        };
 
         lowGrav = new StatusEffect("low-grav"){
             @Override

@@ -13,6 +13,7 @@ import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Structs;
 import arc.util.Time;
+import main.entities.comp.HeatComp;
 import main.game.ScriptedSectorHandler;
 import main.graphics.FrostShaders;
 import main.graphics.ModPal;
@@ -55,7 +56,7 @@ import static mindustry.Vars.ui;
 
 public class Frostscape extends Mod{
 
-    public static boolean photosensitiveMode;
+    public static boolean photosensitiveMode, simplifiedLightning;
 
     public static NativeJavaPackage p = null;
 
@@ -202,12 +203,14 @@ public class Frostscape extends Mod{
                 "main.util",
                 "main.world",
                 "main.world.systems.light",
+                "main.world.systems.heat",
                 "main.world.systems.upgrades",
                 "main.world.systems.research",
                 "main.world.systems.bank"
         );
 
         packages.each(name -> {
+
             p = new NativeJavaPackage(name, Vars.mods.mainLoader());
 
             p.setParentScope(scope);
@@ -240,6 +243,10 @@ public class Frostscape extends Mod{
     }
 
     void loadSettings(){
+        photosensitiveMode = Core.settings.getBool("settings.frostscape-flashing-lights-safety", false);
+        heatOverlay.enabled = Core.settings.getBool("settings.frostscape-heat-overlay", false);
+        simplifiedLightning = Core.settings.getBool("settings.frostscape-simple-lightning");
+
         heatOverlay.enabled = Core.settings.getBool("settings.frostscape-heat-overlay", false);
         ui.settings.addCategory(Core.bundle.get("settings.frostscape-title"), NAME + "-hunter", t -> {
             t.sliderPref(Core.bundle.get("settings.frostscape-parallax"), 100, 1, 100, 1, s -> s + "%");
@@ -247,11 +254,14 @@ public class Frostscape extends Mod{
             t.checkPref(Core.bundle.get("settings.frostscape-flashing-lights-safety"), false, b -> {
                 photosensitiveMode = b;
             });
-            t.row();
-            t.add(Core.bundle.get("settings.frostscape.flashingwarning")).wrap().left().growX().padTop(3);
             t.checkPref(Core.bundle.get("settings.frostscape-heat-overlay"), false, b -> {
                 heatOverlay.enabled = b;
             });
+            t.checkPref(Core.bundle.get("settings.frostscape-simple-lightning"), false, b -> {
+                simplifiedLightning = b;
+            });
+            t.row();
+            t.add(Core.bundle.get("settings.frostscape.flashingwarning")).wrap().left().growX().padTop(3);
         });
     }
 
