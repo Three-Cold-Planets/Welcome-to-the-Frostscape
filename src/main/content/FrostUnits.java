@@ -5,6 +5,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Geometry;
@@ -12,6 +13,7 @@ import arc.math.geom.Rect;
 import arc.struct.Seq;
 import arc.util.Tmp;
 import ent.anno.Annotations;
+import main.ai.types.ArtilleryAI;
 import main.entities.BaseBulletType;
 import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
@@ -31,14 +33,18 @@ import main.type.weapons.ThrustSwingWeapon;
 import main.type.weapons.VelocityWeapon;
 import mindustry.Vars;
 import mindustry.ai.types.CargoAI;
+import mindustry.ai.types.CommandAI;
+import mindustry.ai.types.GroundAI;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.ForceFieldAbility;
+import mindustry.entities.abilities.MoveEffectAbility;
 import mindustry.entities.abilities.ShieldArcAbility;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.RegionPart;
+import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -50,9 +56,9 @@ import mindustry.type.unit.MissileUnitType;
 import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.meta.BlockFlag;
 
-import static arc.graphics.g2d.Draw.alpha;
-import static arc.graphics.g2d.Draw.color;
+import static arc.graphics.g2d.Draw.*;
 import static arc.graphics.g2d.Lines.lineAngle;
 import static arc.graphics.g2d.Lines.stroke;
 import static arc.math.Angles.randLenVectors;
@@ -600,21 +606,49 @@ public class FrostUnits {
             stepShake = 0.5f;
             legExtension = -5f;
             legBaseOffset = 8f;
+            drownTimeMultiplier = 2.5f;
 
             hovering = true;
 
+            targetFlags = new BlockFlag[]{BlockFlag.hasFogRadius};
+
             weapons.addAll(
                 new Weapon(name + "-blaster"){{
+                    parts.add(
+                            new RegionPart("-barrel"){{
+                                progress = PartProgress.recoil.curve(Interp.pow2In);
+                                moveY = -4;
+                                under = true;
+                                layerOffset = -0.01f;
+                                moves.add(new PartMove(PartProgress.warmup.curve(Interp.pow2InInverse), 0, 10, 0));
+                            }},
+                            new RegionPart("-mandible"){{
+                                progress = PartProgress.warmup.compress(0, 0.5f).curve(Interp.pow2InInverse);
+                                x = 31/4;
+                                y = 53/4;
+                                mirror = true;
+                                under = true;
+                                layerOffset = -0.01f;
+                                moveRot = -35;
+                                moveY = -4;
+                                moveX = -1;
+                            }});
                     x = y = 0;
                     mirror = false;
                     minWarmup = 0.8f;
                     shootWarmupSpeed = 0.025f;
                     recoil = 0;
                     shootY = 17;
+                    shootStatus = StatusEffects.slow;
+                    shootStatusDuration = 130;
+
+                    reload = 115;
+                    shootSound = Sounds.artillery;
+                    shake = 4;
                     //Modified titan bullet, will change in the future
-                    bullet = new ArtilleryBulletType(2.5f, 350, "shell"){{
+                    bullet = new BaseBulletType(2.5f, 350, "shell"){{
                         hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
-                        collides = collidesTiles = collidesGround = true;
+                        collidesAir = false;
                         despawnEffect = Fx.none;
                         knockback = 2f;
                         lifetime = 140f;
@@ -645,28 +679,6 @@ public class FrostUnits {
                         shrinkY = 0.1f;
                         buildingDamageMultiplier = 0.3f;
                     }};
-                    reload = 115;
-                    shootSound = Sounds.artillery;
-                    shake = 4;
-                    parts.add(
-                        new RegionPart("-barrel"){{
-                            progress = PartProgress.recoil.curve(Interp.pow2In);
-                            moveY = -4;
-                            under = true;
-                            layerOffset = -0.01f;
-                            moves.add(new PartMove(PartProgress.warmup.curve(Interp.pow2InInverse), 0, 10, 0));
-                        }},
-                        new RegionPart("-mandible"){{
-                        progress = PartProgress.warmup.compress(0, 0.5f).curve(Interp.pow2InInverse);
-                        x = 31/4;
-                        y = 53/4;
-                        mirror = true;
-                        under = true;
-                        layerOffset = -0.01f;
-                        moveRot = -35;
-                        moveY = -4;
-                        moveX = -1;
-                    }});
                 }},
                 new PointDefenseMissileWeapon(name + "-pod-launcher") {{
                     parts.addAll(
@@ -686,10 +698,8 @@ public class FrostUnits {
                     speed = 1.5f;
                     lifetime = 120;
                     reload = 85;
-                    range = 120;
                     rotate = true;
                     rotateSpeed = 5;
-                    rotationLimit = 65;
                     shootCone = 15;
                     targetInterval = 20;
                     targetSwitchInterval = 1;
@@ -700,11 +710,42 @@ public class FrostUnits {
                     useAttackRange = false;
 
                     bullet = new MissileBulletType(){{
+                        shootEffect = new Effect(130, e -> {
+                            Draw.color(Color.gray);
+                            Angles.randLenVectors(e.id, 10, e.finpow() * 45, e.rotation + 180, 30, (x, y) -> {
+                                Fill.circle(e.x + x, e.y + y, e.foutpow() * 3);
+                            });
+                        });
                         spawnUnit = new MissileUnitType("andon-pod"){{
                             rotateSpeed = 0;
                             missileAccelTime = 35;
                             speed = 2.5f;
                             lifetime = 3.2f * 60;
+                            lowAltitude = true;
+
+                            abilities.add(new MoveEffectAbility(){{
+                                effect = new Effect(15, e -> {
+                                    color(Color.white);
+                                    randLenVectors(e.id, 4, e.fin() * 15, e.rotation, 45, (x1, y1) -> {
+                                        Lines.lineAngle(e.x + x1, e.y + y1, Mathf.angle(x1, y1), 4 * e.fout());
+                                    });
+                                });
+                                rotation = 180;
+                                rotateEffect = true;
+                                y = -3f;
+                                interval = 3f;
+                            }});
+
+                            parts.addAll(
+                                    new ShapePart(){{
+                                        progress = PartProgress.life.compress(0, missileAccelTime/lifetime);
+                                        radius = 0;
+                                        radiusTo = 3;
+                                        sides = 20;
+                                        layer = Layer.effect;
+                                        color = ModPal.gelid;
+                                    }}
+                            );
 
                             abilities.add(new ShieldArcAbility(){{
                                 regen = 0;
@@ -714,7 +755,10 @@ public class FrostUnits {
                                 whenShooting = false;
                             }});
                             weapons.add(
-                                new PointDefenseWeapon("small-basic-weapon"){{
+                                new PointDefenseWeapon(){{
+                                    x = 0;
+                                    y = 0;
+                                    mirror = false;
                                     reload = 8f;
 
                                     targetInterval = 9f;
@@ -734,6 +778,8 @@ public class FrostUnits {
                     }};
                 }}
             );
+
+            aiController = () -> new ArtilleryAI();
         }};
 
         sunspot = new HollusUnitType("sunspot"){{
