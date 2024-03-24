@@ -27,6 +27,7 @@ public class HollusUnitType extends UnitType{
         super(name);
         immunities.add(StatusEffects.freezing);
         outlineColor = ModPal.quiteDarkOutline;
+        envDisabled = 0;
     }
 
     @Override

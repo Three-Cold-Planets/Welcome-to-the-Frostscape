@@ -3,7 +3,6 @@ package main.world;
 import arc.graphics.Color;
 import arc.math.geom.Point2;
 import arc.util.ColorCodes;
-import arc.math.geom.Point2;
 import arc.util.Log;
 import arc.util.Tmp;
 import arc.util.io.Reads;
