@@ -20,6 +20,8 @@ import main.math.Math3D;
 import main.math.Math3D.HeightHolder;
 import mindustry.Vars;
 import mindustry.content.Fx;
+import mindustry.content.UnitTypes;
+import mindustry.content.Weathers;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;
 import mindustry.entities.Lightning;
@@ -29,6 +31,8 @@ import mindustry.game.Team;
 import mindustry.gen.*;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.world.Tile;
+import mindustry.world.blocks.environment.Floor;
 
 import java.awt.geom.QuadCurve2D;
 import java.util.Iterator;
@@ -50,7 +54,7 @@ public class BouncyBulletType extends BaseBulletType {
     public int bounceIncend;
     public float bounceIncendSpread, bounceIncendChance;
 
-    public boolean collidesBounce;
+    public boolean collidesBounce, bounceLiquid, bounceDeep;
     public float fragLiftMin, fragLiftMax;
     public boolean useMinLife;
     public boolean useRotation;
@@ -61,7 +65,7 @@ public class BouncyBulletType extends BaseBulletType {
     public float shadowAlpha;
     public float bounceEffectScale;
     public float bounceShake;
-    public Effect bounceEffect;
+    public Effect bounceEffect, sinkEffect;
 
     public TextureRegion shadowRegion;
 
@@ -69,6 +73,7 @@ public class BouncyBulletType extends BaseBulletType {
     public float visualHeightRange;
     public BouncyBulletType(float speed, float damage, String sprite){
         super(speed, damage, sprite);
+        sinkEffect = Fx.smokePuff;
         visualHeightMax = Layer.flyingUnit - 1;
         visualHeightMin = Layer.bullet;
         gravity = 0.0025f;
@@ -87,6 +92,7 @@ public class BouncyBulletType extends BaseBulletType {
         spinsprite = false;
         keepLift = true;
         keepHeight = true;
+        fragOnAbsorb = false;
         shadowAlpha = 1;
         bounceEffectScale = 0.04f;
         bounceShake = 0.5f;
@@ -119,6 +125,7 @@ public class BouncyBulletType extends BaseBulletType {
         }
 
         shadowRegion = new TextureRegion(new Texture(stencil));
+        stencil.dispose();
         visualHeightRange = startingHeight + ((startingLift * startingLift)/2)/gravity;
 
         //Setup effects to accept trailEffect and hitEffect automatically because im lazy
@@ -341,6 +348,21 @@ public class BouncyBulletType extends BaseBulletType {
         else b.data = new HeightHolder(h.height, h.lift);
     }
     public void bounce(Bullet b, HeightHolder holder){
+        Tile tile = Vars.world.tileWorld(b.x, b.y);
+        if(tile != null){
+            Floor floor = tile.floor();
+            if(!tile.block().solid && (tile.floor().isLiquid && !bounceLiquid || tile.floor().isDeep() && !bounceDeep)){
+                //Circumvent despawnHit
+                b.hit = true;
+                b.absorb();
+                sinkEffect.at(b.x, b.y, b.rotation(), this);
+                floor.walkSound.at(b.x, b.y, Mathf.random(floor.walkSoundPitchMin, floor.walkSoundPitchMax));
+                floor.walkEffect.at(b.x, b.y, b.hitSize, floor.mapColor);
+                return;
+            }
+        }
+
+
         bounceEffect.at(b.x, b.y, useRotation ? b.rotation() : bounceEffectScale, Vars.world.floorWorld(b.x, b.y).mapColor);
 
         holder.height *= -1;

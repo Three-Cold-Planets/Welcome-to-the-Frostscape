@@ -23,7 +23,7 @@ public class FrostItems {
     public static void load(){
 
         stone = new Item("stone"){{
-            color = Color.valueOf("8f8f94");
+            color = ModPal.stone;
         }};
 
         limestone = new Item("limestone"){{

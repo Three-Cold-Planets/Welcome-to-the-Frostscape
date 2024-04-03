@@ -18,6 +18,8 @@ import main.entities.BaseBulletType;
 import main.entities.ability.MoveArmorAbility;
 import main.entities.ability.MoveDamageLineAbility;
 import main.entities.ability.RamDamageAbility;
+import main.entities.ability.SelfDamageAbility;
+import main.entities.bullet.BouncyBulletType;
 import main.entities.bullet.ChainLightningBulletType;
 import main.entities.bullet.FrostBulletType;
 import main.entities.bullet.RicochetBulletType;
@@ -26,6 +28,7 @@ import main.gen.EntityRegistry;
 import main.gen.PortaLaserUnit;
 import main.gen.PortaLaserc;
 import main.graphics.ModPal;
+import main.math.MultiInterp;
 import main.type.HollusTankUnitType;
 import main.type.HollusUnitType;
 import main.type.weapons.PointDefenseMissileWeapon;
@@ -35,6 +38,7 @@ import mindustry.Vars;
 import mindustry.ai.types.CargoAI;
 import mindustry.ai.types.CommandAI;
 import mindustry.ai.types.GroundAI;
+import mindustry.ai.types.SuicideAI;
 import mindustry.content.*;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.ForceFieldAbility;
@@ -67,7 +71,7 @@ import static main.Frostscape.NAME;
 public class FrostUnits {
 
     public static UnitType serpieDrone,
-    sunspot, javelin, stalagmite, cord, ghoul, manta, andon;
+    sunspot, javelin, stalagmite, cord, ghoul, manta, flyfish, andon;
 
     public static @Annotations.EntityDef({Unitc.class, PortaLaserc.class}) UnitType upgradeDrone;
 
@@ -485,12 +489,12 @@ public class FrostUnits {
                     new Rect(6 - 36, 25 - 45, 11, 16),
                     new Rect(4-36, 54-45, 12, 28)
             };
+
             weapons.add(new Weapon(NAME + "-manta-weapon"){{
                 bullet = new BaseBulletType(9, 7, "bullet"){{
-                    lifetime = 20;
+                    lifetime = 25;
                     width = 5;
                     height = 9;
-                    pierce = pierceBuilding = true;
                     pierceCap = 2;
                     hitEffect = Fx.hitBulletSmall;
                     shrinkX = 0;
@@ -507,7 +511,7 @@ public class FrostUnits {
                 y = -13/4;
                 recoil = 0;
                 recoils = 2;
-                reload = 7;
+                reload = 5;
                 smoothReloadSpeed = 0.25f;
                 inaccuracy = 6;
                 velocityRnd = 0.3f;
@@ -579,6 +583,147 @@ public class FrostUnits {
             }});
         }};
 
+        flyfish = new HollusUnitType("flyfish"){{
+            lightOpacity = 0.15f;
+            lightRadius = 65;
+            constructor = TankUnit::create;
+            aiController = SuicideAI::new;
+            rotateMoveFirst = false;
+            health = 450;
+            armor = 2;
+            drag = 0.045f;
+            rotateSpeed = 7.5f;
+            accel = 0.045f;
+            speed = 2.7f;
+            treadFrames = 14;
+            hitSize = 15;
+            singleTarget = true;
+            faceTarget = false;
+
+            range = 0;
+            maxRange = 30;
+
+            deathExplosionEffect = new Effect(26, e -> {
+
+                Draw.color(ModPal.swarm, Color.white, e.fin());
+
+                e.scaled(12, e1 -> {
+                    Lines.stroke(e1.fout() * 4.2f);
+                    Lines.circle(e.x, e.y, e.finpow() * 44);
+                });
+
+                stroke(1.5f * e.fout());
+
+                randLenVectors(e.id, 9, e.fin() * 38, e.rotation, 360, (x, y) -> {
+                    float ang = Mathf.angle(x, y);
+                    lineAngle(e.x + x, e.y + y, ang, e.fout() * 3 + 1f);
+                });
+
+                randLenVectors(e.id + 1, 5, e.fin() * 20 + 4, e.rotation, 360, (x, y) -> {
+                    Fill.square(e.x + x, e.y + y, e.fout() * 3, 45 + e.fin() * (x + y));
+                });
+
+                Drawf.light(e.x, e.y, 65, ModPal.swarm, 0.8f * e.fout());
+            });
+
+            engineSize = 0;
+
+            engines.clear();
+            setEnginesMirror(
+                    new ActivationEngine(28/4, -32/4, 3f, 45 - 90, 0.75f, 1.5f, 0.5f, 4.5f)
+            );
+
+            useEngineElevation = false;
+
+            treadRects = new Rect[]{
+                    new Rect(24 - 30, 35 - 101/2, 11, 42)
+            };
+
+            abilities.add(
+                    new RamDamageAbility(65, 10, 0, 37/4, 2.5f, 3.75f, 0, 0.75f, -25, true, false, Fx.none, Fx.hitBulletSmall),
+                    new SelfDamageAbility(){{
+                        damage = 15;
+                        pierceArmor = true;
+                        effect = Fx.generatespark;
+                        effectChance = 50;
+                        color = ModPal.swarm;
+
+                        float width = 50/4, height = 95/4;
+                        effectField = new Rect(-width/2, -height/2, width, height);
+                    }}
+            );
+
+
+            weapons.add(
+                new Weapon(){
+                    {
+                        shootOnDeath = true;
+                        shootCone = 180;
+                        reload = 60;
+                        ejectEffect = Fx.none;
+                        shootSound = Sounds.none;
+                        x = y;
+                        mirror = false;
+                        noAttack = true;
+                        controllable = false;
+                        rotate = false;
+                        inaccuracy = 0;
+
+                        bullet = new ContinuousFlameBulletType() {{
+                            shootEffect = new Effect(35, e -> {
+                                Draw.color(Color.gray);
+                                Angles.randLenVectors(e.id, 15, e.finpow() * 35 + 5, e.rotation + 180, 25, (x, y) -> {
+                                    Fill.circle(e.x + x, e.y + y, e.fout(Interp.pow4) * 4);
+                                });
+                            });
+                            lifetime = 25;
+                            recoil = 0.01f;
+                            damage = 250;
+                            length = 35;
+                            width = 4;
+                            knockback = 1.0F;
+                            pierceCap = 2;
+                            pierceBuilding = true;
+                            drawFlare = false;
+                            colors = new Color[]{Color.valueOf("eb7abe").a(0.55F), Color.valueOf("e189f5").a(0.7F), Color.valueOf("907ef7").a(0.8F), Color.valueOf("91a4ff"), Color.white};
+                        }};
+                        shootStatus = StatusEffects.slow;
+                        shootStatusDuration = 15;
+                        parentizeEffects = false;
+                        predictTarget = false;
+                    }},
+                new Weapon(){{
+                    reload = 25;
+                    x = 24/4;
+                    y = -28/4;
+                    shootCone = 180;
+                    shootSound = Sounds.minebeam;
+                    rotate = false;
+                    baseRotation = 225;
+                    rotationLimit = 50;
+                    alternate = false;
+                    shootStatus = FrostStatusEffects.engineBoost;
+                    shootStatusDuration = 10;
+
+                    recoil = 2f;
+                    shootY = 1f;
+                    bullet = new ContinuousFlameBulletType() {{
+                        recoil = -0.15f;
+                        this.damage = 35;
+                        this.length = 8.5f;
+                        width = 2;
+                        this.knockback = 1.0F;
+                        this.pierceCap = 1;
+                        this.buildingDamageMultiplier = 0.3F;
+                        drawFlare = false;
+                        this.colors = new Color[]{Color.valueOf("eb7abe").a(0.55F), Color.valueOf("e189f5").a(0.7F), Color.valueOf("907ef7").a(0.8F), Color.valueOf("91a4ff"), Color.white};
+                    }};
+                    parentizeEffects = false;
+                    continuous = alwaysContinuous = true;
+                }}
+            );
+        }};
+
         andon = new HollusUnitType("andon"){{
             families.add(Families.gelid);
             constructor = LegsUnit::create;
@@ -642,20 +787,21 @@ public class FrostUnits {
                     shootStatus = StatusEffects.slow;
                     shootStatusDuration = 130;
 
-                    reload = 115;
+                    reload = 215;
                     shootSound = Sounds.artillery;
                     shake = 4;
                     //Modified titan bullet, will change in the future
-                    bullet = new BaseBulletType(2.5f, 350, "shell"){{
+                    bullet = new BaseBulletType(2.5f, 150, "shell"){{
                         hitEffect = new MultiEffect(Fx.titanExplosion, Fx.titanSmoke);
                         collidesAir = false;
+                        scaleLife = true;
                         despawnEffect = Fx.none;
                         knockback = 2f;
                         lifetime = 140f;
                         height = 19f;
                         width = 17f;
-                        splashDamageRadius = 65f;
-                        splashDamage = 350f;
+                        splashDamageRadius = 35f;
+                        splashDamage = 150f;
                         scaledSplashDamage = true;
                         backColor = hitColor = trailColor = Color.valueOf("ea8878").lerp(Pal.redLight, 0.5f);
                         frontColor = Color.white;
@@ -749,9 +895,10 @@ public class FrostUnits {
 
                             abilities.add(new ShieldArcAbility(){{
                                 regen = 0;
-                                angle = 140;
-                                radius = 5;
-                                health = 350;
+                                angle = 160;
+                                radius = 7;
+                                width = 7;
+                                max = 350;
                                 whenShooting = false;
                             }});
                             weapons.add(
@@ -761,15 +908,15 @@ public class FrostUnits {
                                     mirror = false;
                                     reload = 8f;
 
-                                    targetInterval = 9f;
-                                    targetSwitchInterval = 12f;
+                                    targetInterval = 1f;
+                                    targetSwitchInterval = 2f;
                                     recoil = 0.5f;
 
                                     bullet = new BulletType(){{
                                         shootSound = Sounds.lasershoot;
                                         shootEffect = Fx.sparkShoot;
                                         hitEffect = Fx.pointHit;
-                                        maxRange = 100f;
+                                        maxRange = 25;
                                         damage = 38f;
                                     }};
                                 }}
@@ -799,13 +946,12 @@ public class FrostUnits {
             faceTarget = true;
             circleTarget = false;
             omniMovement = false;
+
             engines.clear();
-
-            float rad = 40;
-
             setEnginesMirror(
                         new ActivationEngine(32/4, -30/4, 3f, 45 - 90, 0.25f, 1, 1.5f, 7.5f)
             );
+
             abilities.add(
                     new MoveDamageLineAbility(9, 40/4, 0.85f, 0, 6/4, 1, 4.5f, 0, 0, false, true, Fx.generatespark, Fx.hitLancer, name + "-glow"),
                     new MoveArmorAbility(3.2f, 7, 1.6f, false, name + "-armor",Layer.flyingUnit + 0.1f)

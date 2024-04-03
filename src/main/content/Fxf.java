@@ -33,6 +33,8 @@ import static main.util.WeatherUtils.windDirection;
 import static mindustry.content.Fx.rand;
 
 public class Fxf {
+
+
     public static MultiInterp
             smokeFade = new MultiInterp(new float[]{0, 0.8f}, new Interp[]{Interp.pow2, Interp.pow2Out});
     private static float percent = 0;

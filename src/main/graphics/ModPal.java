@@ -10,6 +10,7 @@ public class ModPal {
     pulseChargeStart = new Color(Color.sky).lerp(Pal.lightTrail, 0.35f),
     pulseChargeEnd = new Color(Color.sky).lerp(Pal.lightTrail, 0.25f).lerp(Color.valueOf("#a4ddf2"), 0.05f),
 
+    //Region item
     aluminium = Color.valueOf("#a0a3b4"),
 
     ferricPanel = Color.valueOf("#eee5f6"),
@@ -32,6 +33,7 @@ public class ModPal {
     salt = Color.valueOf("e8e4e3"),
     lime = Color.valueOf("c4cdd4"),
 
+    stone = Color.valueOf("8f8f94"),
     limestone = Color.valueOf("93938a"),
     cryolite = Color.valueOf("b0a082"),
     rust = Color.valueOf("d0997a"),
@@ -43,6 +45,22 @@ public class ModPal {
     hunter = Color.valueOf("#cae4ec"),
     swarm = Color.valueOf("f0725c"),
     gelid = Color.valueOf("f4e888"),
+
+    //Endregion
+
+    //Region liquid
+
+    carbonDioxide = Color.valueOf("415d58"),
+
+    steam = Color.valueOf("c1c6e1"),
+
+    chlorine = Color.valueOf("b3dc4c"),
+
+    hydrogenFlouride = Color.valueOf("f4ee86"),
+
+    acetylene = Color.valueOf("f8d6cd"),
+
+    //Endregion
 
     heat = new Color(1.0F, 0.22F, 0.22F, 0.8F),
 

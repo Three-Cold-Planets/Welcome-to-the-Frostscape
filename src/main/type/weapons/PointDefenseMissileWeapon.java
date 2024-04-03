@@ -19,7 +19,7 @@ public class PointDefenseMissileWeapon extends BaseWeapon{
     }
 
     {
-        predictTarget = false;
+        predictTarget = true;
         autoTarget = true;
         controllable = false;
         rotate = true;
@@ -29,7 +29,7 @@ public class PointDefenseMissileWeapon extends BaseWeapon{
 
     @Override
     protected Teamc findTarget(Unit unit, float x, float y, float range, boolean air, boolean ground){
-        return Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team != unit.team && b.type().hittable, b -> b.dst2(Tmp.v1) * (Angles.angleDist(unit.angleTo(b), unit.rotation)/90));
+        return Groups.bullet.intersect(x - range, y - range, range*2, range*2).min(b -> b.team != unit.team && b.type().hittable, b -> b.dst2(Tmp.v1) * (Angles.angleDist(b.angleTo(unit), b.rotation())/90));
     }
 
     @Override
