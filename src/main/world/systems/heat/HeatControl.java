@@ -244,13 +244,27 @@ public class HeatControl implements SaveFileReader.CustomChunk {
     /**
      * Handles an exchange of heat between two grid tiles, of which the first parameter is the origin.
      */
-    public static void handleExchange(HeatState state1, HeatState state2){
+    public static float handleExchange(HeatState state1, HeatState state2){
         float flow = calculateFlow(state1.mass, state2.mass, kelvins(state1), kelvins(state2), state1.material, state2.material);
 
         //Flow calculations are reused for both tiles, keeping with conservation of energy, and avoiding double ups on calculation.
         state1.flow += flow;
         state2.flow -= flow;
+
+        return flow;
     }
+    public static float handleExchange(HeatState state1, HeatState state2, float rate){
+        float flow = calculateFlow(state1.mass, state2.mass, kelvins(state1), kelvins(state2), state1.material, state2.material);
+
+        flow /= rate;
+
+        //Flow calculations are reused for both tiles, keeping with conservation of energy, and avoiding double ups on calculation.
+        state1.flow += flow;
+        state2.flow -= flow;
+
+        return flow;
+    }
+
 
     @Override
     public void write(DataOutput stream) throws IOException {

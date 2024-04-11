@@ -1,5 +1,6 @@
 package main.world.blocks.core;
 
+import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
@@ -14,6 +15,8 @@ import main.world.systems.upgrades.UpgradeEntry;
 import main.world.module.UpgradeModule;
 import main.world.systems.upgrades.UpgradeState;
 import mindustry.gen.Building;
+import mindustry.graphics.Drawf;
+import mindustry.graphics.Pal;
 import mindustry.world.blocks.storage.CoreBlock;
 
 //TODO: Implement heat for the core
@@ -64,6 +67,11 @@ public class BaseCore extends CoreBlock implements BaseBlockType {
         @Override
         public void upgraded(UpgradeState state) {
 
+        }
+
+        @Override
+        public void drawLight(){
+            Drawf.light(x, y, lightRadius, lightColor, lightColor.a * 0.9f + Mathf.absin(20f, lightColor.a * 0.1f));
         }
 
         @Override

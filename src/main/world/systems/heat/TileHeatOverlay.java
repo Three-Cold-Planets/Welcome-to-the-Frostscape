@@ -24,7 +24,7 @@ public class TileHeatOverlay {
             if (chunk.state.enabled) Draw.color(Color.white);
             else Draw.color(Color.red, Pal.remove, Mathf.absin(30, 1));
             Lines.stroke(0.5f + (enabled ? Mathf.absin(1.5f, 1) : 0.5f));
-            Lines.rect(chunk.x * Vars.tilesize, chunk.y * Vars.tilesize, HeatControl.chunkSize * Vars.tilesize, HeatControl.chunkSize * Vars.tilesize);
+            Lines.rect((chunk.x - 0.5f) * Vars.tilesize, (chunk.y - 0.5f) * Vars.tilesize, HeatControl.chunkSize * Vars.tilesize, HeatControl.chunkSize * Vars.tilesize);
         }
 
         for (int i = 0; i < HeatControl.s; i++) {

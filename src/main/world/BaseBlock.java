@@ -8,7 +8,7 @@ import main.world.systems.upgrades.Upgrade;
 import main.world.systems.upgrades.UpgradeEntry;
 import mindustry.world.Block;
 
-/** Base building block for upgradeable blocks in Frostscape. Use as example/boilerplate for implementing upgrades in vanilla blocks */
+/** Base building block for upgradeable blocks in Frostscape. Use as example/boilerplate for implementing custom systems in vanilla blocks */
 public class BaseBlock extends Block implements BaseBlockType{
     public BaseBlock(String name) {
         super(name);

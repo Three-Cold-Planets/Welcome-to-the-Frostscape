@@ -31,6 +31,9 @@ public class BlockHeatModule {
     };
 
     public static class ExchangeArea{
+
+        public boolean rotate = false;
+
         //Offsets from the block's tile
         public byte x, y,
         //Offset to the

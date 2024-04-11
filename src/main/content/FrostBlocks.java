@@ -1,6 +1,5 @@
 package main.content;
 import arc.Core;
-import arc.Graphics;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -19,16 +18,16 @@ import main.entities.BaseBulletType;
 import main.entities.bullet.BouncyBulletType;
 import main.entities.bullet.ChainLightningBulletType;
 import main.entities.bullet.RicochetBulletType;
-import main.entities.comp.HeatComp;
 import main.entities.part.AccelPartProgress;
 import main.entities.part.EffectPart;
 import main.gen.Heatc;
-import main.gen.PortaLaserc;
 import main.graphics.Layers;
 import main.graphics.ModPal;
 import main.math.Interps;
 import main.math.Math3D;
 import main.util.DrawUtils;
+import main.world.BaseBlock;
+import main.world.TestHeatBlock;
 import main.world.blocks.BankBlock;
 import main.world.blocks.drawers.*;
 import main.world.blocks.plug.PlugBlock;
@@ -63,16 +62,15 @@ import mindustry.graphics.CacheLayer;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
-import mindustry.io.TypeIO;
 import mindustry.type.*;
 import mindustry.type.unit.MissileUnitType;
-import mindustry.ui.dialogs.DatabaseDialog;
 import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.environment.*;
-import mindustry.world.blocks.production.AttributeCrafter;
-import mindustry.world.blocks.storage.CoreBlock;
+import mindustry.world.blocks.payloads.PayloadConveyor;
+import mindustry.world.blocks.power.PowerGenerator;
+import mindustry.world.blocks.production.BeamDrill;
 import mindustry.world.blocks.units.UnitCargoLoader;
 import mindustry.world.blocks.units.UnitCargoUnloadPoint;
 import mindustry.world.consumers.ConsumeLiquid;
@@ -135,6 +133,10 @@ public class FrostBlocks {
 
     maficBoulder,
 
+    //POIs - hollus
+
+    magnetiteObelisk,
+
     //walls - hollus
     frostWall, volcanicAndesiteWall, magnetiteAndesite, grayWall, sulphurGraystone, wornWall, volcanicDaciteWall, tephraWall,
 
@@ -168,6 +170,9 @@ public class FrostBlocks {
 
     //spawn - hollus
     teleporterFocus,
+
+    //heat - test
+    heatGrating, heatExchanger,
 
     //power - complex
     powerPlug, powerPlugLarge, conductiveWall,
@@ -674,7 +679,12 @@ public class FrostBlocks {
             variants = 2;
         }};
 
+        magnetiteObelisk = new OrePOI("magnetite-obelisk"){{
+
+        }};
+
         //endregion
+
 
         //region defense
 
@@ -738,42 +748,6 @@ public class FrostBlocks {
             tileDamage = 0.75f;
             warmupSpeed = 0.04f;
             warmDownSpeed = 0.15f;
-
-            heat = new BlockHeatModule(){{
-                material = FrostMaterials.stone;
-                mass = 50;
-            }};
-
-            parts(
-                new BlockHeatModule.PartEntry() {{
-                    tileFlowmap.addAll(
-                        new BlockHeatModule.ExchangeArea(){{
-                            x = -4;
-                            y = 0;
-                            width = 1;
-                            height = 1;
-                            mass = 15;
-
-                            rate = 5;
-                            material = FrostMaterials.stone;
-
-                            layerBitmask = 1;
-                        }},
-                        new BlockHeatModule.ExchangeArea(){{
-                            x = 0;
-                            y = 0;
-                            width = 1;
-                            height = 1;
-                            mass = 15;
-
-                            rate = 5;
-                            material = FrostMaterials.stone;
-
-                            layerBitmask = 1 | 2;
-                        }}
-                    );
-                }}
-            );
 
             entries.addAll(
                     new UpgradeEntry(FrostUpgrades.improvedBase){{
@@ -902,6 +876,74 @@ public class FrostBlocks {
         //endregion
 
         //region power
+
+        heatGrating = new TestHeatBlock("heat-grating"){{
+            size = 2;
+            requirements(Category.crafting, ItemStack.with());
+            rotateDraw = false;
+            drawer = new DrawMulti(
+                    new DrawDefault(),
+                    new DrawDefaultRotated("-grid")
+            );
+
+            heat = new BlockHeatModule(){{
+                material = FrostMaterials.stone;
+                mass = 50;
+            }};
+
+            parts(
+                    new BlockHeatModule.PartEntry() {{
+                        material = FrostMaterials.stone;
+                        mass = 81;
+                        tileFlowmap.addAll(
+                                new BlockHeatModule.ExchangeArea(){{
+                                    rotate = true;
+                                    x = 2;
+                                    y = 0;
+                                    width = 1;
+                                    height = 2;
+                                    rate = 1;
+
+                                    layerBitmask = 1;
+                                }}
+                        );
+                    }}
+            );
+        }};
+
+        heatExchanger = new TestHeatBlock("heat-exchanger") {{
+            size = 3;
+            requirements(Category.crafting, ItemStack.with());
+            rotateDraw = false;
+            drawer = new DrawMulti(
+                new DrawDefault(),
+                new DrawDefaultRotated("-grid")
+            );
+
+            heat = new BlockHeatModule(){{
+                material = FrostMaterials.stone;
+                mass = 50;
+            }};
+
+            parts(
+                    new BlockHeatModule.PartEntry() {{
+                        material = FrostMaterials.stone;
+                        mass = 81;
+                        tileFlowmap.addAll(
+                                new BlockHeatModule.ExchangeArea(){{
+                                    rotate = true;
+                                    x = 2;
+                                    y = -1;
+                                    width = 1;
+                                    height = 3;
+                                    rate = 1;
+
+                                    layerBitmask = 1;
+                                }}
+                        );
+                    }}
+            );
+        }};
 
         powerPlug = new PowerPlug("power-plug"){{
             requirements(Category.power, with(FrostItems.rust, 30));

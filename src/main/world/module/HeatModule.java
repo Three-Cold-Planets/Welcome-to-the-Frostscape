@@ -38,8 +38,6 @@ public class HeatModule extends BlockModule {
         }
 
         module.states = states;
-        Log.info("setup states!");
-        Log.info(module.states);
     }
 
     public void finalizeEnergy(){
@@ -48,7 +46,7 @@ public class HeatModule extends BlockModule {
         base.flow = 0;
         for (EntityHeatState state : states) {
             state.addEnergy(state.flow);
-            state.lastFlow = base.flow;
+            state.lastFlow = state.flow;
             state.flow = 0;
         }
     }

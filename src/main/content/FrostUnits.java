@@ -71,7 +71,7 @@ import static main.Frostscape.NAME;
 public class FrostUnits {
 
     public static UnitType serpieDrone,
-    sunspot, javelin, stalagmite, cord, ghoul, manta, flyfish, andon;
+    sunspot, javelin, stalagmite, cord, ghoul, manta, munk, flyfish, andon;
 
     public static @Annotations.EntityDef({Unitc.class, PortaLaserc.class}) UnitType upgradeDrone;
 
@@ -473,6 +473,7 @@ public class FrostUnits {
         }};
 
         manta = new HollusTankUnitType("manta"){{
+            families.add(Families.assault);
             lightOpacity = 0.15f;
             lightRadius = 65;
             constructor = TankUnit::create;
@@ -483,7 +484,7 @@ public class FrostUnits {
             rotateSpeed = 5.5f;
             accel = 0.075f;
             speed = 2.7f;
-            treadFrames = 14;
+            treadFrames = 16;
             hitSize = 15;
             treadRects = new Rect[]{
                     new Rect(6 - 36, 25 - 45, 11, 16),
@@ -583,7 +584,28 @@ public class FrostUnits {
             }});
         }};
 
+        munk = new HollusUnitType("munk"){{
+            families.add(Families.support);
+            lightOpacity = 0.15f;
+            lightRadius = 65;
+            constructor = TankUnit::create;
+            rotateMoveFirst = false;
+            health = 650;
+            armor = 4;
+            drag = 0.085f;
+            rotateSpeed = 5.5f;
+            accel = 0.075f;
+            speed = 2.7f;
+            treadFrames = 16;
+            hitSize = 15;
+            treadRects = new Rect[]{
+                    new Rect(6 - 36, 20 - 45, 11, 16),
+                    new Rect(4-36, 49-45, 12, 28)
+            };
+        }};
+
         flyfish = new HollusUnitType("flyfish"){{
+            families.add(Families.swarm);
             lightOpacity = 0.15f;
             lightRadius = 65;
             constructor = TankUnit::create;
@@ -640,7 +662,7 @@ public class FrostUnits {
             };
 
             abilities.add(
-                    new RamDamageAbility(65, 10, 0, 37/4, 2.5f, 3.75f, 0, 0.75f, -25, true, false, Fx.none, Fx.hitBulletSmall),
+                    new RamDamageAbility(450, 10, 0, 37/4, 0, 1, 0, 0.75f, -25, true, false, Fx.none, Fx.hitBulletSmall),
                     new SelfDamageAbility(){{
                         damage = 15;
                         pierceArmor = true;
@@ -655,43 +677,54 @@ public class FrostUnits {
 
 
             weapons.add(
-                new Weapon(){
-                    {
-                        shootOnDeath = true;
-                        shootCone = 180;
-                        reload = 60;
-                        ejectEffect = Fx.none;
-                        shootSound = Sounds.none;
-                        x = y;
-                        mirror = false;
-                        noAttack = true;
-                        controllable = false;
-                        rotate = false;
-                        inaccuracy = 0;
+                //Purely here to make the ai shoot on close targets
+                new Weapon() {{
+                    rotate = false;
+                    mirror = false;
+                    shootCone = 35;
+                    x = y = 0;
+                    shoot.shots = 0;
+                    shootSound = Sounds.none;
+                    bullet = new BulletType(){{
+                        rangeOverride = 35;
+                    }};
+                }},
+                new Weapon(){{
+                    shootOnDeath = true;
+                    shootCone = 180;
+                    reload = 60;
+                    ejectEffect = Fx.none;
+                    shootSound = Sounds.none;
+                    x = y;
+                    mirror = false;
+                    noAttack = true;
+                    controllable = false;
+                    rotate = false;
+                    inaccuracy = 0;
 
-                        bullet = new ContinuousFlameBulletType() {{
-                            shootEffect = new Effect(35, e -> {
-                                Draw.color(Color.gray);
-                                Angles.randLenVectors(e.id, 15, e.finpow() * 35 + 5, e.rotation + 180, 25, (x, y) -> {
-                                    Fill.circle(e.x + x, e.y + y, e.fout(Interp.pow4) * 4);
-                                });
+                    bullet = new ContinuousFlameBulletType() {{
+                        shootEffect = new Effect(35, e -> {
+                            Draw.color(Color.gray);
+                            Angles.randLenVectors(e.id, 15, e.finpow() * 35 + 5, e.rotation + 180, 25, (x, y) -> {
+                                Fill.circle(e.x + x, e.y + y, e.fout(Interp.pow4) * 4);
                             });
-                            lifetime = 25;
-                            recoil = 0.01f;
-                            damage = 250;
-                            length = 35;
-                            width = 4;
-                            knockback = 1.0F;
-                            pierceCap = 2;
-                            pierceBuilding = true;
-                            drawFlare = false;
-                            colors = new Color[]{Color.valueOf("eb7abe").a(0.55F), Color.valueOf("e189f5").a(0.7F), Color.valueOf("907ef7").a(0.8F), Color.valueOf("91a4ff"), Color.white};
-                        }};
-                        shootStatus = StatusEffects.slow;
-                        shootStatusDuration = 15;
-                        parentizeEffects = false;
-                        predictTarget = false;
-                    }},
+                        });
+                        lifetime = 25;
+                        recoil = 0.01f;
+                        damage = 250;
+                        length = 35;
+                        width = 4;
+                        knockback = 1.0F;
+                        pierceCap = 2;
+                        pierceBuilding = true;
+                        drawFlare = false;
+                        colors = new Color[]{Color.valueOf("eb7abe").a(0.55F), Color.valueOf("e189f5").a(0.7F), Color.valueOf("907ef7").a(0.8F), Color.valueOf("91a4ff"), Color.white};
+                    }};
+                    shootStatus = StatusEffects.slow;
+                    shootStatusDuration = 15;
+                    parentizeEffects = false;
+                    predictTarget = false;
+                }},
                 new Weapon(){{
                     reload = 25;
                     x = 24/4;
@@ -709,14 +742,14 @@ public class FrostUnits {
                     shootY = 1f;
                     bullet = new ContinuousFlameBulletType() {{
                         recoil = -0.15f;
-                        this.damage = 35;
-                        this.length = 8.5f;
+                        damage = 35;
+                        length = 8.5f;
                         width = 2;
-                        this.knockback = 1.0F;
-                        this.pierceCap = 1;
-                        this.buildingDamageMultiplier = 0.3F;
+                        knockback = 1.0F;
+                        pierceCap = 1;
+                        buildingDamageMultiplier = 0.3F;
                         drawFlare = false;
-                        this.colors = new Color[]{Color.valueOf("eb7abe").a(0.55F), Color.valueOf("e189f5").a(0.7F), Color.valueOf("907ef7").a(0.8F), Color.valueOf("91a4ff"), Color.white};
+                        colors = new Color[]{Color.valueOf("eb7abe").a(0.55F), Color.valueOf("e189f5").a(0.7F), Color.valueOf("907ef7").a(0.8F), Color.valueOf("91a4ff"), Color.white};
                     }};
                     parentizeEffects = false;
                     continuous = alwaysContinuous = true;
