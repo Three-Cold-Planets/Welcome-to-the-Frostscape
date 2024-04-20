@@ -27,6 +27,8 @@ Thanks to
 
 - [🔅StaBU🔆#1820](https://github.com/xStaBUx) for fixing the buildscript
 
+- [Leo](https://github.com/Leo-MathGuy) for the python bundle script
+
 -Determiedmech1#6702, Ssem#4539, PsychicFireSong#5026 on discord for being active on mod suggestions in Mod Centre (Join the server [here](https://discord.gg/XrFhAZys7T))
 
 -[Goobrr](https://github.com/Goobrr) for the [Grimoire](https://github.com/Goobrr/Grimoire) API
