@@ -56,7 +56,7 @@ with open("bundle.properties") as f:
             continue
 
         if line.startswith("#"):
-            comment = line.strip().split("#")[-1].strip().upper()
+            comment = line.strip().split("#")[-1].strip()
             comments.append(comment)
             master_bundle.append(("comments", comments[-1]))
             if debug:
